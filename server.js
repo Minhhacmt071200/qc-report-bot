@@ -12,8 +12,9 @@ const { generateReportFile } = require('./report');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
-  res.send('QC Report Bot API is running successfully!');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 const UPLOAD_ROOT = path.join(__dirname, '..', 'data', 'uploads');
 const REPORT_ROOT = path.join(__dirname, '..', 'data', 'reports');
