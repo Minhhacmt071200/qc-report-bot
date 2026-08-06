@@ -1,55 +1,527 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QC Report Bot</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-    }
-    h2 { color: #333; margin-bottom: 20px; }
-    input[type="file"], input[type="text"] {
-      margin-bottom: 15px;
-      width: 100%;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover { background-color: #0056b3; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Báo cáo QC - Sakuko Vietnam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0B2545;
+            --navy-light: #134074;
+            --accent-pink: #D96584;
+            --accent-pink-hover: #c45271;
+            --bg-main: #F4F7FC;
+            --white: #FFFFFF;
+            --text-dark: #1D2D44;
+            --text-muted: #748A9D;
+            --border: #E2E8F0;
+            --danger: #E63946;
+            --warning: #F4A261;
+            --success: #2A9D8F;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR MENU --- */
+        aside {
+            width: 260px;
+            background-color: var(--navy);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .sidebar-brand {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand img {
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            background: white;
+            object-fit: contain;
+            padding: 3px;
+        }
+        .sidebar-brand h2 { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-brand span { font-size: 11px; color: var(--accent-pink); display: block; }
+
+        .sidebar-menu { list-style: none; padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; }
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #A0AEC0;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .sidebar-menu li.active a, .sidebar-menu li a:hover {
+            background-color: var(--navy-light);
+            color: var(--white);
+        }
+        .sidebar-menu li.active a { border-left: 4px solid var(--accent-pink); }
+
+        .sidebar-footer { padding: 16px; font-size: 12px; color: #A0AEC0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        header {
+            background: var(--white);
+            padding: 16px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        .breadcrumb { font-size: 13px; color: var(--text-muted); margin-bottom: 3px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--navy); }
+        
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .notification-bell { position: relative; cursor: pointer; font-size: 18px; color: var(--text-muted); }
+        .notification-bell::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--accent-pink); border-radius: 50%;
+        }
+        .user-profile { display: flex; align-items: center; gap: 10px; background: var(--bg-main); padding: 6px 14px; border-radius: 20px; }
+        .user-profile img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        .user-info .name { font-size: 13px; font-weight: 600; }
+        .user-info .role { font-size: 11px; color: var(--accent-pink); }
+
+        .content-body { flex: 1; overflow-y: auto; padding: 30px; display: none; }
+        .content-body.active { display: block; }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+        }
+        .card h3 { font-size: 16px; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+        /* Dashboard Stats & Filter */
+        .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid var(--border); }
+        .filter-group { display: flex; gap: 12px; align-items: center; font-size: 13px; font-weight: 500; }
+        .filter-group select { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); outline: none; background: var(--bg-main); font-size: 13px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--navy); }
+        .stat-card.pink { border-left-color: var(--accent-pink); }
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-title { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--navy); margin-top: 8px; }
+
+        /* Tables & UI Components */
+        table.hybrid-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        table.hybrid-table th, table.hybrid-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+        table.hybrid-table th { background: var(--bg-main); color: var(--navy); font-weight: 600; }
+        table.hybrid-table input { width: 100%; border: none; background: transparent; font-size: 13px; outline: none; }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge.high { background: #FFD8D8; color: var(--danger); }
+        .badge.medium { background: #FFE8CC; color: #D97706; }
+        .badge.low { background: #D1F5EE; color: var(--success); }
+
+        .btn {
+            background-color: var(--accent-pink); color: var(--white); border: none; padding: 10px 20px;
+            font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn:hover { background-color: var(--accent-pink-hover); }
+        .btn-navy { background-color: var(--navy); }
+        .btn-navy:hover { background-color: var(--navy-light); }
+        .actions-bar { margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px; }
+
+        /* AI Studio Grid Sub-sections */
+        .ai-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .dropzone {
+            border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; background: #FAFAFC; cursor: pointer; transition: all 0.2s;
+        }
+        .dropzone:hover { border-color: var(--accent-pink); background: #FFF5F7; }
+        .ocr-result-box { background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; color: var(--text-dark); margin-top: 10px; height: 110px; overflow-y: auto; }
+
+        .prompt-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .prompt-item { background: #F8FAFC; border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* FLOATING CHATBOT WIDGET */
+        .chat-widget-btn {
+            position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px;
+            background: var(--accent-pink); color: white; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; transition: transform 0.2s;
+        }
+        .chat-widget-btn:hover { transform: scale(1.05); }
+
+        .chat-window {
+            position: fixed; bottom: 96px; right: 24px; width: 380px; height: 500px;
+            background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; overflow: hidden; z-index: 1000; border: 1px solid var(--border);
+            display: none;
+        }
+        .chat-window.open { display: flex; }
+        .chat-header { background: var(--navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
+        .chat-close { cursor: pointer; font-size: 16px; color: #A0AEC0; }
+        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: var(--bg-main); display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 85%; line-height: 1.4; word-break: break-word; }
+        .msg.bot { background: white; color: var(--text-dark); border: 1px solid var(--border); align-self: flex-start; }
+        .msg.user { background: var(--accent-pink); color: white; align-self: flex-end; }
+        
+        .chat-quick-prompts { padding: 8px 12px; background: white; border-top: 1px solid var(--border); display: flex; gap: 6px; overflow-x: auto; }
+        .prompt-chip { background: var(--bg-main); border: 1px solid var(--border); padding: 4px 10px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; color: var(--navy); font-weight: 500; }
+        .prompt-chip:hover { background: #E2E8F0; }
+
+        .chat-input-area { padding: 10px; background: white; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+        .chat-input-area input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h2>🤖 QC Report Bot</h2>
-    <p>Hệ thống xử lý báo cáo tự động</p>
-    <form action="/api/batches" method="POST" enctype="multipart/form-data">
-      <input type="text" name="thang" placeholder="Nhập tháng (VD: 2026-08)" required>
-      <input type="file" name="files" multiple required>
-      <br><br>
-      <button type="submit">Tải file lên & Xử lý</button>
-    </form>
-  </div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside>
+        <div>
+            <div class="sidebar-brand">
+                <img src="logo-sakuko.png" alt="Sakuko Logo" onerror="this.src='https://via.placeholder.com/38'">
+                <div>
+                    <h2>SAKUKO QC</h2>
+                    <span>Kiểm Soát Chất Lượng</span>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#" onclick="switchTab('dashboard', this)">📊 Tổng quan & Thời gian thực</a></li>
+                <li><a href="#" onclick="switchTab('reports', this)">📁 Quản lý Đợt Báo Cáo</a></li>
+                <li><a href="#" onclick="switchTab('ai-studio', this)">🤖 AI Studio & Nâng cao</a></li>
+                <li><a href="#" onclick="switchTab('config', this)">⚙️ Cấu hình & Danh mục</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            Sakuko Vietnam &copy; 2026
+        </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <header>
+            <div>
+                <div class="breadcrumb" id="breadcrumbNav">Trang chủ > Tổng quan hệ thống</div>
+                <div class="page-title" id="pageTitleText">Tổng quan Chất lượng (Dashboard)</div>
+            </div>
+            <div class="header-actions">
+                <div class="notification-bell" title="Thông báo mới">🔔</div>
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Avatar">
+                    <div class="user-info">
+                        <div class="name">Nguyễn Thị Minh Hà</div>
+                        <div class="role">QC Admin</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD MODULE (Tính năng 4: Dashboard đa chiều theo thời gian thực) -->
+        <div class="content-body active" id="dashboard">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <span>🕒 Lọc thời gian:</span>
+                    <select id="timeFilter" onchange="updateDashboardFilter()">
+                        <option value="month">Tháng 08/2026 (Hiện tại)</option>
+                        <option value="week4">Tuần 4 - Tháng 08</option>
+                        <option value="week3">Tuần 3 - Tháng 08</option>
+                        <option value="quarter">Quý 3/2026</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <span>🏢 Cơ sở:</span>
+                    <select id="unitFilter" onchange="updateDashboardFilter()">
+                        <option value="all">Tất cả hệ thống</option>
+                        <option value="kho">Kho Tổng S-grow</option>
+                        <option value="linhdam">SKK Linh Đàm</option>
+                        <option value="nguyentuan">SKK Nguyễn Tuân</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Tổng đợt báo cáo</div>
+                    <div class="stat-value" id="statReports">12 đợt</div>
+                </div>
+                <div class="stat-card pink">
+                    <div class="stat-title">Lỗi phát sinh cao</div>
+                    <div class="stat-value" id="statHighErrors">4 lỗi</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-title">Đang xử lý/chờ duyệt</div>
+                    <div class="stat-value" id="statPending">2 đợt</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-title">Tỷ lệ khắc phục KPI</div>
+                    <div class="stat-value" id="statKPI">96.4%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 Biểu đồ xu hướng lỗi theo thời gian thực</h3>
+                <div id="chartContainerBox" style="height: 220px; display: flex; align-items: center; justify-content: center; background: #F8FAFC; border-radius: 8px; color: var(--navy); font-weight: 600; font-size: 14px;">
+                    📊 Đang hiển thị biểu đồ phân tích lỗi chi tiết theo mốc thời gian đã chọn...
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORTS MODULE -->
+        <div class="content-body" id="reports">
+            <div class="card">
+                <h3>📁 Danh sách các kỳ kiểm soát chất lượng</h3>
+                <table class="hybrid-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đợt</th>
+                            <th>Kỳ báo cáo</th>
+                            <th>Đơn vị / Cơ sở</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#QC-2026-081</td>
+                            <td>Tháng Tám 2026</td>
+                            <td>Kho Tổng S-grow</td>
+                            <td><span class="badge medium">Đang soạn thảo</span></td>
+                            <td><button class="btn" style="padding: 4px 10px; font-size: 11px;" onclick="switchTab('ai-studio', document.querySelectorAll('.sidebar-menu a')[2])">Mở AI Studio</button></td>
+                        </tr>
+                        <tr>
+                            <td>#QC-2026-082</td>
+                            <td>Tháng Tám 2026</td>
+                            <td>Siêu thị SKK Linh Đàm</td>
+                            <td><span class="badge low">Đã duyệt</span></td>
+                            <td><button class="btn btn-navy" style="padding: 4px 10px; font-size: 11px;">Xem Word</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AI STUDIO & ADVANCED FEATURES MODULE -->
+        <div class="content-body" id="ai-studio">
+            <!-- Tính năng 1 & 2: OCR Biên bản & Kho Prompt -->
+            <div class="ai-grid-2col">
+                <div class="card">
+                    <h3>📷 1. Trích xuất OCR Biên bản (Chữ viết tay / Con dấu)</h3>
+                    <div class="dropzone" onclick="triggerOCRScan()">
+                        <span style="font-size: 26px;">📥</span>
+                        <p style="font-size: 12px;"><b>Tải lên ảnh biên bản kiểm tra</b></p>
+                    </div>
+                    <div class="ocr-result-box" id="ocrResultArea">
+                        <b>Kết quả nhận diện OCR tự động:</b><br>
+                        - Trạng thái: Sẵn sàng quét văn bản.<br>
+                        - Nhấp vào vùng trên để giả lập nhận diện chữ viết tay kiểm kê kho/siêu thị.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📚 2. Kho lưu trữ mẫu Prompt chuyên sâu</h3>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Mẫu prompt QC Admin đang sử dụng:</div>
+                    <div class="prompt-list">
+                        <div class="prompt-item">
+                            <span><b>[Khối Kho]</b> Tóm tắt sai lệch tồn kho & nguyên nhân</span>
+                            <button class="btn" style="padding: 2px 6px; font-size: 11px;" onclick="alert('Đã áp dụng mẫu Prompt Kho vào AI Studio!')">Dùng</button>
+                        </div>
+                        <div class="prompt-item">
+                            <span><b>[Khối Siêu thị]</b> Kiểm tra nhãn giá & hạn sử dụng SKU</span>
+                            <button class="btn" style="padding: 2px 6px; font-size: 11px;" onclick="alert('Đã áp dụng mẫu Prompt Siêu thị vào AI Studio!')">Dùng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tính năng 3: Cảnh báo chéo tồn kho (Cross-check) -->
+            <div class="card">
+                <h3>⚠️ 3. Cảnh báo chéo tồn kho tự động (Cross-check Liên cơ sở)</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Hệ thống tự động đối chiếu dữ liệu xuất giữa Kho Tổng S-grow và lượng nhận thực tế tại các siêu thị vệ tinh để phát hiện thất thoát sớm.</p>
+                <table class="hybrid-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SKU / Sản phẩm</th>
+                            <th>Kho Tổng S-grow (Xuất)</th>
+                            <th>SKK Linh Đàm (Nhận)</th>
+                            <th>SKK Nguyễn Tuân (Nhận)</th>
+                            <th>Cảnh báo chênh lệch</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SKU-8821 (Bánh kẹo Nhật)</td>
+                            <td>120 thùng</td>
+                            <td>50 thùng</td>
+                            <td>70 thùng</td>
+                            <td><span class="badge low">Khớp tuyệt đối</span></td>
+                        </tr>
+                        <tr>
+                            <td>SKU-4902 (Mỹ phẩm dưỡng da)</td>
+                            <td>80 hộp</td>
+                            <td>30 hộp</td>
+                            <td>45 hộp</td>
+                            <td><span class="badge high">Thiếu hụt 5 hộp (Cần kiểm tra)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CONFIG MODULE -->
+        <div class="content-body" id="config">
+            <div class="card">
+                <h3>⚙️ Cấu hình hệ thống & Danh mục chuẩn</h3>
+                <p style="font-size: 13px; color: var(--text-muted);">Quản lý danh sách các siêu thị (SKK Nguyễn Tuân, SKK Linh Đàm, 39 Beef Tô Hiệu...), danh mục lỗi tiêu chuẩn và quyền hạn kiểm duyệt.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING CHATBOT WIDGET -->
+    <div class="chat-widget-btn" onclick="toggleChatWindow()" title="Trợ lý Sakuko QC Bot">🤖</div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>Trợ lý Sakuko QC Bot (AI Enhanced)</span>
+            <span class="chat-close" onclick="toggleChatWindow()">&#10005;</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="msg bot">Xin chào Nguyễn Thị Minh Hà! Hệ thống đã được tích hợp đầy đủ 4 tính năng nâng cao (OCR biên bản, Kho Prompt, Cross-check tồn kho và Dashboard thời gian thực). Chị cần hỗ trợ kiểm tra phần nào ạ?</div>
+        </div>
+        <div class="chat-quick-prompts">
+            <span class="prompt-chip" onclick="sendQuickPrompt('Tóm tắt kết quả Cross-check tồn kho mới nhất')">Cross-check tồn kho</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Gợi ý hành động khắc phục cho Kho Tổng')">Gợi ý cho Kho Tổng</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Đánh giá hiệu suất xử lý lỗi tháng này')">Hiệu suất tháng này</span>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInputUser" placeholder="Hỏi bất cứ điều gì về QC, báo cáo, hệ thống..." onkeypress="handleChatEnter(event)">
+            <button class="btn" style="padding: 6px 12px;" onclick="sendUserChat()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        // Điều hướng Tab Sidebar
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.content-body').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if(element) element.parentElement.classList.add('active');
+
+            const titles = {
+                'dashboard': ['Trang chủ > Tổng quan & Thời gian thực', 'Tổng quan Chất lượng (Dashboard)'],
+                'reports': ['Trang chủ > Quản lý đợt báo cáo', 'Danh sách các kỳ báo cáo QC'],
+                'ai-studio': ['Trang chủ > AI Studio & Nâng cao', 'Phân tích thông minh, OCR & Cross-check'],
+                'config': ['Trang chủ > Cấu hình', 'Cấu hình hệ thống & Danh mục']
+            };
+            document.getElementById('breadcrumbNav').innerText = titles[tabId][0];
+            document.getElementById('pageTitleText').innerText = titles[tabId][1];
+        }
+
+        // Tính năng 4: Lọc Dashboard thời gian thực
+        function updateDashboardFilter() {
+            const time = document.getElementById('timeFilter').value;
+            const unit = document.getElementById('unitFilter').value;
+            
+            if(time === 'week4') {
+                document.getElementById('statReports').innerText = '3 đợt';
+                document.getElementById('statHighErrors').innerText = '1 lỗi';
+                document.getElementById('statPending').innerText = '0 đợt';
+                document.getElementById('statKPI').innerText = '98.2%';
+                document.getElementById('chartContainerBox').innerText = '📈 Biểu đồ lọc riêng cho Tuần 4 - Tháng 08/2026: Tỷ lệ lỗi đã giảm 15%.';
+            } else if(time === 'week3') {
+                document.getElementById('statReports').innerText = '4 đợt';
+                document.getElementById('statHighErrors').innerText = '2 lỗi';
+                document.getElementById('statPending').innerText = '1 đợt';
+                document.getElementById('statKPI').innerText = '95.0%';
+                document.getElementById('chartContainerBox').innerText = '📈 Biểu đồ lọc riêng cho Tuần 3 - Tháng 08/2026: Ghi nhận tăng đột biến lỗi tồn kho.';
+            } else {
+                document.getElementById('statReports').innerText = '12 đợt';
+                document.getElementById('statHighErrors').innerText = '4 lỗi';
+                document.getElementById('statPending').innerText = '2 đợt';
+                document.getElementById('statKPI').innerText = '96.4%';
+                document.getElementById('chartContainerBox').innerText = '📊 Đang hiển thị tổng quan toàn hệ thống tháng 08/2026.';
+            }
+        }
+
+        // Tính năng 1: Giả lập OCR Biên bản
+        function triggerOCRScan() {
+            const box = document.getElementById('ocrResultArea');
+            box.innerHTML = '🔄 <b>Đang quét ảnh biên bản...</b><br>Đã trích xuất thành công chữ viết tay:<br><i>"Kho S-grow xuất bù lô hàng SKU-4902 ngày 05/08. Chữ ký xác nhận: Trưởng kho."</i>';
+        }
+
+        // Chatbot Widget & Trí thông minh nhân tạo
+        function toggleChatWindow() {
+            document.getElementById('chatWindow').classList.toggle('open');
+        }
+
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const msg = document.createElement('div');
+            msg.className = `msg ${sender}`;
+            msg.innerText = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function generateAIResponse(question) {
+            const q = question.toLowerCase();
+
+            if (q.includes('cross-check') || q.includes('tồn kho') || q.includes('chéo')) {
+                return "Kết quả Cross-check tồn kho mới nhất:\n- Hệ thống phát hiện chênh lệch 5 hộp SKU-4902 giữa Kho Tổng S-grow (xuất 80 hộp) và tổng nhận tại SKK Linh Đàm + SKK Nguyễn Tuân (chỉ nhận 75 hộp).\n- Đề xuất: Gửi biên bản yêu cầu thủ kho kiểm tra lại phiếu xuất hàng số #XK-882.";
+            }
+            if (q.includes('tóm tắt') || q.includes('nghiêm trọng') || q.includes('lỗi')) {
+                return "Dựa trên dữ liệu thời gian thực:\n- Kho Tổng S-grow: Sai lệch tồn kho lô hàng (Mức độ Cao).\n- SKK Linh Đàm: Sản phẩm cận date chưa dán tem (Mức độ Trung bình).\nToàn bộ đã được cập nhật vào bảng Cross-check và AI Studio.";
+            }
+            if (q.includes('hiệu suất') || q.includes('tháng này')) {
+                return "Hiệu suất xử lý lỗi tháng 08/2026 của chị Minh Hà đạt tỷ lệ khắc phục KPI là 96.4%, tăng 1.2% so với tháng trước. Các cơ sở như SKK Linh Đàm duy trì trạng thái tuân thủ rất tốt.";
+            }
+            return `Em đã tiếp nhận câu hỏi của chị: "${question}". Hệ thống quản lý QC đã sẵn sàng hỗ trợ chị phân tích dữ liệu, kiểm tra OCR biên bản hoặc trích xuất báo cáo Word ngay lập tức ạ!`;
+        }
+
+        function sendUserChat() {
+            const input = document.getElementById('chatInputUser');
+            if(!input.value.trim()) return;
+            const text = input.value;
+            appendMessage(text, 'user');
+            input.value = '';
+
+            const container = document.getElementById('chatMessages');
+            const thinkingMsg = document.createElement('div');
+            thinkingMsg.className = 'msg bot';
+            thinkingMsg.id = 'thinkingIndicator';
+            thinkingMsg.innerText = '🤖 Bot đang suy nghĩ và phân tích...';
+            container.appendChild(thinkingMsg);
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById('thinkingIndicator').remove();
+                const aiReply = generateAIResponse(text);
+                appendMessage(aiReply, 'bot');
+            }, 800);
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chatInputUser').value = promptText;
+            sendUserChat();
+        }
+
+        function handleChatEnter(e) {
+            if(e.key === 'Enter') sendUserChat();
+        }
+    </script>
 </body>
 </html>
