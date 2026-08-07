@@ -9,7 +9,9 @@ const db = require('./db');
 const { extractText } = require('./parsers');
 const { analyze } = require('./analyze');
 const { generateReportFile } = require('./report');
-
+const { callGroq } = require('./agent/groqClient');
+const { toolDefinitions, toolRegistry } = require('./agent/tools');
+const { getPending, setPending, clearPending } = require('./agent/pendingActions');
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -130,7 +132,81 @@ app.get('/api/batches/:id/download', (req, res) => {
   }
   res.download(analysisRow.report_path);
 });
+const chatSessions = new Map();
+const SYSTEM_PROMPT = `Bạn là "Trợ lý của Minh Hà", trợ lý QC cho hệ thống báo cáo chất lượng dịch vụ Sakuko.
+- Trả lời ngắn gọn, tự nhiên, bằng tiếng Việt.
+- Khi người dùng hỏi về batch, phân tích, hay xác nhận báo cáo, hãy gọi tool phù hợp thay vì tự bịa số liệu.
+- Không bao giờ nói đã "phát hành báo cáo" nếu confirm_batch chưa thật sự chạy xong.`;
 
+const CONFIRM_WORDS = ['xác nhận', 'đồng ý', 'ok làm đi', 'yes', 'confirm'];
+const REJECT_WORDS = ['huỷ', 'hủy', 'không đồng ý', 'thôi', 'cancel'];
+
+function getHistory(sessionId) {
+  if (!chatSessions.has(sessionId)) {
+    chatSessions.set(sessionId, [{ role: 'system', content: SYSTEM_PROMPT }]);
+  }
+  return chatSessions.get(sessionId);
+}
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { sessionId = 'default', message } = req.body;
+    if (!message) return res.status(400).json({ error: 'Thiếu message' });
+
+    const history = getHistory(sessionId);
+    const lower = message.trim().toLowerCase();
+    const pending = await getPending(sessionId);
+
+    if (pending && CONFIRM_WORDS.some((w) => lower.includes(w))) {
+      const payload = JSON.parse(pending.payload);
+      const tool = toolRegistry[pending.tool_name];
+      const result = await tool.handler(payload);
+      await clearPending(sessionId);
+      const reply = `Dạ em đã thực hiện xong: ${JSON.stringify(result)}`;
+      history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
+      return res.json({ reply });
+    }
+
+    if (pending && REJECT_WORDS.some((w) => lower.includes(w))) {
+      await clearPending(sessionId);
+      const reply = 'Dạ em đã huỷ, chưa có gì thay đổi ạ.';
+      history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
+      return res.json({ reply });
+    }
+
+    history.push({ role: 'user', content: message });
+    let assistantMsg = await callGroq(history, toolDefinitions);
+
+    if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
+      history.push(assistantMsg);
+
+      for (const call of assistantMsg.tool_calls) {
+        const toolName = call.function.name;
+        const args = JSON.parse(call.function.arguments || '{}');
+        const tool = toolRegistry[toolName];
+        if (!tool) continue;
+
+        if (tool.requiresConfirmation) {
+          await setPending(sessionId, toolName, args);
+          const reply = `Em sẽ thực hiện: **${toolName}** (${JSON.stringify(args)}). Chị gõ "xác nhận" để em làm, hoặc "huỷ" nếu không cần nữa nhé.`;
+          history.push({ role: 'assistant', content: reply });
+          return res.json({ reply, needsConfirmation: true });
+        }
+
+        const result = await tool.handler(args);
+        history.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) });
+      }
+
+      assistantMsg = await callGroq(history, toolDefinitions);
+    }
+
+    history.push({ role: 'assistant', content: assistantMsg.content });
+    res.json({ reply: assistantMsg.content });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
 app.get('/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
 // ---- Lịch tự động: ngày 1 hàng tháng, tự tìm batch "uploaded" mới nhất và chạy /analyze ----
