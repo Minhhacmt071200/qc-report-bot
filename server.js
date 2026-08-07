@@ -1,237 +1,118 @@
-require('dotenv').config();
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const cron = require('node-cron');
+// agent/geminiClient.js
+// Gọi Gemini API (generateContent), hỗ trợ function calling (tools).
+// callGemini() nhận messages/tools theo format kiểu OpenAI để phần còn
+// lại của code (server.js) không cần đổi cấu trúc - file này lo việc
+// chuyển đổi qua lại giữa 2 định dạng.
 
-const db = require('./db');
-const { extractText } = require('./parsers');
-const { analyze } = require('./analyze');
-const { generateReportFile } = require('./report');
-const { callGroq } = require('./agent/groqClient');
-const { toolDefinitions, toolRegistry } = require('./agent/tools');
-const { getPending, setPending, clearPending } = require('./agent/pendingActions');
-const app = express();
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-const UPLOAD_ROOT = path.join(__dirname, '..', 'data', 'uploads');
-const REPORT_ROOT = path.join(__dirname, '..', 'data', 'reports');
+const fetch = require('node-fetch');
 
-// ---- 1. Upload dữ liệu thô của 1 tháng (nhiều file, nhiều định dạng) ----
-const upload = multer({ dest: path.join(__dirname, '..', 'data', 'tmp') });
+const GEMINI_URL = (model) =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
-app.post('/api/batches', upload.array('files', 50), async (req, res) => {
-  try {
-    const thang = req.body.thang; // "2026-08"
-    if (!thang) return res.status(400).json({ error: 'Thiếu trường "thang" (vd: 2026-08)' });
-    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'Chưa upload file nào' });
-
-    const info = db.prepare('INSERT INTO batches (thang, status) VALUES (?, ?)').run(thang, 'uploaded');
-    const batchId = info.lastInsertRowid;
-    const batchDir = path.join(UPLOAD_ROOT, String(batchId));
-    fs.mkdirSync(batchDir, { recursive: true });
-
-    for (const f of req.files) {
-      const dest = path.join(batchDir, f.originalname);
-      fs.renameSync(f.path, dest);
-      const text = await extractText(dest);
-      db.prepare('INSERT INTO files (batch_id, filename, filetype, extracted_text) VALUES (?, ?, ?, ?)').run(
-        batchId, f.originalname, path.extname(f.originalname), text
-      );
-    }
-
-    res.json({ batchId, thang, soFile: req.files.length, status: 'uploaded' });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ---- 2. Chạy phân tích AI cho 1 batch -> ra bản ĐỀ XUẤT (chưa phải báo cáo chính thức) ----
-app.post('/api/batches/:id/analyze', async (req, res) => {
-  try {
-    const batchId = req.params.id;
-    const batch = db.prepare('SELECT * FROM batches WHERE id = ?').get(batchId);
-    if (!batch) return res.status(404).json({ error: 'Không tìm thấy batch' });
-
-    const filesRaw = db.prepare('SELECT * FROM files WHERE batch_id = ?').all(batchId);
-    const files = filesRaw.map((f) => ({
-      ...f,
-      filepath: path.join(UPLOAD_ROOT, String(batchId), f.filename),
-    }));
-
-    const draft = await analyze(files, batch.thang);
-
-    db.prepare(
-      `INSERT INTO analysis (batch_id, draft_json) VALUES (?, ?)
-       ON CONFLICT(batch_id) DO UPDATE SET draft_json = excluded.draft_json`
-    ).run(batchId, JSON.stringify(draft));
-
-    db.prepare('UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run('analyzed', batchId);
-
-    res.json({ batchId, status: 'analyzed', draft, note: 'Đây là ĐỀ XUẤT của AI - cần người dùng xác nhận (POST /confirm) trước khi phát hành báo cáo chính thức.' });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ---- 3. Xem bản đề xuất hiện tại ----
-app.get('/api/batches/:id', (req, res) => {
-  const batch = db.prepare('SELECT * FROM batches WHERE id = ?').get(req.params.id);
-  if (!batch) return res.status(404).json({ error: 'Không tìm thấy batch' });
-  const analysis = db.prepare('SELECT * FROM analysis WHERE batch_id = ?').get(req.params.id);
-  res.json({
-    batch,
-    draft: analysis ? JSON.parse(analysis.draft_json) : null,
-    confirmed: analysis && analysis.confirmed_json ? JSON.parse(analysis.confirmed_json) : null,
-    report_path: analysis ? analysis.report_path : null,
-  });
-});
-
-// ---- 4. NGƯỜI DÙNG XÁC NHẬN (có thể sửa nội dung trước khi duyệt) -> mới thật sự tạo file Word ----
-app.post('/api/batches/:id/confirm', async (req, res) => {
-  try {
-    const batchId = req.params.id;
-    const batch = db.prepare('SELECT * FROM batches WHERE id = ?').get(batchId);
-    if (!batch) return res.status(404).json({ error: 'Không tìm thấy batch' });
-
-    const analysisRow = db.prepare('SELECT * FROM analysis WHERE batch_id = ?').get(batchId);
-    if (!analysisRow) return res.status(400).json({ error: 'Chưa có bản đề xuất, hãy gọi /analyze trước' });
-
-    // Cho phép người dùng gửi bản đã chỉnh sửa qua body; nếu không có thì dùng nguyên bản đề xuất
-    const finalData = req.body && Object.keys(req.body).length ? req.body : JSON.parse(analysisRow.draft_json);
-
-    const outPath = await generateReportFile(finalData, REPORT_ROOT);
-
-    db.prepare('UPDATE analysis SET confirmed_json = ?, report_path = ? WHERE batch_id = ?').run(
-      JSON.stringify(finalData), outPath, batchId
-    );
-    db.prepare('UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run('confirmed', batchId);
-
-    res.json({ batchId, status: 'confirmed', report_path: outPath });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-app.get('/api/batches', (req, res) => {
-  res.json(db.prepare('SELECT * FROM batches ORDER BY id DESC').all());
-});
-
-// ---- 5. Tải file Word báo cáo đã xác nhận ----
-app.get('/api/batches/:id/download', (req, res) => {
-  const analysisRow = db.prepare('SELECT * FROM analysis WHERE batch_id = ?').get(req.params.id);
-  if (!analysisRow || !analysisRow.report_path || !fs.existsSync(analysisRow.report_path)) {
-    return res.status(404).json({ error: 'Chưa có báo cáo đã xác nhận cho batch này' });
-  }
-  res.download(analysisRow.report_path);
-});
-const chatSessions = new Map();
-const SYSTEM_PROMPT = `Bạn là "Trợ lý của Minh Hà", trợ lý QC cho hệ thống báo cáo chất lượng dịch vụ Sakuko.
-- Trả lời ngắn gọn, tự nhiên, bằng tiếng Việt.
-- Khi người dùng hỏi về batch, phân tích, hay xác nhận báo cáo, hãy gọi tool phù hợp thay vì tự bịa số liệu.
-- Không bao giờ nói đã "phát hành báo cáo" nếu confirm_batch chưa thật sự chạy xong.`;
-
-const CONFIRM_WORDS = ['xác nhận', 'đồng ý', 'ok làm đi', 'yes', 'confirm'];
-const REJECT_WORDS = ['huỷ', 'hủy', 'không đồng ý', 'thôi', 'cancel'];
-
-function getHistory(sessionId) {
-  if (!chatSessions.has(sessionId)) {
-    chatSessions.set(sessionId, [{ role: 'system', content: SYSTEM_PROMPT }]);
-  }
-  return chatSessions.get(sessionId);
+function convertTools(tools) {
+  if (!tools || tools.length === 0) return undefined;
+  return [
+    {
+      functionDeclarations: tools.map((t) => ({
+        name: t.function.name,
+        description: t.function.description,
+        parameters: t.function.parameters,
+      })),
+    },
+  ];
 }
 
-app.post('/api/chat', async (req, res) => {
+function safeParse(text) {
   try {
-    const { sessionId = 'default', message } = req.body;
-    if (!message) return res.status(400).json({ error: 'Thiếu message' });
+    return JSON.parse(text);
+  } catch {
+    return { result: text };
+  }
+}
 
-    const history = getHistory(sessionId);
-    const lower = message.trim().toLowerCase();
-    const pending = await getPending(sessionId);
+function convertMessages(messages) {
+  let systemInstruction = null;
+  const contents = [];
 
-    if (pending && CONFIRM_WORDS.some((w) => lower.includes(w))) {
-      const payload = JSON.parse(pending.payload);
-      const tool = toolRegistry[pending.tool_name];
-      const result = await tool.handler(payload);
-      await clearPending(sessionId);
-      const reply = `Dạ em đã thực hiện xong: ${JSON.stringify(result)}`;
-      history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
-      return res.json({ reply });
-    }
-
-    if (pending && REJECT_WORDS.some((w) => lower.includes(w))) {
-      await clearPending(sessionId);
-      const reply = 'Dạ em đã huỷ, chưa có gì thay đổi ạ.';
-      history.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
-      return res.json({ reply });
-    }
-
-    history.push({ role: 'user', content: message });
-    let assistantMsg = await callGroq(history, toolDefinitions);
-
-    if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
-      history.push(assistantMsg);
-
-      for (const call of assistantMsg.tool_calls) {
-        const toolName = call.function.name;
-        const args = JSON.parse(call.function.arguments || '{}');
-        const tool = toolRegistry[toolName];
-        if (!tool) continue;
-
-        if (tool.requiresConfirmation) {
-          await setPending(sessionId, toolName, args);
-          const reply = `Em sẽ thực hiện: **${toolName}** (${JSON.stringify(args)}). Chị gõ "xác nhận" để em làm, hoặc "huỷ" nếu không cần nữa nhé.`;
-          history.push({ role: 'assistant', content: reply });
-          return res.json({ reply, needsConfirmation: true });
-        }
-
-        const result = await tool.handler(args);
-        history.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) });
+  for (const m of messages) {
+    if (m.role === 'system') {
+      systemInstruction = { parts: [{ text: m.content }] };
+    } else if (m.role === 'user') {
+      contents.push({ role: 'user', parts: [{ text: m.content }] });
+    } else if (m.role === 'assistant') {
+      if (m.tool_calls && m.tool_calls.length > 0) {
+        contents.push({
+          role: 'model',
+          parts: m.tool_calls.map((tc) => ({
+            functionCall: {
+              name: tc.function.name,
+              args: JSON.parse(tc.function.arguments || '{}'),
+            },
+          })),
+        });
+      } else {
+        contents.push({ role: 'model', parts: [{ text: m.content || '' }] });
       }
-
-      assistantMsg = await callGroq(history, toolDefinitions);
+    } else if (m.role === 'tool') {
+      contents.push({
+        role: 'user',
+        parts: [
+          {
+            functionResponse: {
+              name: m.name || 'tool_result',
+              response: safeParse(m.content),
+            },
+          },
+        ],
+      });
     }
-
-    history.push({ role: 'assistant', content: assistantMsg.content });
-    res.json({ reply: assistantMsg.content });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
   }
-});
-app.get('/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+  return { systemInstruction, contents };
+}
 
-// ---- Lịch tự động: ngày 1 hàng tháng, tự tìm batch "uploaded" mới nhất và chạy /analyze ----
-// (Không tự "confirm" - vẫn chờ người dùng duyệt, đúng nguyên tắc AI chỉ đề xuất.)
-cron.schedule('0 8 1 * *', async () => {
-  console.log('[CRON] Kiểm tra batch chờ phân tích đầu tháng...');
-  const pending = db.prepare("SELECT * FROM batches WHERE status = 'uploaded' ORDER BY id DESC LIMIT 1").get();
-  if (!pending) {
-    console.log('[CRON] Không có dữ liệu nào đang chờ - cần upload thủ công trước.');
-    return;
+async function callGemini(messages, tools = []) {
+  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const { systemInstruction, contents } = convertMessages(messages);
+
+  const body = { contents };
+  if (systemInstruction) body.systemInstruction = systemInstruction;
+  const geminiTools = convertTools(tools);
+  if (geminiTools) body.tools = geminiTools;
+
+  const res = await fetch(GEMINI_URL(model), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API lỗi (${res.status}): ${errText}`);
   }
-  const filesRaw = db.prepare('SELECT * FROM files WHERE batch_id = ?').all(pending.id);
-  const files = filesRaw.map((f) => ({
-    ...f,
-    filepath: path.join(UPLOAD_ROOT, String(pending.id), f.filename),
-  }));
-  const draft = await analyze(files, pending.thang);
-  db.prepare(
-    `INSERT INTO analysis (batch_id, draft_json) VALUES (?, ?)
-     ON CONFLICT(batch_id) DO UPDATE SET draft_json = excluded.draft_json`
-  ).run(pending.id, JSON.stringify(draft));
-  db.prepare('UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run('analyzed', pending.id);
-  console.log(`[CRON] Đã tạo đề xuất cho batch #${pending.id} (${pending.thang}) - chờ xác nhận thủ công.`);
-});
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.BIND_HOST || '0.0.0.0'; // xem DEPLOY.md để giới hạn qua Tailscale
-app.listen(PORT, HOST, () => console.log(`QC Report Bot đang chạy tại http://${HOST}:${PORT}`));
+  const data = await res.json();
+  const candidate = data.candidates && data.candidates[0];
+  const parts = (candidate && candidate.content && candidate.content.parts) || [];
+
+  const textPart = parts.find((p) => p.text);
+  const functionCalls = parts.filter((p) => p.functionCall);
+
+  if (functionCalls.length > 0) {
+    return {
+      role: 'assistant',
+      content: null,
+      tool_calls: functionCalls.map((p, i) => ({
+        id: `call_${Date.now()}_${i}`,
+        type: 'function',
+        function: {
+          name: p.functionCall.name,
+          arguments: JSON.stringify(p.functionCall.args || {}),
+        },
+      })),
+    };
+  }
+
+  return { role: 'assistant', content: textPart ? textPart.text : '' };
+}
+
+module.exports = { callGemini };
