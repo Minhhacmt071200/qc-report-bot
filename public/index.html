@@ -1,392 +1,167 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKUKO QC REPORT PRO - AI ASSISTANT DASHBOARD</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom Config for Sakuko Theme -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sakuko: {
-                            navy: '#0B192C',
-                            blue: '#1E3E62',
-                            orange: '#FF6500',
-                            lightBg: '#F4F6F9',
-                            cardBg: '#FFFFFF'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-</head>
-<body class="bg-sakuko-lightBg font-sans text-gray-800 antialiased flex h-screen overflow-hidden">
+<script>
+    const GEMINI_API_KEY = "AQ.Ab8RN6IEH_G7RusV4wBneiSiAhksYsVydKzJyVZ6SZUQP5vZgQ"; 
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-    <!-- ================= 1. SIDEBAR LEFT ================= -->
-    <aside class="w-64 bg-sakuko-navy text-white flex flex-col justify-between flex-shrink-0 shadow-xl z-20">
-        <div>
-            <div class="h-16 flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl font-black tracking-wider text-white">SAKUKO <span class="text-sakuko-orange">QC</span></span>
-                    <span class="text-[10px] bg-sakuko-orange text-white font-bold px-1.5 py-0.5 rounded">PRO AI</span>
-                </div>
-            </div>
+    // Dữ liệu tổng hợp toàn bộ các tháng
+    const allMonthsData = {
+        'T05': { monthName: 'Tháng 05/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', res: 'Top 1: SKK Thái Hà (18 đơn)' }, { m: 'T05', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/05', status: '✅ Đã làm', res: 'SKK Hàm Nghi đạt 100%' }, { m: 'T05', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/05', status: '✅ Đã làm', res: 'Chấm điểm 22/22 ST' }] },
+        'T06': { monthName: 'Tháng 06/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', res: 'Top 1: SKK Linh Đàm (21 đơn)' }, { m: 'T06', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/06', status: '✅ Đã làm', res: 'Vi phạm vệ sinh: 3 ST' }, { m: 'T06', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/06', status: '✅ Đã làm', res: 'Hoàn thành 22/22 ST' }] },
+        'T07': { monthName: 'Tháng 07/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (18 đơn)' }, { m: 'T07', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/07', status: '✅ Đã làm', res: 'Tỷ lệ phục vụ tốt 95%' }, { m: 'T07', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/07', status: '✅ Đã làm', res: 'CTKM Tháng 7 hoàn thành' }] },
+        'T08': { monthName: 'Tháng 08/2026', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', pendingColor: 'text-rose-600', rows: [{ m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (23 đơn)' }, { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', res: '17 lỗi tem giá' }, { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', res: 'Chưa tải file dữ liệu' }] }
+    };
 
-            <nav class="mt-6 px-3 space-y-1">
-                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition">
-                    <i class="fa-solid fa-chart-pie text-sakuko-orange w-5"></i> Tổng Quan Dashboard
-                </a>
-                <a href="#" onclick="switchTab('doitra')" id="nav-doitra" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-arrows-rotate w-5"></i> Báo Cáo Đổi Trả
-                </a>
-                <a href="#" onclick="switchTab('dichvu')" id="nav-dichvu" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-star w-5"></i> Đánh Giá Dịch Vụ
-                </a>
-                <a href="#" onclick="switchTab('ctkm')" id="nav-ctkm" class="nav-btn flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-tags w-5"></i> Trưng Bày CTKM
-                </a>
+    let currentSelectedMonth = 'T08';
+    let currentBotName = "QC AI Assistant";
 
-                <div class="pt-4 pb-2">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4">Công Cụ Pro & AI</div>
-                </div>
+    function selectMonth(monthKey) {
+        currentSelectedMonth = monthKey;
+        const data = allMonthsData[monthKey];
 
-                <a href="#" onclick="toggleAiBot()" class="flex items-center justify-between px-4 py-3 rounded-lg text-sm font-semibold text-amber-300 bg-amber-950/40 hover:bg-amber-900/50 border border-amber-800/50 transition">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-robot text-amber-400 w-5"></i> AI QC Assistant
-                    </div>
-                    <span class="flex h-2 w-2 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                </a>
-            </nav>
-        </div>
+        document.querySelectorAll('.month-btn').forEach(btn => btn.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition');
+        const activeTab = document.getElementById(`tab-${monthKey}`);
+        if(activeTab) activeTab.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow';
 
-        <div class="p-4 bg-slate-900 border-t border-slate-800 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-sakuko-orange text-white font-bold flex items-center justify-center shadow-lg">
-                HÀ
-            </div>
-            <div class="overflow-hidden">
-                <p class="text-xs font-bold text-white truncate">Nguyễn Thị Minh Hà</p>
-                <p class="text-[11px] text-slate-400 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> QC Admin
-                </p>
-            </div>
-        </div>
-    </aside>
+        document.getElementById('kpi-month').innerText = data.monthName;
+        document.getElementById('kpi-done').innerText = data.kpiDone;
+        document.getElementById('kpi-pending').innerText = data.kpiPending;
+        document.getElementById('kpi-pending').className = `text-xl font-black mt-1 ${data.pendingColor}`;
+        document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
 
-    <!-- ================= 2. MAIN CONTENT AREA ================= -->
-    <main class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-10">
-            <div>
-                <h1 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    Hệ Thống Báo Cáo Quản Lý Chất Lượng (QC Report)
-                    <span class="text-xs font-normal bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Real Gemini AI Inside</span>
-                </h1>
-            </div>
+        const tbody = document.getElementById('report-table-body');
+        tbody.innerHTML = '';
+        data.rows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="py-3 px-4 font-bold">${row.m}</td>
+                <td class="py-3 px-4 font-bold text-slate-900">${row.name}</td>
+                <td class="py-3 px-4 text-slate-500">${row.date}</td>
+                <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-1 rounded text-[11px] font-bold">${row.status}</span></td>
+                <td class="py-3 px-4">${row.res}</td>
+                <td class="py-3 px-4 text-center"><button class="bg-sakuko-blue text-white px-3 py-1 rounded text-[11px]">Xem</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('ai-screen-tag').innerText = data.monthName;
+    }
 
-            <div class="flex items-center gap-4">
-                <button onclick="toggleAiBot()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-300">
-                    <i class="fa-solid fa-sparkles text-sakuko-orange"></i> AI Status: <span class="text-emerald-600 font-bold">● Live API</span>
-                </button>
-                <button onclick="triggerAutoMail()" class="bg-sakuko-navy hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition shadow">
-                    <i class="fa-solid fa-paper-plane text-sakuko-orange"></i> Gửi Mail Sếp
-                </button>
-            </div>
-        </header>
+    // ================= XỬ LÝ LỆNH THÔNG MINH BẰNG GEMINI AI =================
+    async function sendMessage() {
+        const input = document.getElementById('ai-input');
+        const text = input.value.trim();
+        if (!text) return;
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        appendUserMessage(text);
+        input.value = '';
 
-            <!-- FILTER CARD -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-days text-sakuko-orange text-lg"></i>
-                        <span class="text-sm font-bold text-slate-800">Chọn Tháng Xem Dữ Liệu Báo Cáo:</span>
-                    </div>
-                    
-                    <div class="flex flex-wrap items-center gap-2" id="month-tabs">
-                        <button onclick="selectMonth('T05')" id="tab-T05" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 05/2026</button>
-                        <button onclick="selectMonth('T06')" id="tab-T06" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 06/2026</button>
-                        <button onclick="selectMonth('T07')" id="tab-T07" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 07/2026</button>
-                        <button onclick="selectMonth('T08')" id="tab-T08" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow">Tháng 08/2026</button>
-                    </div>
-                </div>
-            </div>
+        const loadingId = appendLoadingMessage();
 
-            <!-- KPI CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold uppercase text-slate-400">Tháng Đang Chọn</p>
-                    <p class="text-xl font-black text-slate-900 mt-1" id="kpi-month">Tháng 08/2026</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold uppercase text-slate-400">Tổng Nhiệm Vụ</p>
-                    <p class="text-xl font-black text-blue-600 mt-1" id="kpi-total">3 Báo Cáo</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold uppercase text-slate-400">Đã Hoàn Thành</p>
-                    <p class="text-xl font-black text-emerald-600 mt-1" id="kpi-done">2 / 3 Báo Cáo</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
-                    <p class="text-xs font-bold uppercase text-slate-400">Chưa Hoàn Thành</p>
-                    <p class="text-xl font-black text-rose-600 mt-1" id="kpi-pending">1 Báo Cáo</p>
-                </div>
-            </div>
+        // 1. Thực thi hành động trên Web trước (Đổi tháng, Đổi tên, Gửi mail)
+        autoExecuteWebAction(text);
 
-            <!-- TABLE CONTAINER -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-table-list text-sakuko-orange"></i> Chi Tiết Báo Cáo QC
-                    </h2>
-                    <span class="text-xs text-slate-500 font-medium" id="table-subtitle">Dữ liệu Tháng 08/2026</span>
-                </div>
+        try {
+            // 2. Tạo System Prompt thông minh cung cấp toàn bộ ngữ cảnh dữ liệu
+            const systemPrompt = `
+You are an intelligent AI assistant named "${currentBotName}". You are supporting chị Nguyễn Thị Minh Hà (QC Admin at Sakuko).
+Style: Speak polite, natural, clear Vietnamese. Use markdown bullet points and bold texts for key metrics.
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
-                                <th class="py-3 px-4">Tháng</th>
-                                <th class="py-3 px-4">Tên Báo Cáo QC</th>
-                                <th class="py-3 px-4">Hạn Nộp</th>
-                                <th class="py-3 px-4">Trạng Thái</th>
-                                <th class="py-3 px-4">Kết Quả</th>
-                                <th class="py-3 px-4 text-center">Thao Tác</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 text-xs text-slate-700" id="report-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
+[CURRENT SYSTEM CONTEXT]
+- Selected Month on Screen: ${allMonthsData[currentSelectedMonth].monthName}
+- Current Screen Data: ${JSON.stringify(allMonthsData[currentSelectedMonth])}
+- Full Historical Data (T5 to T8): ${JSON.stringify(allMonthsData)}
 
-            <!-- CHARTS -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i> Xu Hướng Lỗi 2026</h3>
-                    <div class="h-60 relative"><canvas id="trendChart"></canvas></div>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4"><i class="fa-solid fa-chart-bar text-rose-600 mr-2"></i> Top Siêu Thị Vi Phạm T8</h3>
-                    <div class="h-60 relative"><canvas id="storeChart"></canvas></div>
-                </div>
-            </div>
+[INSTRUCTIONS FOR RESPONDING]
+1. If the user asks to compare months (e.g., T8 vs T7), analyze the historical data provided and calculate differences directly.
+2. If the user asks to change bot name or navigate tabs, acknowledge that the web interface has been updated automatically.
+3. Be concise, actionable, and focus on QC insights (returns, service rating, store violations).
+`;
 
-        </div>
-    </main>
-
-    <!-- ================= 3. RIGHT PANEL: QC AI BOT ================= -->
-    <aside id="ai-bot-sidebar" class="w-96 bg-white border-l border-slate-200 flex flex-col justify-between flex-shrink-0 shadow-2xl z-30">
-        
-        <div class="p-4 bg-sakuko-navy text-white flex items-center justify-between shadow">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-sakuko-orange flex items-center justify-center text-white text-lg shadow">
-                    <i class="fa-solid fa-robot"></i>
-                </div>
-                <div>
-                    <h3 id="bot-header-name" class="text-sm font-bold leading-tight">QC AI Assistant</h3>
-                    <p class="text-[10px] text-slate-300">Kết nối Gemini API thật</p>
-                </div>
-            </div>
-            <button onclick="toggleAiBot()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-
-        <div class="p-3 bg-sky-50 border-b border-sky-100 text-xs">
-            <div class="flex items-center justify-between mb-1">
-                <span class="font-bold text-sky-900"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> AI Context:</span>
-                <span class="text-[9px] bg-sky-200 text-sky-800 px-1.5 py-0.5 rounded font-bold" id="ai-screen-tag">Tháng 08/2026</span>
-            </div>
-            <div class="text-slate-700 text-[11px]" id="ai-live-remarks">
-                <p>• Sẵn sàng nhận lệnh đổi tháng, gửi mail và phân tích dữ liệu.</p>
-            </div>
-        </div>
-
-        <div class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50" id="chat-window">
-            <div class="flex gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow"><i class="fa-solid fa-robot"></i></div>
-                <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]">
-                    <p class="font-bold text-sakuko-orange text-[11px] bot-display-name">QC AI Assistant</p>
-                    <p>Chào chị Hà! Em đã được kết nối với Gemini AI thật. Chị cần gì cứ bảo em nhé! 😊</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Input -->
-        <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
-            <input type="text" id="ai-input" onkeypress="handleKeyPress(event)" placeholder="Ví dụ: Đổi thành Trợ lý của Minh Hà..." class="flex-1 bg-slate-100 text-xs px-3 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sakuko-orange/50">
-            <button onclick="sendMessage()" class="w-9 h-9 rounded-lg bg-sakuko-orange text-white flex items-center justify-center hover:bg-orange-600 transition shadow">
-                <i class="fa-solid fa-paper-plane text-xs"></i>
-            </button>
-        </div>
-    </aside>
-
-    <!-- ================= 4. JAVASCRIPT SYSTEM WITH REAL GEMINI AI ================= -->
-    <script>
-        const GEMINI_API_KEY = "AQ.Ab8RN6IEH_G7RusV4wBneiSiAhksYsVydKzJyVZ6SZUQP5vZgQ"; 
-        
-        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-        // Dữ liệu mẫu giả lập trên màn hình
-        const mockData = {
-            'T05': { monthName: 'Tháng 05/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', res: 'Top 1: SKK Thái Hà (18 đơn)' }, { m: 'T05', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/05', status: '✅ Đã làm', res: 'SKK Hàm Nghi đạt 100%' }, { m: 'T05', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/05', status: '✅ Đã làm', res: 'Chấm điểm 22/22 ST' }] },
-            'T06': { monthName: 'Tháng 06/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', res: 'Top 1: SKK Linh Đàm (21 đơn)' }, { m: 'T06', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/06', status: '✅ Đã làm', res: 'Vi phạm vệ sinh: 3 ST' }, { m: 'T06', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/06', status: '✅ Đã làm', res: 'Hoàn thành 22/22 ST' }] },
-            'T07': { monthName: 'Tháng 07/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (18 đơn)' }, { m: 'T07', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/07', status: '✅ Đã làm', res: 'Tỷ lệ phục vụ tốt 95%' }, { m: 'T07', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/07', status: '✅ Đã làm', res: 'CTKM Tháng 7 hoàn thành' }] },
-            'T08': { monthName: 'Tháng 08/2026', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', pendingColor: 'text-rose-600', rows: [{ m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (23 đơn)' }, { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', res: '17 lỗi tem giá' }, { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', res: 'Chưa tải file dữ liệu' }] }
-        };
-
-        let currentSelectedMonth = 'T08';
-        let currentBotName = "QC AI Assistant";
-
-        function selectMonth(monthKey) {
-            currentSelectedMonth = monthKey;
-            const data = mockData[monthKey];
-
-            document.querySelectorAll('.month-btn').forEach(btn => btn.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition');
-            document.getElementById(`tab-${monthKey}`).className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow';
-
-            document.getElementById('kpi-month').innerText = data.monthName;
-            document.getElementById('kpi-done').innerText = data.kpiDone;
-            document.getElementById('kpi-pending').innerText = data.kpiPending;
-            document.getElementById('kpi-pending').className = `text-xl font-black mt-1 ${data.pendingColor}`;
-            document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
-
-            const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '';
-            data.rows.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-bold">${row.m}</td>
-                    <td class="py-3 px-4 font-bold text-slate-900">${row.name}</td>
-                    <td class="py-3 px-4 text-slate-500">${row.date}</td>
-                    <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-1 rounded text-[11px] font-bold">${row.status}</span></td>
-                    <td class="py-3 px-4">${row.res}</td>
-                    <td class="py-3 px-4 text-center"><button class="bg-sakuko-blue text-white px-3 py-1 rounded text-[11px]">Xem</button></td>
-                `;
-                tbody.appendChild(tr);
+            const response = await fetch(GEMINI_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `${systemPrompt}\n\nUser Message: ${text}` }] }]
+                })
             });
-            document.getElementById('ai-screen-tag').innerText = data.monthName;
-        }
 
-        // ================= GEMINI REAL AI INTEGRATION =================
-        async function sendMessage() {
-            const input = document.getElementById('ai-input');
-            const text = input.value.trim();
-            if (!text) return;
+            const data = await response.json();
+            removeLoadingMessage(loadingId);
 
-            appendUserMessage(text);
-            input.value = '';
-
-            const loadingId = appendLoadingMessage();
-
-            // Auto Action Check (Chuyển tab / gửi mail / đổi tên)
-            autoExecuteWebAction(text);
-
-            try {
-                const screenContext = JSON.stringify(mockData[currentSelectedMonth]);
-                const systemPrompt = `Bạn là trợ lý ảo của Nguyễn Thị Minh Hà. Tên hiện tại của bạn là "${currentBotName}".
-                Dữ liệu màn hình (${currentSelectedMonth}): ${screenContext}.
-                Trả lời ngắn gọn, thân thiện, phân tích dữ liệu nếu được hỏi. Nếu người dùng yêu cầu đổi tên, hãy báo là bạn đã đổi tên thành công.`;
-
-                const response = await fetch(GEMINI_API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: `${systemPrompt}\n\nLệnh/Câu hỏi: ${text}` }] }]
-                    })
-                });
-
-                const data = await response.json();
-                removeLoadingMessage(loadingId);
-
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    appendAiMessage(data.candidates[0].content.parts[0].text);
-                } else {
-                    appendAiMessage("Lỗi xử lý phản hồi từ Gemini API.");
-                }
-            } catch (err) {
-                removeLoadingMessage(loadingId);
-                appendAiMessage("❌ Lỗi kết nối API. Chị hãy kiểm tra lại GEMINI_API_KEY!");
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                appendAiMessage(data.candidates[0].content.parts[0].text);
+            } else {
+                appendAiMessage("Lỗi xử lý phản hồi từ Gemini API.");
             }
+        } catch (err) {
+            removeLoadingMessage(loadingId);
+            appendAiMessage("❌ Lỗi kết nối API. Chị hãy kiểm tra lại kết nối mạng!");
         }
+    }
 
-        function autoExecuteWebAction(promptText) {
-            const lower = promptText.toLowerCase();
-            
-            // XỬ LÝ LỆNH ĐỔI TÊN (MỚI THÊM)
-            if (lower.includes("đổi tên") || lower.includes("trợ lý của")) {
+    function autoExecuteWebAction(promptText) {
+        const lower = promptText.toLowerCase();
+        
+        // Nhận diện lệnh đổi tên linh hoạt
+        if (lower.includes("đổi tên") || lower.includes("trợ lý của") || lower.includes("đổi thành")) {
+            if (lower.includes("minh hà") || lower.includes("chị hà")) {
                 currentBotName = "Trợ lý của Minh Hà";
-                document.getElementById('bot-header-name').innerText = currentBotName;
-                document.querySelectorAll('.bot-display-name').forEach(el => el.innerText = currentBotName);
+            } else {
+                currentBotName = "QC AI Assistant";
             }
-
-            // XỬ LÝ LỆNH CHUYỂN THÁNG
-            if (lower.includes("tháng 5") || lower.includes("tháng 05") || lower.includes("t05")) selectMonth('T05');
-            else if (lower.includes("tháng 6") || lower.includes("tháng 06") || lower.includes("t06")) selectMonth('T06');
-            else if (lower.includes("tháng 7") || lower.includes("tháng 07") || lower.includes("t07")) selectMonth('T07');
-            else if (lower.includes("tháng 8") || lower.includes("tháng 08") || lower.includes("t08")) selectMonth('T08');
-
-            // XỬ LÝ LỆNH GỬI MAIL
-            if (lower.includes("gửi mail")) triggerAutoMail();
+            const headerEl = document.getElementById('bot-header-name');
+            if (headerEl) headerEl.innerText = currentBotName;
+            document.querySelectorAll('.bot-display-name').forEach(el => el.innerText = currentBotName);
         }
 
-        function appendUserMessage(msg) {
-            const win = document.getElementById('chat-window');
-            win.innerHTML += `<div class="flex gap-2.5 justify-end"><div class="bg-sakuko-blue text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[85%]"><p class="font-bold text-sky-300 text-[10px]">Chị Hà</p><p>${msg}</p></div></div>`;
-            win.scrollTop = win.scrollHeight;
-        }
+        // Nhận diện chuyển tháng
+        if (lower.includes("tháng 5") || lower.includes("tháng 05") || lower.includes("t05")) selectMonth('T05');
+        else if (lower.includes("tháng 6") || lower.includes("tháng 06") || lower.includes("t06")) selectMonth('T06');
+        else if (lower.includes("tháng 7") || lower.includes("tháng 07") || lower.includes("t07")) selectMonth('T07');
+        else if (lower.includes("tháng 8") || lower.includes("tháng 08") || lower.includes("t08")) selectMonth('T08');
 
-        function appendAiMessage(msg) {
-            const win = document.getElementById('chat-window');
-            const formatted = msg.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            win.innerHTML += `<div class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]"><p class="font-bold text-sakuko-orange text-[11px] bot-display-name">${currentBotName}</p><p>${formatted}</p></div></div>`;
-            win.scrollTop = win.scrollHeight;
-        }
+        // Nhận diện gửi mail
+        if (lower.includes("gửi mail") || lower.includes("gửi báo cáo")) triggerAutoMail();
+    }
 
-        function appendLoadingMessage() {
-            const win = document.getElementById('chat-window');
-            const id = 'loading-' + Date.now();
-            win.innerHTML += `<div id="${id}" class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl text-xs text-slate-400 italic">AI đang suy nghĩ...</div></div>`;
-            win.scrollTop = win.scrollHeight;
-            return id;
-        }
+    function appendUserMessage(msg) {
+        const win = document.getElementById('chat-window');
+        win.innerHTML += `<div class="flex gap-2.5 justify-end"><div class="bg-sakuko-blue text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[85%]"><p class="font-bold text-sky-300 text-[10px]">Chị Hà</p><p>${msg}</p></div></div>`;
+        win.scrollTop = win.scrollHeight;
+    }
 
-        function removeLoadingMessage(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
+    function appendAiMessage(msg) {
+        const win = document.getElementById('chat-window');
+        const formatted = msg.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        win.innerHTML += `<div class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]"><p class="font-bold text-sakuko-orange text-[11px] bot-display-name">${currentBotName}</p><p>${formatted}</p></div></div>`;
+        win.scrollTop = win.scrollHeight;
+    }
 
-        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
-        function toggleAiBot() { document.getElementById('ai-bot-sidebar').classList.toggle('hidden'); }
-        function triggerAutoMail() { alert("📧 [Auto Mail] Đã gửi báo cáo tổng hợp cho Sếp!"); }
+    function appendLoadingMessage() {
+        const win = document.getElementById('chat-window');
+        const id = 'loading-' + Date.now();
+        win.innerHTML += `<div id="${id}" class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl text-xs text-slate-400 italic">AI đang phân tích...</div></div>`;
+        win.scrollTop = win.scrollHeight;
+        return id;
+    }
 
-        function initCharts() {
-            new Chart(document.getElementById('trendChart'), {
-                type: 'line',
-                data: { labels: ['T5', 'T6', 'T7', 'T8'], datasets: [{ label: 'Số Lỗi', data: [142, 128, 114, 90], borderColor: '#2563eb', fill: false }] }
-            });
-            new Chart(document.getElementById('storeChart'), {
-                type: 'bar',
-                data: { labels: ['Trần Đăng Ninh', 'Linh Đàm', 'Thái Hà', 'Hàm Nghi'], datasets: [{ label: 'Lỗi T8', data: [23, 15, 12, 9], backgroundColor: '#dc2626' }] }
-            });
-        }
+    function removeLoadingMessage(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
 
-        window.onload = function() { selectMonth('T08'); initCharts(); };
-    </script>
-</body>
-</html>
+    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+    function toggleAiBot() { document.getElementById('ai-bot-sidebar').classList.toggle('hidden'); }
+    function triggerAutoMail() { alert("📧 [Auto Mail] Đã gửi báo cáo tổng hợp cho Sếp!"); }
+
+    function initCharts() {
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: { labels: ['T5', 'T6', 'T7', 'T8'], datasets: [{ label: 'Số Lỗi', data: [142, 128, 114, 90], borderColor: '#2563eb', fill: false }] }
+        });
+        new Chart(document.getElementById('storeChart'), {
+            type: 'bar',
+            data: { labels: ['Trần Đăng Ninh', 'Linh Đàm', 'Thái Hà', 'Hàm Nghi'], datasets: [{ label: 'Lỗi T8', data: [23, 15, 12, 9], backgroundColor: '#dc2626' }] }
+        });
+    }
+
+    window.onload = function() { selectMonth('T08'); initCharts(); };
+</script>
