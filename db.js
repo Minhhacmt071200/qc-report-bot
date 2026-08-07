@@ -1,9 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-
 const dbPath = process.env.RENDER ? '/tmp/app.db' : path.join(__dirname, '..', 'data', 'app.db');
 const db = new sqlite3.Database(dbPath);
-
 db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS batches (
@@ -14,7 +12,6 @@ db.serialize(() => {
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
     `);
-
     db.run(`
         CREATE TABLE IF NOT EXISTS files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +22,6 @@ db.serialize(() => {
             FOREIGN KEY (batch_id) REFERENCES batches(id)
         );
     `);
-
     db.run(`
         CREATE TABLE IF NOT EXISTS analysis (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,6 +32,13 @@ db.serialize(() => {
             FOREIGN KEY (batch_id) REFERENCES batches(id)
         );
     `);
+    db.run(`
+        CREATE TABLE IF NOT EXISTS chat_pending (
+            session_id TEXT PRIMARY KEY,
+            tool_name TEXT NOT NULL,
+            payload TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
 });
-
 module.exports = db;
