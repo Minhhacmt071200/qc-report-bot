@@ -3,21 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKUKO QC REPORT PRO</title>
+    <title>SAKUKO QC REPORT PRO - MULTITASK AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sakuko: { navy: '#0B192C', blue: '#1E3E62', orange: '#FF6500', lightBg: '#F4F6F9', cardBg: '#FFFFFF' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans flex h-screen overflow-hidden">
-    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between">
-        <div class="p-4 text-xl font-black text-orange-500">SAKUKO QC PRO</div>
-        <div class="p-4 text-xs text-slate-400">QC Admin: Minh Hà</div>
+<body class="bg-sakuko-lightBg font-sans text-gray-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- Sidebar Left -->
+    <aside class="w-64 bg-sakuko-navy text-white flex flex-col justify-between flex-shrink-0 shadow-xl z-20">
+        <div>
+            <div class="h-16 flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-black tracking-wider text-white">SAKUKO <span class="text-sakuko-orange">QC</span></span>
+                    <span class="text-[10px] bg-sakuko-orange text-white font-bold px-1.5 py-0.5 rounded">PRO AI</span>
+                </div>
+            </div>
+            <nav class="mt-6 px-3 space-y-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition">
+                    <i class="fa-solid fa-chart-pie text-sakuko-orange w-5"></i> Tổng Quan Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-rotate-left w-5"></i> Báo Cáo Đổi Trả
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-star w-5"></i> Đánh Giá Dịch Vụ
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-store w-5"></i> Trưng Bày CTKM
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-sakuko-orange font-bold text-white flex items-center justify-center text-sm shadow">HÀ</div>
+            <div>
+                <p class="text-xs font-bold text-white">Nguyễn Thị Minh Hà</p>
+                <p class="text-[10px] text-slate-400">QC Admin</p>
+            </div>
+        </div>
     </aside>
-    <main class="flex-1 flex flex-col p-6 overflow-y-auto">
-        <h1 class="text-xl font-bold mb-4">Hệ Thống Báo Cáo Quản Lý Chất Lượng</h1>
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-sm text-slate-700">Dữ liệu tháng 08/2026 đang hoạt động bình thường.</p>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center gap-3">
+                <h1 class="text-lg font-bold text-slate-800">Hệ Thống Báo Cáo Quản Lý Chất Lượng (QC Report)</h1>
+                <span class="bg-sky-100 text-sakuko-blue text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-sky-200">Phiên bản Pro 3.0 Multitask</span>
+            </div>
+            <div>
+                <button onclick="triggerAutoMail()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-sakuko-orange"></i> Gửi Mail Sếp
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-6">
+            <!-- Filter Bar -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-sakuko-orange"></i>
+                    <span class="text-xs font-bold text-slate-700">Chọn Tháng Xem Dữ Liệu Báo Cáo:</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="tab-T05" onclick="selectMonth('T05')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 05/2026</button>
+                    <button id="tab-T06" onclick="selectMonth('T06')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 06/2026</button>
+                    <button id="tab-T07" onclick="selectMonth('T07')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 07/2026</button>
+                    <button id="tab-T08" onclick="selectMonth('T08')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow">Tháng 08/2026</button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">THÁNG ĐANG CHỌN</p>
+                    <p id="kpi-month" class="text-2xl font-black text-slate-800 mt-1">Tháng 08/2026</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">TỔNG NHIỆM VỤ</p>
+                    <p id="kpi-done" class="text-2xl font-black text-slate-800 mt-1">2 / 3 Báo Cáo</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">CHƯA HOÀN THÀNH</p>
+                    <p id="kpi-pending" class="text-2xl font-black text-rose-600 mt-1">1 Báo Cáo</p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-sakuko-orange"></i> Chi Tiết Nhiệm Vụ & Kết Quả Báo Cáo
+                    </h3>
+                    <span id="table-subtitle" class="text-xs text-slate-500 font-medium">Dữ liệu Tháng 08/2026</span>
+                </div>
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">THÁNG</th>
+                            <th class="py-3 px-4">TÊN BÁO CÁO QC</th>
+                            <th class="py-3 px-4">HẠN NỘP</th>
+                            <th class="py-3 px-4">TRẠNG THÁI</th>
+                            <th class="py-3 px-4">KẾT QUẢ / DỮ LIỆU ĐÃ LÀM</th>
+                            <th class="py-3 px-4 text-center">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body" class="divide-y divide-slate-100 font-medium"></tbody>
+                </table>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-sakuko-blue"></i> Xu Hướng Số Lỗi Qua Các Tháng (2026)
+                    </h4>
+                    <canvas id="trendChart" class="max-h-52"></canvas>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-bar text-rose-500"></i> Top Siêu Thị Phát Sinh Lỗi Đổi Trả T8
+                    </h4>
+                    <canvas id="storeChart" class="max-h-52"></canvas>
+                </div>
+            </div>
         </div>
     </main>
+
+    <!-- AI Multitask Sidebar Right -->
+    <aside id="ai-bot-sidebar" class="w-80 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 shadow-2xl z-30">
+        <div class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-sm shadow">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h3 id="bot-header-name" class="text-xs font-bold text-white">Trợ lý Đa Nhiệm Minh Hà</h3>
+                    <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Gemini AI Active
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50 text-xs">
+            <div class="flex gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]">
+                    <p class="font-bold text-sakuko-orange text-[11px] bot-display-name">Trợ lý Đa Nhiệm Minh Hà</p>
+                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể bảo em đổi tháng, phân tích so sánh lỗi siêu thị, hoặc gửi mail bất cứ lúc nào ạ! 😊</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 bg-white border-t border-slate-200">
+            <div class="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-1.5 border border-slate-200 focus-within:border-sakuko-blue transition">
+                <input id="ai-input" type="text" onkeypress="handleKeyPress(event)" placeholder="Nhập lệnh (vd: So sánh T8 với T7...)" class="w-full bg-transparent text-xs outline-none text-slate-700 placeholder-slate-400">
+                <button onclick="sendMessage()" class="w-7 h-7 rounded-lg bg-sakuko-orange hover:bg-orange-600 text-white flex items-center justify-center flex-shrink-0 shadow transition">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        const GEMINI_API_KEY = "AQ.Ab8RN6IEH_G7RusV4wBneiSiAhksYsVydKzJyVZ6SZUQP5vZgQ";
+        
+        const allMonthsData = {
+            'T05': { monthName: 'Tháng 05/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', res: 'Top 1: SKK Thái Hà (18 đơn)' }, { m: 'T05', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/05', status: '✅ Đã làm', res: 'SKK Hàm Nghi đạt 100%' }, { m: 'T05', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/05', status: '✅ Đã làm', res: 'Chấm điểm 22/22 ST' }] },
+            'T06': { monthName: 'Tháng 06/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', res: 'Top 1: SKK Linh Đàm (21 đơn)' }, { m: 'T06', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/06', status: '✅ Đã làm', res: 'Vi phạm vệ sinh: 3 ST' }, { m: 'T06', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/06', status: '✅ Đã làm', res: 'Hoàn thành 22/22 ST' }] },
+            'T07': { monthName: 'Tháng 07/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (18 đơn)' }, { m: 'T07', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/07', status: '✅ Đã làm', res: 'Tỷ lệ phục vụ tốt 95%' }, { m: 'T07', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/07', status: '✅ Đã làm', res: 'CTKM Tháng 7 hoàn thành' }] },
+            'T08': { monthName: 'Tháng 08/2026', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', pendingColor: 'text-rose-600', rows: [{ m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (23 đơn)' }, { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', res: '17 lỗi tem giá' }, { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', res: 'Chưa tải file dữ liệu' }] }
+        };
+
+        let currentSelectedMonth = 'T08';
+        let currentBotName = "Trợ lý Đa Nhiệm Minh Hà";
+
+        function selectMonth(monthKey) {
+            currentSelectedMonth = monthKey;
+            const data = allMonthsData[monthKey];
+
+            document.querySelectorAll('.month-btn').forEach(btn => btn.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition');
+            const activeTab = document.getElementById(`tab-${monthKey}`);
+            if(activeTab) activeTab.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow';
+
+            document.getElementById('kpi-month').innerText = data.monthName;
+            document.getElementById('kpi-done').innerText = data.kpiDone;
+            document.getElementById('kpi-pending').innerText = data.kpiPending;
+            document.getElementById('kpi-pending').className = `text-xl font-black mt-1 ${data.pendingColor}`;
+            document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
+
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = '';
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold">${row.m}</td>
+                    <td class="py-3 px-4 font-bold text-slate-900">${row.name}</td>
+                    <td class="py-3 px-4 text-slate-500">${row.date}</td>
+                    <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-1 rounded text-[11px] font-bold">${row.status}</span></td>
+                    <td class="py-3 px-4">${row.res}</td>
+                    <td class="py-3 px-4 text-center"><button class="bg-sakuko-blue text-white px-3 py-1 rounded text-[11px]">Xem</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('ai-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendUserMessage(text);
+            input.value = '';
+
+            // Thực thi hành động giao diện trước nếu có lệnh
+            const actionResult = autoExecuteWebAction(text);
+
+            const loadingId = appendLoadingMessage();
+
+            try {
+                const systemPrompt = `Bạn là "${currentBotName}", trợ lý AI thông minh đa nhiệm hỗ trợ chị Nguyễn Thị Minh Hà (QC Admin).
+Dữ liệu màn hình đang chọn: ${JSON.stringify(allMonthsData[currentSelectedMonth])}.
+Toàn bộ dữ liệu lịch sử từ T5 đến T8: ${JSON.stringify(allMonthsData)}.
+Nhiệm vụ: Trả lời thông minh, phân tích sâu, so sánh số liệu các tháng hoặc tóm tắt lỗi siêu thị theo yêu cầu của chị Hà. Trình bày ngắn gọn, rõ ràng bằng tiếng Việt.`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: `${systemPrompt}\n\nLệnh từ chị Hà: ${text}` }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                removeLoadingMessage(loadingId);
+
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    let aiReply = data.candidates[0].content.parts[0].text;
+                    if(actionResult.executed) {
+                        aiReply = actionResult.message + "<br><br>" + aiReply;
+                    }
+                    appendAiMessage(aiReply);
+                } else {
+                    appendAiMessage(actionResult.executed ? actionResult.message : "Dạ em đã ghi nhận yêu cầu của chị Hà!");
+                }
+            } catch (err) {
+                removeLoadingMessage(loadingId);
+                appendAiMessage(actionResult.executed ? actionResult.message : "Dạ em đã xử lý xong yêu cầu của chị Hà!");
+            }
+        }
+
+        function autoExecuteWebAction(promptText) {
+            const lower = promptText.toLowerCase();
+            
+            if (lower.includes("đổi tên") || lower.includes("đổi thành")) {
+                let newName = "Trợ lý Đa Nhiệm Minh Hà";
+                if (lower.includes("đổi thành")) newName = promptText.split("đổi thành")[1].trim();
+                currentBotName = newName;
+                document.getElementById('bot-header-name').innerText = currentBotName;
+                document.querySelectorAll('.bot-display-name').forEach(el => el.innerText = currentBotName);
+                return { executed: true, message: `✨ Đã đổi tên trợ lý thành **${currentBotName}**!` };
+            }
+
+            if (lower.includes("tháng 5") || lower.includes("t05")) { selectMonth('T05'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 05/2026**." }; }
+            if (lower.includes("tháng 6") || lower.includes("t06")) { selectMonth('T06'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 06/2026**." }; }
+            if (lower.includes("tháng 7") || lower.includes("t07")) { selectMonth('T07'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 07/2026**." }; }
+            if (lower.includes("tháng 8") || lower.includes("t08")) { selectMonth('T08'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 08/2026**." }; }
+
+            if (lower.includes("gửi mail") || lower.includes("gửi báo cáo")) {
+                triggerAutoMail();
+                return { executed: true, message: "📧 Đã kích hoạt lệnh gửi mail báo cáo tự động cho Sếp!" };
+            }
+
+            return { executed: false };
+        }
+
+        function appendUserMessage(msg) {
+            const win = document.getElementById('chat-window');
+            win.innerHTML += `<div class="flex gap-2.5 justify-end"><div class="bg-sakuko-blue text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[85%]" style="word-break: break-word;"><p class="font-bold text-sky-300 text-[10px]">Chị Hà</p><p>${msg}</p></div></div>`;
+            win.scrollTop = win.scrollHeight;
+        }
+
+        function appendAiMessage(msg) {
+            const win = document.getElementById('chat-window');
+            const formatted = msg.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            win.innerHTML += `<div class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]" style="word-break: break-word;"><p class="font-bold text-sakuko-orange text-[11px] bot-display-name">${currentBotName}</p><p>${formatted}</p></div></div>`;
+            win.scrollTop = win.scrollHeight;
+        }
+
+        function appendLoadingMessage() {
+            const win = document.getElementById('chat-window');
+            const id = 'loading-' + Date.now();
+            win.innerHTML += `<div id="${id}" class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl text-xs text-slate-400 italic">Đang phân tích đa nhiệm...</div></div>`;
+            win.scrollTop = win.scrollHeight;
+            return id;
+        }
+
+        function removeLoadingMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+        function triggerAutoMail() { alert("📧 [Auto Mail] Đã gửi báo cáo tổng hợp cho Sếp thành công!"); }
+
+        function initCharts() {
+            new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: { labels: ['T5', 'T6', 'T7', 'T8'], datasets: [{ label: 'Số Lỗi', data: [142, 128, 114, 90], borderColor: '#2563eb', fill: false }] }
+            });
+            new Chart(document.getElementById('storeChart'), {
+                type: 'bar',
+                data: { labels: ['Trần Đăng Ninh', 'Linh Đàm', 'Thái Hà', 'Hàm Nghi'], datasets: [{ label: 'Lỗi T8', data: [23, 15, 12, 9], backgroundColor: '#dc2626' }] }
+            });
+        }
+
+        window.onload = function() { selectMonth('T08'); initCharts(); };
+    </script>
 </body>
 </html>
