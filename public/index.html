@@ -38,19 +38,34 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* Upload Box */
-    .upload-card { background: #fff; border: 2px dashed var(--navy-light); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; }
-    .btn { background: var(--navy-light); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    /* Dedicated Upload Card inside Reports */
+    .upload-section {
+      background: #fff;
+      border: 2px dashed var(--navy-light);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    .upload-info h4 { font-size: 15px; color: var(--navy); margin-bottom: 4px; }
+    .upload-info p { font-size: 12px; color: #64748B; }
+    .upload-controls { display: flex; align-items: center; gap: 10px; }
+    .month-picker { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; }
+
+    .btn { background: var(--navy-light); color: #fff; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
     .btn-pink { background: var(--pink); }
 
     /* KPI Cards */
     .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-    .kpi-card { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
+    .kpi-card { background: #fff; padding: 18px; border-radius: 10px; border: 1px solid var(--border); }
     .kpi-card h4 { font-size: 12px; color: #64748B; margin-bottom: 8px; text-transform: uppercase; }
-    .kpi-card .val { font-size: 24px; font-weight: 700; color: var(--navy); }
+    .kpi-card .val { font-size: 22px; font-weight: 700; color: var(--navy); }
 
     /* Report Paper Simulation */
-    .report-paper { background: #fff; padding: 35px; border-radius: 8px; border: 1px solid var(--border); max-width: 900px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .report-paper { background: #fff; padding: 35px; border-radius: 8px; border: 1px solid var(--border); max-width: 950px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
     .report-paper h2 { color: #111; margin-bottom: 5px; font-size: 20px; text-transform: uppercase; }
     .report-paper .meta { color: #666; font-size: 13px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     .report-paper p, .report-paper li { font-size: 14px; line-height: 1.6; color: #333; }
@@ -64,18 +79,17 @@
   <aside>
     <div class="brand">SAKUKO QC <span>REPORT</span></div>
     <ul class="menu">
-      <li class="menu-item active" onclick="switchTab('upload')">📤 Tải Dữ Liệu Lên</li>
-      <li class="menu-item" onclick="switchTab('report-doitra')">🔄 Báo Cáo Đổi Trả</li>
-      <li class="menu-item" onclick="switchTab('report-dichvu')">🌟 Đánh Giá Dịch Vụ</li>
-      <li class="menu-item" onclick="switchTab('report-ctkm')">🎨 Đánh Giá CTKM</li>
-      <li class="menu-item" onclick="switchTab('dashboard')">📈 Tổng Quan Dashboard</li>
+      <li class="menu-item active" onclick="switchTab(this, 'report-doitra')">🔄 Báo Cáo Đổi Trả</li>
+      <li class="menu-item" onclick="switchTab(this, 'report-dichvu')">🌟 Đánh Giá Dịch Vụ</li>
+      <li class="menu-item" onclick="switchTab(this, 'report-ctkm')">🎨 Đánh Giá CTKM</li>
+      <li class="menu-item" onclick="switchTab(this, 'dashboard')">📈 Tổng Quan Dashboard</li>
     </ul>
   </aside>
 
   <!-- Main View -->
   <main>
     <header>
-      <h3 id="page-title">Tải Lên & Xử Lý Dữ Liệu Báo Cáo</h3>
+      <h3 id="page-title">Báo Cáo Kết Quả Đổi Trả Giao Dịch Tháng</h3>
       <div class="user-info">
         <div>
           <strong>Nguyễn Thị Minh Hà</strong><br>
@@ -87,22 +101,26 @@
 
     <div class="content">
 
-      <!-- TAB 1: UPLOAD DỮ LIỆU -->
-      <div id="tab-upload" class="tab-panel active">
-        <div class="upload-card">
-          <h3>📥 Tải file dữ liệu báo cáo tháng lên hệ thống</h3>
-          <p style="color:#64748B; margin: 10px 0 20px;">Hỗ trợ file Excel (.xlsx), CSV hoặc file ảnh biên bản chấm điểm siêu thị</p>
-          <input type="file" id="fileInput" multiple style="display:none">
-          <button class="btn btn-pink" onclick="document.getElementById('fileInput').click()">Chọn File Báo Cáo</button>
+      <!-- TAB 1: BÁO CÁO ĐỔI TRẢ -->
+      <div id="tab-report-doitra" class="tab-panel active">
+        <!-- Khu Upload Riêng Cho Đổi Trả -->
+        <div class="upload-section">
+          <div class="upload-info">
+            <h4>📥 Tải lên dữ liệu Đổi trả Siêu thị</h4>
+            <p>Hỗ trợ file Excel chi tiết đơn đổi trả (.xlsx, .xls, .csv)</p>
+          </div>
+          <div class="upload-controls">
+            <input type="month" value="2026-08" class="month-picker">
+            <input type="file" id="fileDoitra" style="display:none">
+            <button class="btn btn-pink" onclick="document.getElementById('fileDoitra').click()">Chọn File Đổi Trả</button>
+            <button class="btn" onclick="alert('Đã tạo xong báo cáo Đổi trả!')">⚡ Phân Tích & Xuất Báo Cáo</button>
+          </div>
         </div>
-      </div>
 
-      <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
-      <div id="tab-report-doitra" class="tab-panel">
-        <div style="margin-bottom:15px; text-align:right;">
-          <button class="btn" onclick="alert('Đã sao chép nội dung báo cáo!')">📋 Copy Văn Bản Báo Cáo</button>
-        </div>
         <div class="report-paper">
+          <div style="text-align:right; margin-bottom:10px;">
+            <button class="btn" style="background:#475569" onclick="alert('Đã sao chép nội dung báo cáo!')">📋 Copy Văn Bản Báo Cáo</button>
+          </div>
           <h2>BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG 07/2026</h2>
           <div class="meta">P. Kiểm soát - SVN | Ngày xuất: 2026-08-05</div>
           <p>Dear các anh chị Siêu thị,</p>
@@ -110,25 +128,39 @@
           
           <div class="kpi-grid" style="margin-top:20px;">
             <div class="kpi-card"><h4>Số Siêu Thị Offline</h4><div class="val">22</div></div>
-            <div class="kpi-card"><h4>Top 1 Đổi Trả</h4><div class="val" style="font-size:16px; color:#D97706;">SKK Trần Đăng Ninh (23)</div></div>
-            <div class="kpi-card"><h4>Top 2 Đổi Trả</h4><div class="val" style="font-size:16px;">SKK Mandarin C1 (17)</div></div>
-            <div class="kpi-card"><h4>Top 3 Đổi Trả</h4><div class="val" style="font-size:16px;">SKK Nguyễn Tuân (15)</div></div>
+            <div class="kpi-card"><h4>Top 1 Đổi Trả</h4><div class="val" style="font-size:15px; color:#D97706;">SKK Trần Đăng Ninh (23)</div></div>
+            <div class="kpi-card"><h4>Top 2 Đổi Trả</h4><div class="val" style="font-size:15px;">SKK Mandarin C1 (17)</div></div>
+            <div class="kpi-card"><h4>Top 3 Đổi Trả</h4><div class="val" style="font-size:15px;">SKK Nguyễn Tuân (15)</div></div>
           </div>
 
           <div class="highlight-box">
             <strong>Nhận xét chung:</strong>
             <p>Các siêu thị có số lượng đổi trả cao nhất trong tháng: <b>SKK Trần Đăng Ninh, SKK Mandarin, SKK Nguyễn Tuân</b>.</p>
-            <p>Tổng số đơn đổi trả tại nhóm dẫn đầu đã giảm rõ rệt trong tháng 7 (ví dụ SKK Trần Đăng Ninh giảm từ 30 xuống 23 đơn), cho thấy các đơn vị đã có sự cải thiện nhất định. Tỷ lệ lỗi phát sinh từ phía siêu thị giảm xuống còn 21.05%.</p>
+            <p>Tổng số đơn đổi trả tại nhóm dẫn đầu đã giảm rõ rệt trong tháng 7 (ví dụ SKK Trần Đăng Ninh giảm từ 30 xuống 23 đơn). Tỷ lệ lỗi phát sinh từ phía siêu thị giảm xuống còn 21.05%.</p>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: BÁO CÁO ĐÁNH GIÁ DỊCH VỤ -->
+      <!-- TAB 2: BÁO CÁO ĐÁNH GIÁ DỊCH VỤ -->
       <div id="tab-report-dichvu" class="tab-panel">
-        <div style="margin-bottom:15px; text-align:right;">
-          <button class="btn" onclick="alert('Đã sao chép nội dung báo cáo!')">📋 Copy Văn Bản Báo Cáo</button>
+        <!-- Khu Upload Riêng Cho Đánh Giá Dịch Vụ -->
+        <div class="upload-section">
+          <div class="upload-info">
+            <h4>📥 Tải lên dữ liệu Đánh Giá Dịch Vụ</h4>
+            <p>Hỗ trợ file Bảng điểm chấm dịch vụ các siêu thị (.xlsx, .csv)</p>
+          </div>
+          <div class="upload-controls">
+            <input type="month" value="2026-08" class="month-picker">
+            <input type="file" id="fileDichvu" style="display:none">
+            <button class="btn btn-pink" onclick="document.getElementById('fileDichvu').click()">Chọn File Dịch Vụ</button>
+            <button class="btn" onclick="alert('Đã tạo xong báo cáo Dịch vụ!')">⚡ Phân Tích & Xuất Báo Cáo</button>
+          </div>
         </div>
+
         <div class="report-paper">
+          <div style="text-align:right; margin-bottom:10px;">
+            <button class="btn" style="background:#475569" onclick="alert('Đã sao chép nội dung báo cáo!')">📋 Copy Văn Bản Báo Cáo</button>
+          </div>
           <h2>BÁO CÁO KẾT QUẢ ĐÁNH GIÁ DỊCH VỤ THÁNG 07 NĂM 2026</h2>
           <div class="meta">Phòng Kiểm soát chất lượng &lt;pks@sakukovietnam.com.vn&gt;</div>
           <p>Dear các Anh/ Chị;</p>
@@ -148,8 +180,22 @@
         </div>
       </div>
 
-      <!-- TAB 4: BÁO CÁO CTKM -->
+      <!-- TAB 3: BÁO CÁO CTKM -->
       <div id="tab-report-ctkm" class="tab-panel">
+        <!-- Khu Upload Riêng Cho Trưng Bày CTKM -->
+        <div class="upload-section">
+          <div class="upload-info">
+            <h4>📥 Tải lên dữ liệu Trưng Bày CTKM</h4>
+            <p>Hỗ trợ file Báo cáo hình ảnh / Excel kết quả kiểm tra trưng bày</p>
+          </div>
+          <div class="upload-controls">
+            <input type="month" value="2026-08" class="month-picker">
+            <input type="file" id="fileCTKM" style="display:none">
+            <button class="btn btn-pink" onclick="document.getElementById('fileCTKM').click()">Chọn File CTKM</button>
+            <button class="btn" onclick="alert('Đã tạo xong báo cáo CTKM!')">⚡ Phân Tích & Xuất Báo Cáo</button>
+          </div>
+        </div>
+
         <div class="report-paper">
           <h2>KẾT QUẢ ĐÁNH GIÁ TRƯNG BÀY CTKM THÁNG 08/2026</h2>
           <div class="meta">P. Kiểm soát - SVN | 2026-08-05</div>
@@ -166,7 +212,7 @@
         </div>
       </div>
 
-      <!-- TAB 5: DASHBOARD TỔNG QUAN -->
+      <!-- TAB 4: DASHBOARD TỔNG QUAN -->
       <div id="tab-dashboard" class="tab-panel">
         <div class="kpi-grid">
           <div class="kpi-card"><h4>Tổng Đợt Báo Cáo</h4><div class="val">12 đợt</div></div>
@@ -180,17 +226,14 @@
   </main>
 
   <script>
-    function switchTab(tabName) {
-      // Toggle Tab Active
-      document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+    function switchTab(el, tabName) {
+      document.querySelectorAll('.tab-panel').forEach(item => item.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
       
       document.getElementById('tab-' + tabName).classList.add('active');
-      event.currentTarget.classList.add('active');
+      el.classList.add('active');
 
-      // Update Header Title
       const titles = {
-        'upload': 'Tải Lên & Xử Lý Dữ Liệu Báo Cáo',
         'report-doitra': 'Báo Cáo Kết Quả Đổi Trả Giao Dịch Tháng',
         'report-dichvu': 'Báo Cáo Kết Quả Đánh Giá Dịch Vụ Tháng',
         'report-ctkm': 'Báo Cáo Đánh Giá Trưng Bày CTKM Tháng',
