@@ -39,8 +39,9 @@
                 <a href="#" onclick="switchTab('dashboard', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dashboard">
                     <i class="fa-solid fa-chart-pie w-5"></i> Tổng Quan Dashboard
                 </a>
+                <!-- Báo Cáo Đổi Trả - ĐÃ THAY ICON KHIÊN ĐỒNG BỘ -->
                 <a href="#" onclick="switchTab('doitra', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition" data-target="doitra">
-                    <i class="fa-solid fa-arrows-rotate text-sakuko-orange w-5"></i> Báo Cáo Đổi Trả
+                    <i class="fa-solid fa-shield-halved text-sakuko-orange w-5"></i> Báo Cáo Đổi Trả
                 </a>
                 <a href="#" onclick="switchTab('dichvu', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dichvu">
                     <i class="fa-solid fa-star w-5"></i> Đánh Giá Dịch Vụ
@@ -81,7 +82,7 @@
         <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
         <div id="doitra" class="content-section p-8 space-y-6">
             
-            <!-- Header Icon Chuyên Nghiệp + Lịch sử Cập Nhật -->
+            <!-- Header Icon Chuyên Nghiệp -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <div class="flex items-center gap-2.5">
@@ -106,7 +107,7 @@
                 </div>
             </div>
 
-            <!-- Bảng số liệu chi tiết + Nút Thêm Hàng bên dưới header bảng -->
+            <!-- Bảng số liệu chi tiết -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                     <div>
@@ -138,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- Biểu đồ Giao Dịch Đổi Hàng 12 Tháng Cả Năm -->
+            <!-- Biểu đồ Giao Dịch 12 Tháng -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
@@ -151,13 +152,12 @@
                 </div>
             </div>
 
-            <!-- BÁO CÁO KẾT QUẢ - ĐÃ ĐỔI ICON VÀ LINK DỮ LIỆU ĐỘNG TỪ BẢNG LARK -->
+            <!-- BÁO CÁO KẾT QUẢ - ĐÃ ĐƯỢC BỔ SUNG CẢNH BÁO VÀ LỜI KHUYÊN CHI TIẾT -->
             <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
                 <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
                     <div class="flex items-center gap-2.5">
-                        <!-- Icon Báo Cáo Chuyên Nghiệp Mới -->
                         <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-line text-sakuko-orange text-sm"></i>
+                            <i class="fa-solid fa-shield-halved text-sakuko-orange text-sm"></i>
                         </div>
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
                     </div>
@@ -168,7 +168,7 @@
 
                 <div class="p-6 bg-white text-slate-800 space-y-5">
                     
-                    <!-- HỆ THỐNG CẢNH BÁO DỮ LIỆU -->
+                    <!-- CẢNH BÁO DỮ LIỆU THIẾU -->
                     <div id="dataWarningBox" class="hidden p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-amber-800 text-xs">
                         <div class="flex items-center gap-2 font-bold mb-1">
                             <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
@@ -188,13 +188,12 @@
                         Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng 8/2026.
                     </p>
 
-                    <!-- Khối thông số: Số Siêu Thị Offline ĐỘNG TÍNH TỪ BẢNG & Top Đơn Cao -->
+                    <!-- Khối thông số -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-center items-center shadow-sm">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                                 <i class="fa-solid fa-store text-sakuko-blue"></i> SỐ SIÊU THỊ OFFLINE
                             </span>
-                            <!-- Lấy chính xác từ tổng số siêu thị trong bảng thực -->
                             <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">22</span>
                         </div>
                         <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
@@ -205,23 +204,33 @@
                         </div>
                     </div>
 
-                    <!-- Nhận xét tự động chính xác 100% dựa trên dữ liệu bảng -->
-                    <div class="space-y-2">
+                    <!-- PHẦN NHẬN XÉT VÀ CẢNH BÁO CHI TIẾT -->
+                    <div class="space-y-3">
                         <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-square-poll-vertical text-sakuko-orange"></i> Nhận xét chung:
+                            <i class="fa-solid fa-magnifying-glass-chart text-sakuko-orange"></i> Nhận xét & Đánh giá chi tiết:
                         </h4>
-                        <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-1.5 leading-relaxed">
+                        <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-2 leading-relaxed">
                             <!-- JS tự tạo nhận xét chuẩn -->
                         </ul>
                     </div>
 
-                    <!-- Lưu ý quy trình -->
+                    <!-- PHẦN KHUYÊN BẢO & KHẮC PHỤC CHO THÁNG TIẾP THEO -->
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG 9/2026:
+                        </h4>
+                        <div id="adviceTextList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+                            <!-- JS Render Lời Khuyên -->
+                        </div>
+                    </div>
+
+                    <!-- Lưu ý quy trình bắt buộc -->
                     <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
                         <p class="font-bold text-amber-950 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý:
+                            <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý bắt buộc:
                         </p>
                         <p class="pl-5">• Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
-                        <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm trước khi tiến hành tạo đơn đổi trả trên hệ thống.</p>
+                        <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm (bao bì, date, lỗi tem giá) trước khi tiến hành tạo đơn đổi trả trên hệ thống POS/Lark.</p>
                     </div>
                 </div>
             </div>
@@ -242,7 +251,6 @@
     </main>
 
     <script>
-        // Cấu hình API Lark Base
         const LARK_CONFIG = {
             appId: 'cli_aaf3ff925438dee6',
             appSecret: 'l0co7N4IIUiVyVKmk5mdfef0WWOXKWe0',
@@ -250,7 +258,6 @@
             tableId: 'tblWoJQxfccqGwr8'
         };
 
-        // Danh sách đầy đủ 22 siêu thị khớp 100% với dữ liệu bảng Lark Base
         let storeData = [
             { name: "S1001 -- SKK Đội Cấn", t7: 11, t8: 11 },
             { name: "S1002 -- SKK Linh Đàm", t7: 5, t8: 5 },
@@ -276,12 +283,9 @@
             { name: "S2201 -- SKK Bắc Ninh", t7: 10, t8: 10 }
         ];
 
-        // Mảng dữ liệu cả năm 12 tháng
         let fullYearData = [0, 0, 0, 0, 0, 0, 185, 191, 0, 0, 0, 0];
-
         let chartInstance = null;
 
-        // Render Bảng Dữ Liệu
         function renderTable() {
             const tbody = document.getElementById('doitraTableBody');
             tbody.innerHTML = '';
@@ -295,7 +299,6 @@
                     hasIncompleteData = true;
                 }
 
-                // Biến động
                 let diffHTML = '';
                 if (valT7 !== null && valT8 !== null) {
                     const diff = valT8 - valT7;
@@ -332,7 +335,6 @@
                 tbody.appendChild(tr);
             });
 
-            // Cảnh báo nếu dữ liệu không đầy đủ
             const warningBox = document.getElementById('dataWarningBox');
             if (hasIncompleteData || storeData.length === 0) {
                 warningBox.classList.remove('hidden');
@@ -364,7 +366,6 @@
             renderTable();
         }
 
-        // Biểu đồ Cả Năm (12 Tháng)
         function initFullYearChart() {
             const ctx = document.getElementById('fullYearChart').getContext('2d');
             const labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
@@ -410,15 +411,14 @@
                 sumT7 += (parseInt(s.t7) || 0);
                 sumT8 += (parseInt(s.t8) || 0);
             });
-            fullYearData[6] = sumT7; // T7
-            fullYearData[7] = sumT8; // T8
+            fullYearData[6] = sumT7;
+            fullYearData[7] = sumT8;
             chartInstance.data.datasets[0].data = fullYearData;
             chartInstance.update();
         }
 
-        // Tự động sinh báo cáo kết quả động từ dữ liệu thật
+        // Tự tạo nhận xét sâu + Lời khuyên tối ưu
         function generateReport() {
-            // SỐ SIÊU THỊ OFFLINE TỰ ĐỘNG LẤY THEO ĐỘ DÀI MẢNG DỮ LIỆU
             document.getElementById('totalStoresCount').innerText = storeData.length;
 
             const sorted = [...storeData].sort((a, b) => (parseInt(b.t8)||0) - (parseInt(a.t8)||0));
@@ -436,20 +436,43 @@
             });
 
             let sumT7 = 0, sumT8 = 0;
+            let increasedStores = [];
             storeData.forEach(s => {
-                sumT7 += (parseInt(s.t7) || 0);
-                sumT8 += (parseInt(s.t8) || 0);
+                const t7 = parseInt(s.t7) || 0;
+                const t8 = parseInt(s.t8) || 0;
+                sumT7 += t7;
+                sumT8 += t8;
+                if (t8 > t7) {
+                    increasedStores.push(s.name.replace(/S\d+\s*--\s*/, ''));
+                }
             });
 
             const diffTotal = sumT8 - sumT7;
             const topNames = top3.map(s => s.name.replace(/S\d+\s*--\s*/, '')).join(', ');
 
+            // Phân tích sâu
             const analysisList = document.getElementById('analysisTextList');
             analysisList.innerHTML = `
-                <li>Toàn hệ thống hiện có <strong class="text-slate-900">${storeData.length} siêu thị Offline</strong> đang hoạt động ghi nhận dữ liệu đổi trả.</li>
-                <li>Các siêu thị có số lượng đơn đổi trả phát sinh cao nhất trong tháng: <strong class="text-slate-900">${topNames}</strong>.</li>
-                <li>Tổng số đơn đổi trả toàn hệ thống ghi nhận trong tháng 8 là <strong class="text-slate-900">${sumT8} đơn</strong> (So với tháng 7 là <strong>${sumT7} đơn</strong>, ${diffTotal < 0 ? 'giảm ' + Math.abs(diffTotal) : (diffTotal > 0 ? 'tăng ' + diffTotal : 'giữ nguyên')} đơn).</li>
-                <li>Hệ thống khuyến nghị các siêu thị nằm trong nhóm đầu tiếp tục nâng cao kiểm soát quy trình giao dịch quầy để giảm thiểu tỷ lệ phát sinh đơn đổi trả.</li>
+                <li><strong>Quy mô kiểm soát:</strong> Hệ thống hiện ghi nhận số liệu từ <strong class="text-slate-900">${storeData.length} siêu thị Offline</strong>. Tổng số đơn đổi trả tháng 8 là <strong class="text-slate-900">${sumT8} đơn</strong> (Tháng 7: <strong>${sumT7} đơn</strong>, ${diffTotal < 0 ? 'giảm ' + Math.abs(diffTotal) : (diffTotal > 0 ? 'tăng ' + diffTotal : 'giữ nguyên')} đơn).</li>
+                <li><strong>Mức độ tập trung rủi ro:</strong> 3 siêu thị có lượng đơn phát sinh cao nhất gồm <strong class="text-rose-600">${topNames}</strong> chiếm tỷ trọng lớn trong toàn hệ thống.</li>
+                <li><strong class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo biến động:</strong> ${increasedStores.length > 0 ? `Các cửa hàng ghi nhận số đơn tăng so với tháng trước bao gồm: <strong>${increasedStores.join(', ')}</strong>.` : 'Không có siêu thị nào tăng đơn đột biến so với tháng trước.'}</li>
+            `;
+
+            // Lời khuyên hành động cho tháng 9
+            const adviceContainer = document.getElementById('adviceTextList');
+            adviceContainer.innerHTML = `
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-user-gear text-sakuko-blue"></i> 1. Đối với nhóm Top nguy cơ cao (${top3[0] ? top3[0].name.replace(/S\d+\s*--\s*/, '') : 'Top 1'}...):
+                    </p>
+                    <p class="text-slate-600 text-[11px] leading-relaxed">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết (lỗi do tư vấn, hàng hóa hỏng/lỗi hay thao tác nhầm của thu ngân) và báo cáo biện pháp khắc phục trước ngày 15/09.</p>
+                </div>
+                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-graduation-cap text-emerald-600"></i> 2. Đào tạo quy trình POS & Thu ngân:
+                    </p>
+                    <p class="text-slate-600 text-[11px] leading-relaxed">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã hoặc in trùng hóa đơn.</p>
+                </div>
             `;
         }
 
