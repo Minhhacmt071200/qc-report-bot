@@ -70,17 +70,26 @@
 
         <!-- TAB 1: DASHBOARD -->
         <div id="dashboard" class="content-section p-8 space-y-6">
-            <!-- Filter Bar -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <!-- Filter Bar / Date Picker -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-days text-sakuko-orange"></i>
+                    <i class="fa-solid fa-calendar-days text-sakuko-orange text-base"></i>
                     <span class="text-xs font-bold text-slate-700">Chọn Tháng Xem Dữ Liệu Báo Cáo:</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button id="tab-T05" onclick="selectMonth('T05')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 05/2026</button>
-                    <button id="tab-T06" onclick="selectMonth('T06')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 06/2026</button>
-                    <button id="tab-T07" onclick="selectMonth('T07')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Tháng 07/2026</button>
-                    <button id="tab-T08" onclick="selectMonth('T08')" class="month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow">Tháng 08/2026</button>
+                
+                <div class="flex items-center gap-3">
+                    <!-- Date Picker (Ô chọn tháng lịch) -->
+                    <div class="relative flex items-center">
+                        <input type="month" id="monthPicker" onchange="handleMonthInputChange(this.value)" value="2026-08" min="2026-01" max="2026-12" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs font-bold rounded-lg focus:ring-sakuko-blue focus:border-sakuko-blue block px-3 py-2 cursor-pointer shadow-sm">
+                    </div>
+
+                    <!-- Phím tắt chọn nhanh tháng -->
+                    <div class="flex items-center gap-1.5 border-l border-slate-200 pl-3">
+                        <button id="btn-T05" onclick="selectMonth('T05')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">T5/2026</button>
+                        <button id="btn-T06" onclick="selectMonth('T06')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">T6/2026</button>
+                        <button id="btn-T07" onclick="selectMonth('T07')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">T7/2026</button>
+                        <button id="btn-T08" onclick="selectMonth('T08')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-sakuko-blue text-white shadow">T8/2026</button>
+                    </div>
                 </div>
             </div>
 
@@ -104,7 +113,7 @@
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-sakuko-orange"></i> Chi Tiết Nhiệm Vụ & Kết Quả Báo Cáo
+                        <i class="fa-solid fa-list-check text-sakuko-orange"></i> Chi Tiết Nhiệm Vụ Báo Cáo QC
                     </h3>
                     <span id="table-subtitle" class="text-xs text-slate-500 font-medium">Dữ liệu Tháng 08/2026</span>
                 </div>
@@ -115,7 +124,6 @@
                             <th class="py-3 px-4">TÊN BÁO CÁO QC</th>
                             <th class="py-3 px-4">HẠN NỘP</th>
                             <th class="py-3 px-4">TRẠNG THÁI</th>
-                            <th class="py-3 px-4">KẾT QUẢ / DỮ LIỆU ĐÃ LÀM</th>
                             <th class="py-3 px-4 text-center">THAO TÁC</th>
                         </tr>
                     </thead>
@@ -139,7 +147,7 @@
                 </div>
             </div>
 
-            <!-- New Display Comparison Chart Section -->
+            <!-- Display Comparison Chart Section -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
@@ -207,7 +215,7 @@
                 </div>
                 <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]">
                     <p class="font-bold text-sakuko-orange text-[11px] bot-display-name">Trợ lý Đa Nhiệm Minh Hà</p>
-                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể bảo em đổi tháng, phân tích so sánh lỗi siêu thị, tra cứu batch dữ liệu, chạy phân tích hoặc chuyển trang quản lý bất cứ lúc nào ạ! 😊</p>
+                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể chọn tháng trên lịch, bấm "Xem" chuyển đến từng báo cáo thật hoặc bảo em chuyển trang giúp chị nhé! 😊</p>
                 </div>
             </div>
         </div>
@@ -225,21 +233,49 @@
     <script>
         const CHAT_SESSION_ID = 'minh-ha-web';
 
+        // Dữ liệu chuẩn cho từng tháng, link trực tiếp tới các mục tab thật trên giao diện
         const allMonthsData = {
-            'T05': { monthName: 'Tháng 05/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', res: 'Top 1: SKK Thái Hà (18 đơn)' }, { m: 'T05', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/05', status: '✅ Đã làm', res: 'SKK Hàm Nghi đạt 100%' }, { m: 'T05', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/05', status: '✅ Đã làm', res: 'Chấm điểm 22/22 ST' }] },
-            'T06': { monthName: 'Tháng 06/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', res: 'Top 1: SKK Linh Đàm (21 đơn)' }, { m: 'T06', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/06', status: '✅ Đã làm', res: 'Vi phạm vệ sinh: 3 ST' }, { m: 'T06', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/06', status: '✅ Đã làm', res: 'Hoàn thành 22/22 ST' }] },
-            'T07': { monthName: 'Tháng 07/2026', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', rows: [{ m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (18 đơn)' }, { m: 'T07', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/07', status: '✅ Đã làm', res: 'Tỷ lệ phục vụ tốt 95%' }, { m: 'T07', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/07', status: '✅ Đã làm', res: 'CTKM Tháng 7 hoàn thành' }] },
-            'T08': { monthName: 'Tháng 08/2026', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', pendingColor: 'text-rose-600', rows: [{ m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', res: 'Top 1: SKK Trần Đăng Ninh (23 đơn)' }, { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', res: '17 lỗi tem giá' }, { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', res: 'Chưa tải file dữ liệu' }] }
+            'T05': { 
+                monthName: 'Tháng 05/2026', pickerValue: '2026-05', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', 
+                rows: [
+                    { m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', targetTab: 'doitra' },
+                    { m: 'T05', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/05', status: '✅ Đã làm', targetTab: 'dichvu' },
+                    { m: 'T05', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/05', status: '✅ Đã làm', targetTab: 'trungbay' }
+                ] 
+            },
+            'T06': { 
+                monthName: 'Tháng 06/2026', pickerValue: '2026-06', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', 
+                rows: [
+                    { m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', targetTab: 'doitra' },
+                    { m: 'T06', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/06', status: '✅ Đã làm', targetTab: 'dichvu' },
+                    { m: 'T06', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/06', status: '✅ Đã làm', targetTab: 'trungbay' }
+                ] 
+            },
+            'T07': { 
+                monthName: 'Tháng 07/2026', pickerValue: '2026-07', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', 
+                rows: [
+                    { m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', targetTab: 'doitra' },
+                    { m: 'T07', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/07', status: '✅ Đã làm', targetTab: 'dichvu' },
+                    { m: 'T07', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/07', status: '✅ Đã làm', targetTab: 'trungbay' }
+                ] 
+            },
+            'T08': { 
+                monthName: 'Tháng 08/2026', pickerValue: '2026-08', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', pendingColor: 'text-rose-600', 
+                rows: [
+                    { m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', targetTab: 'doitra' },
+                    { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', targetTab: 'dichvu' },
+                    { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', targetTab: 'trungbay' }
+                ] 
+            }
         };
 
         let currentSelectedMonth = 'T08';
         let currentBotName = "Trợ lý Đa Nhiệm Minh Hà";
 
-        // Hàm chuyển tab chức năng mượt mà
+        // Chuyển Tab chức năng trên hệ thống
         function switchTab(targetId, event) {
             if (event) event.preventDefault();
             
-            // Cập nhật active class menu sidebar
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
                 item.classList.add('text-slate-400', 'font-medium');
@@ -251,7 +287,6 @@
                 activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
             }
 
-            // Ẩn tất cả các section chính và hiển thị section được chọn
             document.querySelectorAll('.content-section').forEach(section => {
                 section.style.display = 'none';
             });
@@ -262,31 +297,55 @@
             }
         }
 
+        // Chọn tháng từ Ô Lịch DatePicker
+        function handleMonthInputChange(val) {
+            if (!val) return;
+            const [year, month] = val.split('-');
+            const monthKey = `T${month}`;
+            if (allMonthsData[monthKey]) {
+                selectMonth(monthKey);
+            } else {
+                document.getElementById('kpi-month').innerText = `Tháng ${month}/${year}`;
+                document.getElementById('table-subtitle').innerText = `Dữ liệu Tháng ${month}/${year}`;
+            }
+        }
+
+        // Cập nhật dữ liệu giao diện theo tháng
         function selectMonth(monthKey) {
             currentSelectedMonth = monthKey;
             const data = allMonthsData[monthKey];
+            if(!data) return;
 
-            document.querySelectorAll('.month-btn').forEach(btn => btn.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition');
-            const activeTab = document.getElementById(`tab-${monthKey}`);
-            if(activeTab) activeTab.className = 'month-btn px-4 py-2 rounded-lg text-xs font-bold bg-sakuko-blue text-white shadow';
+            // Cập nhật giá trị lịch picker
+            document.getElementById('monthPicker').value = data.pickerValue;
 
+            // Active style nút bấm nhanh
+            document.querySelectorAll('.month-btn').forEach(btn => btn.className = 'month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition');
+            const activeTab = document.getElementById(`btn-${monthKey}`);
+            if(activeTab) activeTab.className = 'month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-sakuko-blue text-white shadow';
+
+            // Cập nhật thẻ KPI
             document.getElementById('kpi-month').innerText = data.monthName;
             document.getElementById('kpi-done').innerText = data.kpiDone;
             document.getElementById('kpi-pending').innerText = data.kpiPending;
             document.getElementById('kpi-pending').className = `text-2xl font-black mt-1 ${data.pendingColor}`;
             document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
 
+            // Đổ lại dữ liệu bảng nhiệm vụ (Loại bỏ cột Kết quả đã làm)
             const tbody = document.getElementById('report-table-body');
             tbody.innerHTML = '';
             data.rows.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-bold">${row.m}</td>
-                    <td class="py-3 px-4 font-bold text-slate-900">${row.name}</td>
-                    <td class="py-3 px-4 text-slate-500">${row.date}</td>
-                    <td class="py-3 px-4"><span class="bg-slate-100 px-2 py-1 rounded text-[11px] font-bold">${row.status}</span></td>
-                    <td class="py-3 px-4">${row.res}</td>
-                    <td class="py-3 px-4 text-center"><button class="bg-sakuko-blue text-white px-3 py-1 rounded text-[11px]">Xem</button></td>
+                    <td class="py-3.5 px-4 font-bold text-slate-700">${row.m}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-900">${row.name}</td>
+                    <td class="py-3.5 px-4 text-slate-500 font-medium">${row.date}</td>
+                    <td class="py-3.5 px-4"><span class="bg-slate-100 px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-200">${row.status}</span></td>
+                    <td class="py-3.5 px-4 text-center">
+                        <button onclick="switchTab('${row.targetTab}', event)" class="bg-sakuko-blue hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5 mx-auto">
+                            <i class="fa-regular fa-eye"></i> Xem
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
