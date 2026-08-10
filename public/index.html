@@ -233,7 +233,7 @@
     <script>
         const CHAT_SESSION_ID = 'minh-ha-web';
 
-        // Dữ liệu chuẩn cho từng tháng, link trực tiếp tới các mục tab thật trên giao diện
+        // Dữ liệu chuẩn cho từng tháng
         const allMonthsData = {
             'T05': { 
                 monthName: 'Tháng 05/2026', pickerValue: '2026-05', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', 
@@ -331,7 +331,7 @@
             document.getElementById('kpi-pending').className = `text-2xl font-black mt-1 ${data.pendingColor}`;
             document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
 
-            // Đổ lại dữ liệu bảng nhiệm vụ (Loại bỏ cột Kết quả đã làm)
+            // Đổ lại dữ liệu bảng nhiệm vụ
             const tbody = document.getElementById('report-table-body');
             tbody.innerHTML = '';
             data.rows.forEach(row => {
