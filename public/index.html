@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKUKO QC REPORT PRO - MULTITASK AI</title>
+    <title>SAKUKO QC REPORT PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,7 +32,7 @@
             <div class="h-16 flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800">
                 <div class="flex items-center gap-2">
                     <span class="text-xl font-black tracking-wider text-white">SAKUKO <span class="text-sakuko-orange">QC</span></span>
-                    <span class="text-[10px] bg-sakuko-orange text-white font-bold px-1.5 py-0.5 rounded">PRO AI</span>
+                    <span class="text-[10px] bg-sakuko-orange text-white font-bold px-1.5 py-0.5 rounded">PRO</span>
                 </div>
             </div>
             <nav class="mt-6 px-3 space-y-1">
@@ -59,12 +59,12 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Main Content (Mở rộng tràn màn hình) -->
     <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
             <div class="flex items-center gap-3">
                 <h1 class="text-lg font-bold text-slate-800">Hệ Thống Báo Cáo Quản Lý Chất Lượng (QC Report)</h1>
-                <span class="bg-sky-100 text-sakuko-blue text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-sky-200">Phiên bản Pro 3.0 Multitask</span>
+                <span class="bg-sky-100 text-sakuko-blue text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-sky-200">Phiên bản Pro 3.0</span>
             </div>
         </header>
 
@@ -181,47 +181,7 @@
         </div>
     </main>
 
-    <!-- AI Multitask Sidebar Right -->
-    <aside id="ai-bot-sidebar" class="w-80 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 shadow-2xl z-30">
-        <div class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-sm shadow">
-                    <i class="fa-solid fa-robot"></i>
-                </div>
-                <div>
-                    <h3 id="bot-header-name" class="text-xs font-bold text-white">Trợ lý Đa Nhiệm Minh Hà</h3>
-                    <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> AI Active
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50 text-xs">
-            <div class="flex gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow">
-                    <i class="fa-solid fa-robot"></i>
-                </div>
-                <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]">
-                    <p class="font-bold text-sakuko-orange text-[11px] bot-display-name">Trợ lý Đa Nhiệm Minh Hà</p>
-                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể chọn tháng trên lịch, bấm "Xem" chuyển đến từng báo cáo thật hoặc bảo em chuyển trang giúp chị nhé! 😊</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-3 bg-white border-t border-slate-200">
-            <div class="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-1.5 border border-slate-200 focus-within:border-sakuko-blue transition">
-                <input id="ai-input" type="text" onkeypress="handleKeyPress(event)" placeholder="Nhập lệnh (vd: So sánh T8 với T7...)" class="w-full bg-transparent text-xs outline-none text-slate-700 placeholder-slate-400">
-                <button onclick="sendMessage()" class="w-7 h-7 rounded-lg bg-sakuko-orange hover:bg-orange-600 text-white flex items-center justify-center flex-shrink-0 shadow transition">
-                    <i class="fa-solid fa-paper-plane text-xs"></i>
-                </button>
-            </div>
-        </div>
-    </aside>
-
     <script>
-        const CHAT_SESSION_ID = 'minh-ha-web';
-
         const allMonthsData = {
             'T05': { 
                 monthName: 'Tháng 05/2026', pickerValue: '2026-05', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', pendingColor: 'text-emerald-600', 
@@ -257,9 +217,6 @@
             }
         };
 
-        let currentSelectedMonth = 'T08';
-        let currentBotName = "Trợ lý Đa Nhiệm Minh Hà";
-
         function switchTab(targetId, event) {
             if (event) event.preventDefault();
             document.querySelectorAll('.menu-item').forEach(item => {
@@ -289,7 +246,6 @@
         }
 
         function selectMonth(monthKey) {
-            currentSelectedMonth = monthKey;
             const data = allMonthsData[monthKey];
             if(!data) return;
 
@@ -322,143 +278,6 @@
                 tbody.appendChild(tr);
             });
         }
-
-        // TỰ ĐỘNG XỬ LÝ PHÂN TÍCH & NẠP LẠI KHI BACKEND LỖI (SMART FALLBACK)
-        async function sendMessage() {
-            const input = document.getElementById('ai-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            appendUserMessage(text);
-            input.value = '';
-
-            const actionResult = autoExecuteWebAction(text);
-            const loadingId = appendLoadingMessage();
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId: CHAT_SESSION_ID, message: text })
-                });
-
-                if (!response.ok) throw new Error("Backend API chưa kết nối");
-                const data = await response.json();
-                removeLoadingMessage(loadingId);
-
-                if (data.reply) {
-                    let aiReply = data.reply;
-                    if (actionResult.executed) aiReply = actionResult.message + "<br><br>" + aiReply;
-                    appendAiMessage(aiReply);
-                } else {
-                    throw new Error("Không có phản hồi từ backend");
-                }
-            } catch (err) {
-                // Xử lý Phân tích trực tiếp tại Front-End khi Backend không phản hồi
-                setTimeout(() => {
-                    removeLoadingMessage(loadingId);
-                    let fallbackReply = generateSmartAnalysis(text, actionResult);
-                    appendAiMessage(fallbackReply);
-                }, 500);
-            }
-        }
-
-        function generateSmartAnalysis(text, actionResult) {
-            const lower = text.toLowerCase();
-            let analysis = "";
-
-            if (lower.includes("phân tích") || lower.includes("đổi trả")) {
-                analysis = "📊 **KẾT QUẢ PHÂN TÍCH BÁO CÁO ĐỔI TRẢ (THÁNG 7 VS THÁNG 8/2026):**<br><br>" +
-                    "1. **Tổng quan xu hướng lỗi:**<br>" +
-                    "• **Tháng 07/2026:** Phát sinh **114 lỗi** đổi trả.<br>" +
-                    "• **Tháng 08/2026:** Số lỗi giảm xuống còn **90 lỗi** (Giảm **21%** - tín hiệu rất tích cực!).<br><br>" +
-                    "2. **Top điểm nóng phát sinh lỗi (Tháng 8):**<br>" +
-                    "• **SKK Trần Đăng Ninh:** 23 lỗi *(Cao nhất toàn hệ thống)*<br>" +
-                    "• **SKK Linh Đàm:** 15 lỗi<br>" +
-                    "• **SKK Thái Hà:** 12 lỗi<br>" +
-                    "• **SKK Hàm Nghi:** 9 lỗi<br><br>" +
-                    "💡 **Khuyến nghị QC:** Cần tăng cường rà soát quy trình dán tem nhãn và hướng dẫn bảo quản hàng hóa tại chi nhánh Trần Đăng Ninh.";
-            } else if (lower.includes("dịch vụ") || lower.includes("chấm điểm")) {
-                analysis = "⭐ **Báo cáo Đánh giá Dịch vụ:** Dữ liệu cho thấy các siêu thị duy trì điểm đánh giá trung bình trên **90%**. SKK Linh Đàm đạt điểm số trưng bày cao nhất (**95%**).";
-            } else if (actionResult.executed) {
-                analysis = actionResult.message;
-            } else {
-                analysis = "Dạ em đã ghi nhận yêu cầu! Chị có thể hỏi em phân tích báo cáo đổi trả, dịch vụ hoặc yêu cầu chuyển tháng xem dữ liệu nhé ạ.";
-            }
-
-            if (actionResult.executed && !lower.includes("phân tích") && !lower.includes("đổi trả")) {
-                return analysis;
-            } else if (actionResult.executed) {
-                return actionResult.message + "<br><br>" + analysis;
-            }
-
-            return analysis;
-        }
-
-        function autoExecuteWebAction(promptText) {
-            const lower = promptText.toLowerCase();
-
-            if (lower.includes("đổi tên") || lower.includes("đổi thành")) {
-                let newName = "Trợ lý Đa Nhiệm Minh Hà";
-                if (lower.includes("đổi thành")) newName = promptText.split("đổi thành")[1].trim();
-                currentBotName = newName;
-                document.getElementById('bot-header-name').innerText = currentBotName;
-                document.querySelectorAll('.bot-display-name').forEach(el => el.innerText = currentBotName);
-                return { executed: true, message: `✨ Đã đổi tên trợ lý thành **${currentBotName}**!` };
-            }
-
-            if (lower.includes("tháng 5") || lower.includes("t05")) { selectMonth('T05'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 05/2026**." }; }
-            if (lower.includes("tháng 6") || lower.includes("t06")) { selectMonth('T06'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 06/2026**." }; }
-            if (lower.includes("tháng 7") || lower.includes("t07")) { selectMonth('T07'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 07/2026**." }; }
-            if (lower.includes("tháng 8") || lower.includes("t08")) { selectMonth('T08'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 08/2026**." }; }
-
-            if (lower.includes("đổi trả") || lower.includes("báo cáo đổi trả")) {
-                switchTab('doitra');
-                return { executed: true, message: "🔄 Đã chuyển sang trang **Báo Cáo Đổi Trả**." };
-            }
-            if (lower.includes("dịch vụ") || lower.includes("đánh giá dịch vụ")) {
-                switchTab('dichvu');
-                return { executed: true, message: "⭐ Đã chuyển sang trang **Đánh Giá Dịch Vụ**." };
-            }
-            if (lower.includes("trưng bày") || lower.includes("ctkm")) {
-                switchTab('trungbay');
-                return { executed: true, message: "🏬 Đã chuyển sang trang **Trưng Bày CTKM**." };
-            }
-            if (lower.includes("dashboard") || lower.includes("tổng quan")) {
-                switchTab('dashboard');
-                return { executed: true, message: "📊 Đã chuyển về **Tổng Quan Dashboard**." };
-            }
-
-            return { executed: false };
-        }
-
-        function appendUserMessage(msg) {
-            const win = document.getElementById('chat-window');
-            win.innerHTML += `<div class="flex gap-2.5 justify-end"><div class="bg-sakuko-blue text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[85%]" style="word-break: break-word;"><p class="font-bold text-sky-300 text-[10px]">Chị Hà</p><p>${msg}</p></div></div>`;
-            win.scrollTop = win.scrollHeight;
-        }
-
-        function appendAiMessage(msg) {
-            const win = document.getElementById('chat-window');
-            const formatted = msg.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            win.innerHTML += `<div class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0 shadow"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]" style="word-break: break-word;"><p class="font-bold text-sakuko-orange text-[11px] bot-display-name">${currentBotName}</p><p>${formatted}</p></div></div>`;
-            win.scrollTop = win.scrollHeight;
-        }
-
-        function appendLoadingMessage() {
-            const win = document.getElementById('chat-window');
-            const id = 'loading-' + Date.now();
-            win.innerHTML += `<div id="${id}" class="flex gap-2.5"><div class="w-7 h-7 rounded-full bg-sakuko-orange text-white flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-white border border-slate-200 p-3 rounded-2xl text-xs text-slate-400 italic">Đang phân tích đa nhiệm...</div></div>`;
-            win.scrollTop = win.scrollHeight;
-            return id;
-        }
-
-        function removeLoadingMessage(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
-
-        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
         function initCharts() {
             new Chart(document.getElementById('trendChart'), {
