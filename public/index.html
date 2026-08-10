@@ -36,16 +36,16 @@
                 </div>
             </div>
             <nav class="mt-6 px-3 space-y-1">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition">
+                <a href="#" onclick="switchTab('dashboard', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition" data-target="dashboard">
                     <i class="fa-solid fa-chart-pie text-sakuko-orange w-5"></i> Tổng Quan Dashboard
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                <a href="#" onclick="switchTab('doitra', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="doitra">
                     <i class="fa-solid fa-rotate-left w-5"></i> Báo Cáo Đổi Trả
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                <a href="#" onclick="switchTab('dichvu', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dichvu">
                     <i class="fa-solid fa-star w-5"></i> Đánh Giá Dịch Vụ
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                <a href="#" onclick="switchTab('trungbay', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="trungbay">
                     <i class="fa-solid fa-store w-5"></i> Trưng Bày CTKM
                 </a>
             </nav>
@@ -66,14 +66,10 @@
                 <h1 class="text-lg font-bold text-slate-800">Hệ Thống Báo Cáo Quản Lý Chất Lượng (QC Report)</h1>
                 <span class="bg-sky-100 text-sakuko-blue text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-sky-200">Phiên bản Pro 3.0 Multitask</span>
             </div>
-            <div>
-                <button onclick="triggerAutoMail()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
-                    <i class="fa-solid fa-paper-plane text-sakuko-orange"></i> Gửi Mail Sếp
-                </button>
-            </div>
         </header>
 
-        <div class="p-8 space-y-6">
+        <!-- TAB 1: DASHBOARD -->
+        <div id="dashboard" class="content-section p-8 space-y-6">
             <!-- Filter Bar -->
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -127,7 +123,7 @@
                 </table>
             </div>
 
-            <!-- Charts -->
+            <!-- Charts (Trend & Top Store & Display Comparison) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <h4 class="text-xs font-bold text-slate-700 mb-4 flex items-center gap-2">
@@ -140,6 +136,49 @@
                         <i class="fa-solid fa-chart-bar text-rose-500"></i> Top Siêu Thị Phát Sinh Lỗi Đổi Trả T8
                     </h4>
                     <canvas id="storeChart" class="max-h-52"></canvas>
+                </div>
+            </div>
+
+            <!-- New Display Comparison Chart Section -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-store text-sakuko-orange"></i> So Sánh Chỉ Số Đánh Giá Trưng Bày Siêu Thị Theo Tháng
+                    </h4>
+                </div>
+                <canvas id="displayComparisonChart" class="max-h-52"></canvas>
+            </div>
+        </div>
+
+        <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
+        <div id="doitra" class="content-section p-8 space-y-6" style="display: none;">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-rotate-left text-sakuko-orange mr-2"></i> Quản Lý & Phân Tích Báo Cáo Đổi Trả</h3>
+                <p class="text-xs text-slate-500">Khu vực chuyên sâu theo dõi toàn bộ dữ liệu đổi trả giao dịch, nguyên nhân lỗi sản phẩm và lịch sử xử lý tại các siêu thị.</p>
+                <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-600">
+                    <p>💡 <i>Trợ lý AI đang sẵn sàng phân tích dữ liệu đổi trả chi tiết. Chị có thể nhập lệnh bên khung chat để tra cứu thêm!</i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ĐÁNH GIÁ DỊCH VỤ -->
+        <div id="dichvu" class="content-section p-8 space-y-6" style="display: none;">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-star text-sakuko-orange mr-2"></i> Báo Cáo Đánh Giá Dịch Vụ Siêu Thị</h3>
+                <p class="text-xs text-slate-500">Theo dõi điểm chuẩn chất lượng phục vụ, tác phong nhân viên, vệ sinh quầy kệ và các lỗi tem giá hàng tháng.</p>
+                <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-600">
+                    <p>⭐ <i>Dữ liệu chấm điểm dịch vụ được tổng hợp tự động từ các biên bản kiểm tra định kỳ và đột xuất.</i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: TRƯNG BÀY CTKM -->
+        <div id="trungbay" class="content-section p-8 space-y-6" style="display: none;">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-store text-sakuko-orange mr-2"></i> Báo Cáo Trưng Bày Chương Trình Khuyến Mãi (CTKM)</h3>
+                <p class="text-xs text-slate-500">Kiểm soát hình ảnh trưng bày sản phẩm khuyến mãi, POSM, và mức độ tuân thủ quy chuẩn visual merchandising tại các điểm bán.</p>
+                <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-600">
+                    <p>📊 <i>Biểu đồ so sánh chỉ số trưng bày siêu thị hiển thị đầy đủ tại Dashboard tổng quan.</i></p>
                 </div>
             </div>
         </div>
@@ -168,7 +207,7 @@
                 </div>
                 <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-xs text-slate-800 shadow-sm max-w-[85%]">
                     <p class="font-bold text-sakuko-orange text-[11px] bot-display-name">Trợ lý Đa Nhiệm Minh Hà</p>
-                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể bảo em đổi tháng, phân tích so sánh lỗi siêu thị, tra cứu batch dữ liệu, chạy phân tích hoặc xác nhận phát hành báo cáo bất cứ lúc nào ạ! 😊</p>
+                    <p>Dạ em chào chị Hà! Em đã sẵn sàng nhận lệnh đa nhiệm: Chị có thể bảo em đổi tháng, phân tích so sánh lỗi siêu thị, tra cứu batch dữ liệu, chạy phân tích hoặc chuyển trang quản lý bất cứ lúc nào ạ! 😊</p>
                 </div>
             </div>
         </div>
@@ -196,6 +235,33 @@
         let currentSelectedMonth = 'T08';
         let currentBotName = "Trợ lý Đa Nhiệm Minh Hà";
 
+        // Hàm chuyển tab chức năng mượt mà
+        function switchTab(targetId, event) {
+            if (event) event.preventDefault();
+            
+            // Cập nhật active class menu sidebar
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
+                item.classList.add('text-slate-400', 'font-medium');
+            });
+            
+            const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
+            if (activeMenu) {
+                activeMenu.classList.remove('text-slate-400', 'font-medium');
+                activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
+            }
+
+            // Ẩn tất cả các section chính và hiển thị section được chọn
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+        }
+
         function selectMonth(monthKey) {
             currentSelectedMonth = monthKey;
             const data = allMonthsData[monthKey];
@@ -207,7 +273,7 @@
             document.getElementById('kpi-month').innerText = data.monthName;
             document.getElementById('kpi-done').innerText = data.kpiDone;
             document.getElementById('kpi-pending').innerText = data.kpiPending;
-            document.getElementById('kpi-pending').className = `text-xl font-black mt-1 ${data.pendingColor}`;
+            document.getElementById('kpi-pending').className = `text-2xl font-black mt-1 ${data.pendingColor}`;
             document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
 
             const tbody = document.getElementById('report-table-body');
@@ -234,9 +300,7 @@
             appendUserMessage(text);
             input.value = '';
 
-            // Vẫn giữ các hành động UI tức thời (đổi tháng hiển thị, đổi tên trên đầu khung chat)
             const actionResult = autoExecuteWebAction(text);
-
             const loadingId = appendLoadingMessage();
 
             try {
@@ -281,9 +345,21 @@
             if (lower.includes("tháng 7") || lower.includes("t07")) { selectMonth('T07'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 07/2026**." }; }
             if (lower.includes("tháng 8") || lower.includes("t08")) { selectMonth('T08'); return { executed: true, message: "📂 Đã chuyển giao diện sang **Tháng 08/2026**." }; }
 
-            if (lower.includes("gửi mail") || lower.includes("gửi báo cáo")) {
-                triggerAutoMail();
-                return { executed: true, message: "📧 Đã kích hoạt lệnh gửi mail báo cáo tự động cho Sếp!" };
+            if (lower.includes("đổi trả") || lower.includes("báo cáo đổi trả")) {
+                switchTab('doitra');
+                return { executed: true, message: "🔄 Đã chuyển sang trang **Báo Cáo Đổi Trả**." };
+            }
+            if (lower.includes("dịch vụ") || lower.includes("đánh giá dịch vụ")) {
+                switchTab('dichvu');
+                return { executed: true, message: "⭐ Đã chuyển sang trang **Đánh Giá Dịch Vụ**." };
+            }
+            if (lower.includes("trưng bày") || lower.includes("ctkm")) {
+                switchTab('trungbay');
+                return { executed: true, message: "🏬 Đã chuyển sang trang **Trưng Bày CTKM**." };
+            }
+            if (lower.includes("dashboard") || lower.includes("tổng quan")) {
+                switchTab('dashboard');
+                return { executed: true, message: "📊 Đã chuyển về **Tổng Quan Dashboard**." };
             }
 
             return { executed: false };
@@ -316,16 +392,22 @@
         }
 
         function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
-        function triggerAutoMail() { alert("📧 [Auto Mail] Đã gửi báo cáo tổng hợp cho Sếp thành công!"); }
 
         function initCharts() {
             new Chart(document.getElementById('trendChart'), {
                 type: 'line',
-                data: { labels: ['T5', 'T6', 'T7', 'T8'], datasets: [{ label: 'Số Lỗi', data: [142, 128, 114, 90], borderColor: '#2563eb', fill: false }] }
+                data: { labels: ['T5', 'T6', 'T7', 'T8'], datasets: [{ label: 'Số Lỗi', data: [142, 128, 114, 90], borderColor: '#2563eb', fill: false }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
             });
             new Chart(document.getElementById('storeChart'), {
                 type: 'bar',
-                data: { labels: ['Trần Đăng Ninh', 'Linh Đàm', 'Thái Hà', 'Hàm Nghi'], datasets: [{ label: 'Lỗi T8', data: [23, 15, 12, 9], backgroundColor: '#dc2626' }] }
+                data: { labels: ['Trần Đăng Ninh', 'Linh Đàm', 'Thái Hà', 'Hàm Nghi'], datasets: [{ label: 'Lỗi T8', data: [23, 15, 12, 9], backgroundColor: '#dc2626' }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+            new Chart(document.getElementById('displayComparisonChart'), {
+                type: 'bar',
+                data: { labels: ['SKK Linh Đàm', 'SKK Trần Đăng Ninh', 'SKK Thái Hà', 'SKK Hàm Nghi'], datasets: [{ label: 'Điểm Trưng Bày (%)', data: [95, 88, 92, 85], backgroundColor: '#FF6500' }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
             });
         }
 
