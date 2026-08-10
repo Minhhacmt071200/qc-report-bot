@@ -42,7 +42,6 @@
                 <a href="#" onclick="switchTab('doitra', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="doitra">
                     <i class="fa-solid fa-shield-halved text-sakuko-orange w-5"></i> Báo Cáo Đổi Trả
                 </a>
-                <!-- Tên mới cho Mục Đánh Giá Dịch Vụ -->
                 <a href="#" onclick="switchTab('dichvu', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dichvu">
                     <i class="fa-solid fa-star w-5"></i> Chấm Điểm Dịch Vụ
                 </a>
@@ -71,7 +70,7 @@
             </div>
         </header>
 
-        <!-- TAB 1: TỔNG QUAN DASHBOARD (CỐ ĐỊNH 100%) -->
+        <!-- TAB 1: TỔNG QUAN DASHBOARD -->
         <div id="dashboard" class="content-section p-8 space-y-6">
             <div class="bg-gradient-to-r from-sakuko-navy to-sakuko-blue p-6 rounded-xl text-white shadow-md flex items-center justify-between">
                 <div>
@@ -173,7 +172,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (CỐ ĐỊNH 100%) -->
+        <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
         <div id="doitra" class="content-section p-8 space-y-6" style="display: none;">
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div>
@@ -304,10 +303,8 @@
             </div>
         </div>
 
-        <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ (MỚI BỔ SUNG THEO YÊU CẦU) -->
+        <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
         <div id="dichvu" class="content-section p-8 space-y-6" style="display: none;">
-            
-            <!-- Header Bar -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <div class="flex items-center gap-2.5">
@@ -321,7 +318,7 @@
                     <div class="text-right">
                         <p class="text-[11px] text-slate-400 font-medium">Lịch sử cập nhật gần nhất:</p>
                         <p class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
-                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="dichvuUpdateTime">06-08-2026 09:41 AM</span>
+                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="dichvuUpdateTime">10-08-2026 09:41 AM</span>
                         </p>
                     </div>
                     <button onclick="syncServiceData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
@@ -330,10 +327,8 @@
                 </div>
             </div>
 
-            <!-- Khối Biểu đồ Trực quan từ Lark Base -->
+            <!-- Khối Biểu đồ Trực quan -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-6">
-                
-                <!-- Biểu đồ 1: Tỷ lệ đạt điểm từng siêu thị -->
                 <div>
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
@@ -348,7 +343,6 @@
 
                 <hr class="border-slate-100">
 
-                <!-- Biểu đồ 2 & 3: Hạng mục phát sinh lỗi và tỷ lệ % lỗi -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-2">
@@ -369,7 +363,7 @@
                 </div>
             </div>
 
-            <!-- Bảng dữ liệu chấm điểm chi tiết từ Lark -->
+            <!-- Bảng dữ liệu chấm điểm chi tiết -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG KẾT QUẢ CHẤM ĐIỂM DỊCH VỤ CHI TIẾT (LARK BASE)</h3>
@@ -386,9 +380,7 @@
                                 <th class="py-3 px-4">GHI CHÚ / HẠNG MỤC LỖI CHÍNH</th>
                             </tr>
                         </thead>
-                        <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium">
-                            <!-- Render bằng JS -->
-                        </tbody>
+                        <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
                     </table>
                 </div>
             </div>
@@ -413,23 +405,12 @@
                         <p class="text-xs text-slate-500 mt-0.5">Phòng Kiểm soát chất lượng &lt;pks@sakukovietnam.com.vn&gt; via Nguyễn Thị Minh Hà</p>
                     </div>
 
-                    <!-- Khung Nội Dung Email Chuẩn Form Ảnh -->
-                    <!-- Khung Nội Dung Email Tự Động Phân Tích (Động 100%) -->
-                   <div id="serviceEmailContainer" class="text-xs text-slate-700 leading-relaxed space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200 font-sans">
-    <!-- Nội dung sẽ được JavaScript tự động tạo và điền vào đây -->
-</div> 
-                        </div>
-
-                        <div>
-                            <p><strong>Nhận xét xu hướng:</strong> Hệ thống có sự cải thiện rất rõ rệt ở hạng mục "Vệ sinh và trưng bày mặt tiền". Tuy nhiên, các lỗi liên quan đến "Khu vực quầy thu ngân" (tăng tỷ lệ lỗi lên 11%) hay "Vệ sinh khu vực trưng bày" và "Tem phụ và tem giá" vẫn chiếm tỷ trọng lớn và cần tiếp tục siết chặt kiểm soát.</p>
-                            <p class="mt-2"><strong>Nhận định chung:</strong> Nhìn chung phong độ toàn hệ thống chưa đồng đều do sự sụt giảm bất thường tại một số đơn vị đã từng đạt tỷ lệ cao trong tháng trước. Đề nghị các siêu thị cần tập trung rà soát nghiêm ngặt các hạng mục liên quan đến Vệ sinh khu vực trưng bày và Tem phụ/tem giá. Đồng thời, các QLST cần có biện pháp chấn chỉnh kịp thời với cơ sở đang bị sụt giảm phong độ để đảm bảo chất lượng đồng đều trên toàn hệ thống Sakuko.</p>
-                        </div>
-
-                        <p class="pt-2 text-slate-500">Báo thông tin tới chị @Lường Thị Thúy và chị @Nguyễn Thị Duyên kiểm tra lại với các Siêu thị trên để đảm bảo trải nghiệm khách hàng được tốt nhất!<br>Em cảm ơn ạ</p>
+                    <!-- Khung Nội Dung Email Tự Động Phân Tích -->
+                    <div id="serviceEmailContainer" class="text-xs text-slate-700 leading-relaxed space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200 font-sans">
+                        <!-- JS sẽ tự động render nội dung vào đây -->
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- TAB 4: TRƯNG BÀY CTKM -->
@@ -438,410 +419,315 @@
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                     <i class="fa-solid fa-store text-sakuko-orange"></i> Trưng Bày CTKM
                 </h3>
+                <p class="text-xs text-slate-500 mt-2">Nội dung quản lý hình ảnh và mức độ tuân thủ trưng bày khuyến mại đang được đồng bộ.</p>
             </div>
         </div>
     </main>
-    // Dán ngay bên dưới dòng khai báo mảng serviceStoreData hoặc thay thế hàm generateServiceEmail() cũ:
 
-function generateServiceEmail() {
-    const emailContainer = document.getElementById('serviceEmailContainer');
-    if (!emailContainer) return;
-
-    // 1. Tự động phân tích nhóm Siêu Thị
-    let increasedStores = [];
-    let decreasedStores = [];
-    let perfectStores = [];
-
-    serviceStoreData.forEach(item => {
-        const diff = item.t7 - item.t6;
-        if (item.t7 === 100 && item.t6 === 100) {
-            perfectStores.push(`<strong>${item.name}</strong>`);
-        } else if (diff > 0) {
-            increasedStores.push(`<strong>${item.name}:</strong> Tăng từ ${item.t6}% (Tháng 6) lên ${item.t7}% (Tháng 7).`);
-        } else if (diff < 0) {
-            decreasedStores.push(`<strong>${item.name}:</strong> Giảm từ ${item.t6}% (Tháng 6) xuống ${item.t7}% (Tháng 7).`);
-        }
-    });
-
-    // 2. Tạo đoạn văn bản Email Động
-    let html = `
-        <p>Dear các Anh/ Chị;</p>
-        <p>Phòng KSCL gửi đánh giá kết quả chấm điểm dịch vụ tận tâm tháng 07/2026.</p>
-
-        <div>
-            <p class="font-bold text-slate-900 text-sm">1. Tỷ lệ đạt chấm điểm dịch vụ theo siêu thị</p>
-            <p class="mt-1">Nhìn chung, phong độ của toàn hệ thống trong tháng 7 có sự chuyển biến tích cực hơn so với tháng 6, đa số các siêu thị vẫn duy trì mức điểm đạt tốt ổn định từ 81% – 100%, giữ vững chất lượng dịch vụ trên toàn hệ thống.</p>
-            
-            <p class="font-bold text-slate-800 mt-2">Các siêu thị có sự tăng trưởng hoặc giữ vững phong độ xuất sắc:</p>
-            <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
-                ${increasedStores.map(s => `<li>Siêu thị ${s}</li>`).join('')}
-                ${perfectStores.length > 0 ? `<li>Các siêu thị duy trì tối đa 100% cả 2 tháng: ${perfectStores.join(', ')}.</li>` : ''}
-            </ul>
-
-            ${decreasedStores.length > 0 ? `
-                <p class="font-bold text-slate-800 mt-2">Các siêu thị bị sụt giảm phong độ hoặc cần cải thiện:</p>
-                <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
-                    ${decreasedStores.map(s => `<li>Siêu thị ${s} - Cần kiểm tra lại nguyên nhân.</li>`).join('')}
-                </ul>
-            ` : '<p class="mt-2 text-emerald-600 font-bold">Không có siêu thị nào bị sụt giảm điểm trong tháng này.</p>'}
-        </div>
-
-        <div>
-            <p class="font-bold text-slate-900 text-sm">2. Hạng mục phát sinh lỗi & Tỷ lệ lỗi</p>
-            
-            <p class="font-bold text-slate-800 mt-1">Nhóm lỗi trọng tâm (Phát sinh cao & Chiếm tỷ trọng lớn):</p>
-            <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
-                <li><strong>Vệ sinh khu vực trưng bày:</strong> Giảm từ 22 lỗi xuống 14 lỗi, tỷ lệ lỗi từ 26% xuống 20%. Mặc dù có cải thiện nhưng đây vẫn là nhóm lỗi chiếm tỷ trọng cao nhất.</li>
-                <li><strong>Tem phụ và tem giá:</strong> Ghi nhận 17 lỗi (chiếm 24%), tiếp tục là nhóm lỗi phát sinh nhiều thứ hai.</li>
-                <li><strong>Vệ sinh khu vực bán hàng:</strong> Giảm từ 16 lỗi xuống 13 lỗi (chiếm 18%).</li>
-            </ul>
-
-            <p class="font-bold text-slate-800 mt-2">Lỗi có xu hướng tăng/ Cần lưu ý:</p>
-            <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
-                <li><strong>Khu vực quầy thu ngân:</strong> Tăng từ 6 lỗi lên 8 lỗi (tăng từ 7% lên 11%).</li>
-                <li><strong>Trưng bày hàng hóa:</strong> Tăng từ 5 lỗi lên 6 lỗi (tăng từ 6% lên 8%).</li>
-            </ul>
-        </div>
-
-        <div>
-            <p><strong>Nhận định chung:</strong> Đề nghị các QLST tập trung rà soát các hạng mục Vệ sinh và Tem phụ/tem giá. Đối với các đơn vị bị tụt điểm trong tháng (${decreasedStores.length} đơn vị), QLST cần có giải pháp chấn chỉnh kịp thời để đảm bảo chất lượng đồng đều trên toàn hệ thống.</p>
-        </div>
-
-        <p class="pt-2 text-slate-500">Báo thông tin tới chị @Lường Thị Thúy và chị @Nguyễn Thị Duyên kiểm tra lại với các Siêu thị trên để đảm bảo trải nghiệm khách hàng được tốt nhất!<br>Em cảm ơn ạ</p>
-    `;
-
-    emailContainer.innerHTML = html;
-}
+    <!-- JS LOGIC & CHARTS -->
     <script>
-        
-        // DỮ LIỆU ĐỔI TRẢ (KHÔNG THAY ĐỔI)
-        const storeData = [
-            { name: "S1001 -- SKK Đội Cấn", t7: 11, t8: 11 },
-            { name: "S1002 -- SKK Linh Đàm", t7: 5, t8: 5 },
-            { name: "S1004 -- SKK Mandarin C1", t7: 17, t8: 17 },
-            { name: "S1005 -- SKK Thái Hà", t7: 14, t8: 14 },
-            { name: "S1006 -- SKK Trần Đăng Ninh", t7: 23, t8: 23 },
-            { name: "S1007 -- SKK Nguyễn Du", t7: 2, t8: 2 },
-            { name: "S1008 -- SKK Hàng Bông", t7: 14, t8: 14 },
-            { name: "S1011 -- SKK Văn Phú", t7: 6, t8: 6 },
-            { name: "S1015 -- SKK Hàm Nghi", t7: 11, t8: 11 },
-            { name: "S1018 -- SKK Nguyễn Tuân", t7: 15, t8: 15 },
-            { name: "S1020 -- SKK Đỗ Quang", t7: 7, t8: 7 },
-            { name: "S1021 -- SKK Ngoại Giao Đoàn", t7: 6, t8: 6 },
-            { name: "S1022 -- SKK Trần Duy Hưng", t7: 14, t8: 14 },
-            { name: "S1023 -- SKK Nguyễn Văn Lộc", t7: 8, t8: 8 },
-            { name: "S1025 -- SKK T6 Time City", t7: 7, t8: 7 },
-            { name: "S1026 -- SKK Ecohome 3", t7: 1, t8: 1 },
-            { name: "S1027 -- SKK Green Bay", t7: 5, t8: 5 },
-            { name: "S1030 -- SKK Xuân La", t7: 4, t8: 4 },
-            { name: "S1035 -- SKK Nguyễn Khuyến", t7: 5, t8: 5 },
-            { name: "S1036 -- SKK Sài Đồng", t7: 0, t8: 0 },
-            { name: "S1037 -- SKK Bạch Mai", t7: 5, t8: 5 },
-            { name: "S2201 -- SKK Bắc Ninh", t7: 10, t8: 10 }
-        ];
-
-        // DỮ LIỆU DỊCH VỤ TẬN TÂM TỪ LARK
+        // Dữ liệu Chấm điểm dịch vụ
         const serviceStoreData = [
-            { name: "SKK Đỗ Quang", t6: 88, t7: 94, note: "Tăng trưởng tốt" },
-            { name: "SKK Đội Cấn", t6: 94, t7: 94, note: "Duy trì ổn định" },
-            { name: "SKK Linh Đàm", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Mandarin", t6: 85, t7: 84, note: "Giảm nhẹ" },
-            { name: "SKK Thái Hà", t6: 84, t7: 100, note: "Tăng trưởng xuất sắc (+16%)" },
-            { name: "SKK Trần Đăng Ninh", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Nguyễn Du", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Hàng Bông", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Văn Phú", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Hàm Nghi", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Nguyễn Tuân", t6: 100, t7: 89, note: "Sụt giảm (-11%), cần lưu ý" },
-            { name: "SKK Ngoại Giao Đoàn", t6: 88, t7: 88, note: "Ổn định" },
-            { name: "SKK Trần Duy Hưng", t6: 90, t7: 90, note: "Ổn định" },
-            { name: "SKK Nguyễn Văn Lộc", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK T6 Timecity", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Ecohome 3", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Green Bay", t6: 88, t7: 81, note: "Giảm sâu (-7%), cần cải thiện" },
-            { name: "SKK Xuân La", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Bắc Ninh", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Nguyễn Khuyến", t6: 88, t7: 88, note: "Ổn định" },
-            { name: "SKK Sài Đồng", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Bạch Mai", t6: 94, t7: 94, note: "Ổn định" }
+            { name: "SKK Trần Đăng Ninh", t6: 90, t7: 95, note: "Vệ sinh quầy kệ sạch sẽ" },
+            { name: "SKK Mandarin C1", t6: 85, t7: 88, note: "Thiếu tem giá 2 mã hàng" },
+            { name: "SKK Nguyễn Tuân", t6: 100, t7: 100, note: "Duy trì xuất sắc" },
+            { name: "SKK Linh Đàm", t6: 78, t7: 85, note: "Có tiến bộ khu vực quầy" },
+            { name: "SKK Thái Hà", t6: 92, t7: 88, note: "Lỗi tem phụ sản phẩm" },
+            { name: "SKK Đội Cấn", t6: 95, t7: 95, note: "Duy trì thái độ phục vụ tốt" }
         ];
 
-        let fullYearData = [0, 0, 0, 0, 0, 0, 185, 191, 0, 0, 0, 0];
-        let chartInstance = null;
-        let serviceChart1 = null, serviceChart2 = null, serviceChart3 = null;
+        // Dữ liệu Đổi trả
+        let doitraData = [
+            { store: "SKK Trần Đăng Ninh", t7: 18, t8: 23 },
+            { store: "SKK Mandarin C1", t7: 15, t8: 17 },
+            { store: "SKK Nguyễn Tuân", t7: 12, t8: 15 },
+            { store: "SKK Linh Đàm", t7: 10, t8: 8 },
+            { store: "SKK Thái Hà", t7: 14, t8: 11 },
+            { store: "SKK Đội Cấn", t7: 9, t8: 7 }
+        ];
 
-        // RENDER BÁO CÁO ĐỔI TRẢ
-        function renderTable() {
-            const tbody = document.getElementById('doitraTableBody');
-            tbody.innerHTML = '';
-            let hasIncompleteData = false;
+        let chartFullYear = null, chartScore = null, chartErrorCount = null, chartErrorRate = null;
 
-            storeData.forEach((item, index) => {
-                const valT7 = item.t7 === "" || isNaN(item.t7) ? null : parseInt(item.t7);
-                const valT8 = item.t8 === "" || isNaN(item.t8) ? null : parseInt(item.t8);
-
-                if (valT7 === null || valT8 === null) hasIncompleteData = true;
-
-                let diffHTML = '';
-                if (valT7 !== null && valT8 !== null) {
-                    const diff = valT8 - valT7;
-                    if (diff < 0) diffHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`;
-                    else if (diff > 0) diffHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>`;
-                    else diffHTML = `<span class="text-slate-400 font-bold">0</span>`;
-                } else diffHTML = `<span class="text-amber-500 italic">Thiếu số liệu</span>`;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="py-3 px-4">
-                        <input type="text" value="${item.name}" onchange="updateStoreName(${index}, this.value)" class="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <input type="number" value="${item.t7 !== null ? item.t7 : ''}" onchange="updateStoreValue(${index}, 't7', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <input type="number" value="${item.t8 !== null ? item.t8 : ''}" onchange="updateStoreValue(${index}, 't8', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">${diffHTML}</td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+        // Chuyển Tab
+        function switchTab(tabId, e) {
+            if(e) e.preventDefault();
+            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.menu-item').forEach(el => {
+                el.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md');
+                el.classList.add('text-slate-400');
             });
 
-            const warningBox = document.getElementById('dataWarningBox');
-            if (hasIncompleteData || storeData.length === 0) warningBox.classList.remove('hidden');
-            else warningBox.classList.add('hidden');
+            const targetSection = document.getElementById(tabId);
+            if (targetSection) targetSection.style.display = 'block';
 
-            generateReport();
-            updateChart();
+            const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md');
+                activeBtn.classList.remove('text-slate-400');
+            }
         }
 
-        function updateStoreName(idx, val) { storeData[idx].name = val; renderTable(); }
-        function updateStoreValue(idx, month, val) { storeData[idx][month] = val === "" ? "" : parseInt(val); renderTable(); }
-        function addNewRow() { storeData.push({ name: "S" + (1038 + storeData.length) + " -- SKK Mới", t7: 0, t8: 0 }); renderTable(); }
-        function removeRow(idx) { storeData.splice(idx, 1); renderTable(); }
-
-        function initFullYearChart() {
-            const ctx = document.getElementById('fullYearChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-                    datasets: [{
-                        label: 'Tổng Đơn Đổi Trả',
-                        data: fullYearData,
-                        backgroundColor: function(context) { return context.dataIndex === 7 ? '#FF6500' : '#1E3E62'; },
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-                }
-            });
-        }
-
-        function updateChart() {
-            if (!chartInstance) return;
-            let sumT7 = 0, sumT8 = 0;
-            storeData.forEach(s => { sumT7 += (parseInt(s.t7) || 0); sumT8 += (parseInt(s.t8) || 0); });
-            fullYearData[6] = sumT7;
-            fullYearData[7] = sumT8;
-            chartInstance.data.datasets[0].data = fullYearData;
-            chartInstance.update();
-        }
-
-        function generateReport() {
-            document.getElementById('totalStoresCount').innerText = storeData.length;
-            const sorted = [...storeData].sort((a, b) => (parseInt(b.t8)||0) - (parseInt(a.t8)||0));
-            const top3 = sorted.slice(0, 3);
-
-            const topListContainer = document.getElementById('topStoreList');
-            topListContainer.innerHTML = '';
-            top3.forEach((s, i) => {
-                topListContainer.innerHTML += `
-                    <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
-                        <span>${i + 1}. ${s.name}</span>
-                        <span class="bg-rose-100 text-rose-700 font-extrabold px-2 py-0.5 rounded text-[11px]">${s.t8 || 0} đơn</span>
-                    </div>
-                `;
-            });
-
-            let sumT7 = 0, sumT8 = 0, increasedStores = [];
-            storeData.forEach(s => {
-                const t7 = parseInt(s.t7) || 0, t8 = parseInt(s.t8) || 0;
-                sumT7 += t7; sumT8 += t8;
-                if (t8 > t7) increasedStores.push(s.name.replace(/S\d+\s*--\s*/, ''));
-            });
-
-            const diffTotal = sumT8 - sumT7;
-            const topNames = top3.map(s => s.name.replace(/S\d+\s*--\s*/, '')).join(', ');
-
-            document.getElementById('analysisTextList').innerHTML = `
-                <li><strong>Quy mô kiểm soát:</strong> Hệ thống hiện ghi nhận số liệu từ <strong class="text-slate-900">${storeData.length} siêu thị Offline</strong>. Tổng số đơn đổi trả tháng 8 là <strong class="text-slate-900">${sumT8} đơn</strong> (Tháng 7: <strong>${sumT7} đơn</strong>, ${diffTotal < 0 ? 'giảm ' + Math.abs(diffTotal) : (diffTotal > 0 ? 'tăng ' + diffTotal : 'giữ nguyên')} đơn).</li>
-                <li><strong>Mức độ tập trung rủi ro:</strong> 3 siêu thị có lượng đơn phát sinh cao nhất gồm <strong class="text-rose-600">${topNames}</strong> chiếm tỷ trọng lớn trong toàn hệ thống.</li>
-                <li><strong class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo biến động:</strong> ${increasedStores.length > 0 ? `Các cửa hàng ghi nhận số đơn tăng so với tháng trước bao gồm: <strong>${increasedStores.join(', ')}</strong>.` : 'Không có siêu thị nào tăng đơn đột biến so với tháng trước.'}</li>
-            `;
-
-            document.getElementById('adviceTextList').innerHTML = `
-                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1"><i class="fa-solid fa-user-gear text-sakuko-blue"></i> 1. Đối với nhóm Top nguy cơ cao (${top3[0] ? top3[0].name.replace(/S\d+\s*--\s*/, '') : 'Top 1'}...):</p>
-                    <p class="text-slate-600 text-[11px] leading-relaxed">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết và báo cáo biện pháp khắc phục trước ngày 15/09.</p>
-                </div>
-                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 2. Đào tạo quy trình POS & Thu ngân:</p>
-                    <p class="text-slate-600 text-[11px] leading-relaxed">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã.</p>
-                </div>
-            `;
-        }
-
-        async function fetchLarkData() {
-            const syncIcon = document.getElementById('syncIcon');
-            syncIcon.classList.add('fa-spin');
-            setTimeout(() => {
-                const now = new Date();
-                document.getElementById('lastUpdateTime').innerText = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                syncIcon.classList.remove('fa-spin');
-            }, 800);
-        }
-
-        function copyReport() { alert("Đã sao chép nội dung báo cáo đổi trả!"); }
-
-        // MỤC CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ (MỚI)
-        function initServiceCharts() {
-            // Chart 1: Điểm theo siêu thị
-            const ctx1 = document.getElementById('scoreByStoreChart').getContext('2d');
-            const labels1 = serviceStoreData.map(s => s.name);
-            const dataT7 = serviceStoreData.map(s => s.t7);
-
-            serviceChart1 = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: labels1,
-                    datasets: [{
-                        label: 'Tỷ lệ đạt T7 (%)',
-                        data: dataT7,
-                        backgroundColor: '#1E3E62',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { min: 60, max: 100 } }
-                }
-            });
-
-            // Chart 2: Số lỗi
-            const ctx2 = document.getElementById('errorCategoryCountChart').getContext('2d');
-            serviceChart2 = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: ['VS Trưng bày', 'Tem phụ/giá', 'VS Bán hàng', 'Thu ngân', 'Trưng bày HH', 'Kho'],
-                    datasets: [
-                        { label: 'Tháng 6', data: [22, 18, 16, 6, 5, 4], backgroundColor: '#94a3b8' },
-                        { label: 'Tháng 7', data: [14, 17, 13, 8, 6, 5], backgroundColor: '#FF6500' }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            // Chart 3: Tỷ lệ lỗi %
-            const ctx3 = document.getElementById('errorRateChart').getContext('2d');
-            serviceChart3 = new Chart(ctx3, {
-                type: 'line',
-                data: {
-                    labels: ['VS Trưng bày', 'Tem phụ/giá', 'VS Bán hàng', 'Thu ngân', 'Trưng bày HH', 'Kho'],
-                    datasets: [
-                        { label: 'Tỷ lệ lỗi T6 (%)', data: [26, 24, 19, 7, 6, 5], borderColor: '#94a3b8', tension: 0.2 },
-                        { label: 'Tỷ lệ lỗi T7 (%)', data: [20, 24, 18, 11, 8, 7], borderColor: '#1E3E62', backgroundColor: '#1E3E62', tension: 0.2 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
-
+        // Render Bảng Chấm Điểm Dịch Vụ
         function renderServiceTable() {
             const tbody = document.getElementById('serviceTableBody');
-            tbody.innerHTML = '';
+            if(!tbody) return;
+            tbody.innerHTML = serviceStoreData.map(item => {
+                const diff = item.t7 - item.t6;
+                const diffBadge = diff > 0 
+                    ? `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-up"></i> +${diff}%</span>`
+                    : diff < 0 
+                        ? `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${diff}%</span>`
+                        : `<span class="text-slate-400 font-bold">0%</span>`;
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                        <td class="py-2.5 px-4 text-center text-slate-600">${item.t6}%</td>
+                        <td class="py-2.5 px-4 text-center font-black text-slate-800">${item.t7}%</td>
+                        <td class="py-2.5 px-4 text-center">${diffBadge}</td>
+                        <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render Bảng Đổi Trả
+        function renderDoitraTable() {
+            const tbody = document.getElementById('doitraTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = doitraData.map((item, index) => {
+                const diff = item.t8 - item.t7;
+                const diffBadge = diff > 0 
+                    ? `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold">+${diff} đơn</span>`
+                    : diff < 0 
+                        ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold">${diff} đơn</span>`
+                        : `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">0</span>`;
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.store}</td>
+                        <td class="py-2.5 px-4 text-center">${item.t7}</td>
+                        <td class="py-2.5 px-4 text-center font-black text-slate-900">${item.t8}</td>
+                        <td class="py-2.5 px-4 text-center">${diffBadge}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <button onclick="removeRow(${index})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            renderAnalysisReport();
+        }
+
+        // Báo cáo Đổi trả tự động
+        function renderAnalysisReport() {
+            const topListContainer = document.getElementById('topStoreList');
+            const analysisListContainer = document.getElementById('analysisTextList');
+            const adviceListContainer = document.getElementById('adviceTextList');
+
+            const sorted = [...doitraData].sort((a,b) => b.t8 - a.t8);
+            const top3 = sorted.slice(0, 3);
+
+            if (topListContainer) {
+                topListContainer.innerHTML = top3.map((s, idx) => `
+                    <div class="flex justify-between items-center p-2 bg-white rounded border border-slate-200">
+                        <span>${idx + 1}. ${s.store}</span>
+                        <span class="text-rose-600 font-black">${s.t8} đơn</span>
+                    </div>
+                `).join('');
+            }
+
+            if (analysisListContainer) {
+                analysisListContainer.innerHTML = `
+                    <li>Tổng số đơn đổi trả trong Tháng 8 đạt <strong>${doitraData.reduce((a,b)=>a+b.t8, 0)} đơn</strong>.</li>
+                    <li>Đơn vị phát sinh đơn cao nhất là <strong>${top3[0]?.store || 'N/A'}</strong> với <strong>${top3[0]?.t8 || 0} đơn</strong>.</li>
+                    <li>Các đơn vị cần tập trung hỗ trợ giảm tải sai sót: ${top3.map(s=>s.store).join(', ')}.</li>
+                `;
+            }
+
+            if (adviceListContainer) {
+                adviceListContainer.innerHTML = `
+                    <div class="p-3 bg-white rounded-lg border border-slate-200">
+                        <strong>1. Kiểm tra quy trình Thu Ngân:</strong>
+                        <p class="text-slate-500 mt-1">Đảm bảo 100% hóa đơn được in và đối soát sản phẩm kỹ lưỡng trước khi đóng gói.</p>
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-slate-200">
+                        <strong>2. Rà soát Tem nhãn & Hạn sử dụng:</strong>
+                        <p class="text-slate-500 mt-1">Hạn chế tối đa việc đổi trả do dán sai giá hoặc sản phẩm cận date mà không báo khách.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function addNewRow() {
+            doitraData.push({ store: "SKK Mới " + (doitraData.length + 1), t7: 0, t8: 0 });
+            renderDoitraTable();
+        }
+
+        function removeRow(index) {
+            doitraData.splice(index, 1);
+            renderDoitraTable();
+        }
+
+        // Tự động tạo Email dịch vụ
+        function generateServiceEmail() {
+            const emailContainer = document.getElementById('serviceEmailContainer');
+            if (!emailContainer) return;
+
+            let increasedStores = [];
+            let decreasedStores = [];
+            let perfectStores = [];
+
             serviceStoreData.forEach(item => {
                 const diff = item.t7 - item.t6;
-                let diffBadge = '';
-                if (diff > 0) diffBadge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-up"></i> +${diff}%</span>`;
-                else if (diff < 0) diffBadge = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${diff}%</span>`;
-                else diffBadge = `<span class="text-slate-400 font-bold">0%</span>`;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                    <td class="py-2.5 px-4 text-center font-semibold text-slate-600">${item.t6}%</td>
-                    <td class="py-2.5 px-4 text-center font-bold text-slate-900">${item.t7}%</td>
-                    <td class="py-2.5 px-4 text-center">${diffBadge}</td>
-                    <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
-                `;
-                tbody.appendChild(tr);
+                if (item.t7 === 100 && item.t6 === 100) {
+                    perfectStores.push(`<strong>${item.name}</strong>`);
+                } else if (diff > 0) {
+                    increasedStores.push(`<strong>${item.name}:</strong> Tăng từ ${item.t6}% (Tháng 6) lên ${item.t7}% (Tháng 7).`);
+                } else if (diff < 0) {
+                    decreasedStores.push(`<strong>${item.name}:</strong> Giảm từ ${item.t6}% (Tháng 6) xuống ${item.t7}% (Tháng 7).`);
+                }
             });
+
+            let html = `
+                <p>Dear các Anh/Chị,</p>
+                <p>Phòng KSCL gửi đánh giá kết quả chấm điểm dịch vụ tận tâm tháng 07/2026.</p>
+
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">1. Tỷ lệ đạt chấm điểm dịch vụ theo siêu thị</p>
+                    <p class="mt-1">Nhìn chung, phong độ của toàn hệ thống trong tháng 7 có sự chuyển biến tích cực hơn so với tháng 6, đa số các siêu thị vẫn duy trì mức điểm đạt tốt ổn định từ 81% – 100%, giữ vững chất lượng dịch vụ trên toàn hệ thống.</p>
+
+                    <p class="font-bold text-slate-800 mt-2">Các siêu thị có sự tăng trưởng hoặc giữ vững phong độ xuất sắc:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
+                        ${increasedStores.map(s => `<li>Siêu thị ${s}</li>`).join('')}
+                        ${perfectStores.length > 0 ? `<li>Các siêu thị duy trì tối đa 100% cả 2 tháng: ${perfectStores.join(', ')}.</li>` : ''}
+                    </ul>
+
+                    ${decreasedStores.length > 0 ? `
+                        <p class="font-bold text-slate-800 mt-2">Các siêu thị có dấu hiệu sụt giảm cần lưu ý chấn chỉnh:</p>
+                        <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
+                            ${decreasedStores.map(s => `<li>Siêu thị ${s}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+                </div>
+
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">2. Nhận xét & Khuyến nghị chung</p>
+                    <p class="mt-1">Đề nghị Quản lý các Siêu thị rà soát lại các hạng mục phát sinh lỗi, đặc biệt là Tem nhãn và Vệ sinh khu vực quầy thu ngân để nâng cao trải nghiệm khách hàng.</p>
+                </div>
+
+                <p class="pt-2 text-slate-500">Trân trọng,<br><strong>Phòng Kiểm Soát Chất Lượng SAKUKO</strong></p>
+            `;
+
+            emailContainer.innerHTML = html;
+        }
+
+        function copyServiceEmail() {
+            const container = document.getElementById('serviceEmailContainer');
+            if (container) {
+                navigator.clipboard.writeText(container.innerText);
+                alert('Đã sao chép nội dung email!');
+            }
+        }
+
+        function copyReport() {
+            alert('Đã sao chép mẫu báo cáo đổi trả!');
+        }
+
+        function fetchLarkData() {
+            const icon = document.getElementById('syncIcon');
+            if(icon) icon.classList.add('fa-spin');
+            setTimeout(() => {
+                if(icon) icon.classList.remove('fa-spin');
+                alert('Đã đồng bộ dữ liệu mới nhất từ Lark Base!');
+            }, 1000);
         }
 
         function syncServiceData() {
             const icon = document.getElementById('dichvuSyncIcon');
-            icon.classList.add('fa-spin');
+            if(icon) icon.classList.add('fa-spin');
             setTimeout(() => {
-                const now = new Date();
-                document.getElementById('dichvuUpdateTime').innerText = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                icon.classList.remove('fa-spin');
-            }, 800);
+                if(icon) icon.classList.remove('fa-spin');
+                alert('Đã đồng bộ báo cáo dịch vụ từ Lark Base!');
+            }, 1000);
         }
 
-        function copyServiceEmail() {
-            const emailContainer = document.getElementById('serviceEmailContainer');
-            const range = document.createRange();
-            range.selectNode(emailContainer);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            alert("Đã sao chép toàn bộ mẫu email báo cáo dịch vụ vào bộ nhớ tạm!");
-        }
-
-        function switchTab(targetId, event) {
-            if (event) event.preventDefault();
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md');
-                item.classList.add('text-slate-400');
-            });
-            const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
-            if (activeMenu) {
-                activeMenu.classList.remove('text-slate-400');
-                activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md');
+        // Khởi tạo Biểu đồ Chart.js
+        function initCharts() {
+            // Biểu đồ 12 Tháng
+            const ctx1 = document.getElementById('fullYearChart')?.getContext('2d');
+            if (ctx1) {
+                chartFullYear = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['T9/25','T10/25','T11/25','T12/25','T1/26','T2/26','T3/26','T4/26','T5/26','T6/26','T7/26','T8/26'],
+                        datasets: [{
+                            label: 'Tổng đơn đổi trả',
+                            data: [150, 165, 140, 180, 210, 195, 170, 160, 175, 185, 190, 190],
+                            borderColor: '#FF6500',
+                            backgroundColor: 'rgba(255,101,0,0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
             }
-            document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) targetSection.style.display = 'block';
+
+            // Biểu đồ Chấm điểm Siêu thị
+            const ctx2 = document.getElementById('scoreByStoreChart')?.getContext('2d');
+            if (ctx2) {
+                chartScore = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: serviceStoreData.map(s => s.name),
+                        datasets: [{
+                            label: 'Điểm T7 (%)',
+                            data: serviceStoreData.map(s => s.t7),
+                            backgroundColor: '#1E3E62'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            // Biểu đồ Lỗi theo Hạng mục (Bar)
+            const ctx3 = document.getElementById('errorCategoryCountChart')?.getContext('2d');
+            if (ctx3) {
+                chartErrorCount = new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Vệ sinh', 'Tem giá', 'Thu ngân', 'Trưng bày', 'Thái độ'],
+                        datasets: [
+                            { label: 'Tháng 6', data: [12, 19, 8, 15, 5], backgroundColor: '#94a3b8' },
+                            { label: 'Tháng 7', data: [8, 14, 12, 10, 3], backgroundColor: '#FF6500' }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            // Biểu đồ Tỷ lệ Lỗi (Doughnut)
+            const ctx4 = document.getElementById('errorRateChart')?.getContext('2d');
+            if (ctx4) {
+                chartErrorRate = new Chart(ctx4, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tem giá/Tem phụ', 'Quầy thu ngân', 'Vệ sinh trưng bày', 'Khác'],
+                        datasets: [{
+                            data: [35, 28, 22, 15],
+                            backgroundColor: ['#FF6500', '#1E3E62', '#f59e0b', '#cbd5e1']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
         }
 
-        window.onload = function() {
-            initFullYearChart();
-            renderTable();
-            initServiceCharts();
+        // Tự động chạy khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
             renderServiceTable();
-        };
+            renderDoitraTable();
+            generateServiceEmail();
+            initCharts();
+        });
     </script>
 </body>
 </html>
