@@ -811,6 +811,357 @@
             renderTable();
             initServiceCharts();
             renderServiceTable();
+            renderTrungBayTable();
+        };
+    </script>
+
+    <!-- TAB 4: TRƯNG BÀY CTKM (Nằm ngoài thẻ <script>) -->
+    <div id="trungbay" class="content-section p-8 space-y-6" style="display: none;">
+        <!-- Header Thanh Đồng Bộ Lark -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-store text-sakuko-orange text-xl"></i>
+                    <h2 class="text-lg font-bold text-slate-800 uppercase">Báo Cáo Đánh Giá Trưng Bày CTKM</h2>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                    Theo dõi mức độ tuân thủ chỉ thị trưng bày và tiến độ gửi báo cáo đúng hạn của 22 Siêu Thị.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-[11px] text-slate-400 font-medium">Lịch sử cập nhật gần nhất:</p>
+                    <p class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
+                        <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="trungbayUpdateTime">10-08-2026 14:30</span>
+                    </p>
+                </div>
+                <button onclick="syncTrungBayData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate text-xs" id="trungbaySyncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
+                </button>
+            </div>
+        </div>
+
+        <!-- Khối Chỉ Số KPI Tổng Quan -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-[11px] font-bold text-slate-400 uppercase">Số Siêu Thị Offline</p>
+                <p class="text-3xl font-black text-slate-800 mt-1" id="kpiTotalStores">22</p>
+                <p class="text-[10px] text-slate-400 font-medium mt-1">(Số siêu thị Offline)</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-[11px] font-bold text-slate-400 uppercase">Số ST Gửi Báo Cáo</p>
+                <p class="text-3xl font-black text-emerald-600 mt-1" id="kpiSubmittedStores">22</p>
+                <p class="text-[10px] text-emerald-600 font-medium mt-1">(100% ST gửi báo cáo)</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-[11px] font-bold text-slate-400 uppercase">ST Gửi BC Đúng Deadline</p>
+                <p class="text-3xl font-black text-sakuko-blue mt-1" id="kpiOnTimeStores">18</p>
+                <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiLateNote">(Còn 4 ST trễ deadline)</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-[11px] font-bold text-slate-400 uppercase">ST Trưng Bày Đạt Chỉ Thị</p>
+                <p class="text-3xl font-black text-sakuko-orange mt-1" id="kpiPassedStores">20</p>
+                <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiFailNote">(Còn 2 ST chưa đạt)</p>
+            </div>
+        </div>
+
+        <!-- Khối Biểu Đồ So Sánh Trưng Bày & Deadline Các Siêu Thị -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-chart-column text-sakuko-orange"></i> Kết Quả Đánh Giá Trưng Bày & Tiến Độ Theo Siêu Thị
+                </h3>
+                <div class="flex items-center gap-4 text-xs font-semibold">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-600 rounded-sm inline-block"></span> Tổng Điểm Đạt</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-sky-400 rounded-sm inline-block"></span> Điểm Deadline</span>
+                </div>
+            </div>
+            <div class="h-64"><canvas id="trungbayChart"></canvas></div>
+        </div>
+
+        <!-- Bảng Dữ Liệu Chi Tiết Trưng Bày Lark Base -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐÁNH GIÁ TRƯNG BÀY CHI TIẾT (DỮ LIỆU THÁNG 08/2026)</h3>
+                <div class="flex items-center gap-3">
+                    <span class="text-[11px] text-emerald-600 font-bold">Đã đồng bộ 22 Cửa hàng</span>
+                    <button onclick="addTrungBayRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> Thêm Siêu Thị
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto max-h-[350px]">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
+                        <tr>
+                            <th class="py-3 px-4">TÊN SIÊU THỊ</th>
+                            <th class="py-3 px-4 text-center">GỬI BÁO CÁO</th>
+                            <th class="py-3 px-4 text-center">ĐÚNG DEADLINE</th>
+                            <th class="py-3 px-4 text-center">ĐẠT CHỈ THỊ</th>
+                            <th class="py-3 px-4">GHI CHÚ VẤN ĐỀ TRƯNG BÀY</th>
+                            <th class="py-3 px-4 text-center w-16">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trungbayTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MẪU BÁO CÁO ĐÁNH GIÁ CHUYÊN SÂU -->
+        <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
+                        <i class="fa-solid fa-bullhorn text-sakuko-orange text-sm"></i>
+                    </div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO ĐÁNH GIÁ TRƯNG BÀY CTKM (MẪU COPY TỰ ĐỘNG)</h3>
+                </div>
+                <button onclick="copyTrungBayReport()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Báo Cáo
+                </button>
+            </div>
+
+            <div class="p-6 bg-white text-slate-800 space-y-4">
+                <div class="border-b border-slate-200 pb-3">
+                    <h2 class="text-lg font-black text-slate-900 uppercase">KẾT QUẢ ĐÁNH GIÁ TRƯNG BÀY CTKM THÁNG 08/2026</h2>
+                    <p class="text-xs text-slate-500 mt-0.5"><span class="font-bold text-slate-700">P. Kiểm soát - SVN</span> | P. KSCL | Ngày ban hành: 2026-08-05</p>
+                </div>
+
+                <div id="trungbayReportPreview" class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-4 font-sans leading-relaxed">
+                    <p>Dear các Siêu thị, Phòng Kiểm soát chất lượng xin gửi tới các siêu thị: <strong>Kết quả đánh giá Trưng bày CTKM tháng 08/2026</strong>.</p>
+
+                    <div class="p-3 bg-slate-200 rounded-lg text-center text-slate-500 font-semibold border border-slate-300">
+                        <i class="fa-regular fa-image text-lg mb-1 block"></i>
+                        [Hình ảnh tổng hợp biểu đồ Dashboard Trưng bày CTKM T8/2026]
+                    </div>
+
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-bullhorn text-sakuko-orange text-sm mt-0.5"></i>
+                            <p id="reportLateText">
+                                Vẫn còn <strong>4/22</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>SKK Đội Cấn, SKK Hàng Bông, SKK Ecohome, SKK Văn Phú</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.
+                            </p>
+                        </div>
+
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-bullhorn text-sakuko-orange text-sm mt-0.5"></i>
+                            <p id="reportPassText">
+                                Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>2/22</strong> siêu thị là <strong>SKK Greenbay và SKK Sài Đồng</strong> chưa đạt theo chỉ thị trưng bày.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
+                        <p class="font-bold text-amber-900 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-lightbulb text-amber-600"></i> HƯỚNG DẪN RÚT KINH NGHIỆM & CẢI THIỆN CHO THÁNG SAU:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-amber-800 text-[11px]">
+                            <li><strong>Đối với nhóm trễ Deadline (Đội Cấn, Hàng Bông, Ecohome, Văn Phú):</strong> Cần chủ động lên lịch chụp ảnh nghiệm thu ngay trong ngày đầu chạy CTKM, cài đặt nhắc lịch báo cáo trước 12h so với hạn chót trên Lark.</li>
+                            <li><strong>Đối với nhóm chưa Đạt Chỉ Thị (Greenbay, Sài Đồng):</strong> Cần rà soát lại sơ đồ POP/POSM, bổ sung ngay wobbler giá ưu đãi và sắp xếp đúng diện tích mâm kệ theo hướng dẫn của Merchandise trước khi bấm chụp gửi QC.</li>
+                            <li><strong>Yêu cầu chung:</strong> Tất cả Cửa hàng Trưởng kiểm tra chéo thực tế tại điểm bán trước khi nhấn xác nhận báo cáo trên hệ thống Lark Base.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT XỬ LÝ RIÊNG FOR TAB TRƯNG BÀY -->
+    <script>
+        // Dữ liệu ban đầu Trưng Bày CTKM (22 Siêu Thị)
+        let trungbayData = [
+            { name: "SKK Đội Cấn", submitted: true, onTime: false, passed: true, note: "Trễ deadline gửi ảnh" },
+            { name: "SKK Hàng Bông", submitted: true, onTime: false, passed: true, note: "Gửi báo cáo muộn 2 tiếng" },
+            { name: "SKK Linh Đàm", submitted: true, onTime: true, passed: true, note: "Trưng bày chuẩn sơ đồ" },
+            { name: "SKK Đỗ Quang", submitted: true, onTime: true, passed: true, note: "Hình ảnh rõ nét, đạt" },
+            { name: "SKK Trần Đăng Ninh", submitted: true, onTime: true, passed: true, note: "Thi công POP đẹp" },
+            { name: "SKK Greenbay", submitted: true, onTime: true, passed: false, note: "Thiếu wobbler giá CTKM" },
+            { name: "SKK Hàm Nghi", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+            { name: "SKK Nguyễn Văn Lộc", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+            { name: "SKK Mandarin C1", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
+            { name: "SKK Nguyễn Tuân", submitted: true, onTime: true, passed: true, note: "Trưng bày ấn tượng" },
+            { name: "SKK Trần Duy Hưng", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+            { name: "SKK Thái Hà", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
+            { name: "SKK Bắc Ninh", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Nguyễn Du", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Ecohome 3", submitted: true, onTime: false, passed: true, note: "Gửi thiếu ảnh đầu kệ" },
+            { name: "SKK Văn Phú", submitted: true, onTime: false, passed: true, note: "Nộp trễ deadline" },
+            { name: "SKK Ngoại Giao Đoàn", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Nguyễn Khuyến", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Sài Đồng", submitted: true, onTime: true, passed: false, note: "Sai vị trí sản phẩm trọng tâm" },
+            { name: "SKK Bạch Mai", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Times City", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+            { name: "SKK Xuân La", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" }
+        ];
+
+        // Render Bảng Trưng Bày
+        function renderTrungBayTable() {
+            const tbody = document.getElementById('trungbayTableBody');
+            if(!tbody) return;
+
+            tbody.innerHTML = trungbayData.map((item, index) => {
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đã gửi</span>
+                        </td>
+                        <td class="py-2.5 px-4 text-center">
+                            ${item.onTime 
+                                ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700">Đúng hạn</span>' 
+                                : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Trễ deadline</span>'}
+                        </td>
+                        <td class="py-2.5 px-4 text-center">
+                            ${item.passed 
+                                ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đạt</span>' 
+                                : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Chưa đạt</span>'}
+                        </td>
+                        <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <button onclick="deleteTrungBayRow(${index})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateTrungBayAnalysisAndKPI();
+        }
+
+        // Cập nhật các ô KPI & Khối nhận xét tự động
+        function updateTrungBayAnalysisAndKPI() {
+            const total = trungbayData.length;
+            const submitted = trungbayData.filter(d => d.submitted).length;
+            const onTimeList = trungbayData.filter(d => d.onTime);
+            const lateList = trungbayData.filter(d => !d.onTime);
+            const passedList = trungbayData.filter(d => d.passed);
+            const failList = trungbayData.filter(d => !d.passed);
+
+            // Update KPI Box
+            if(document.getElementById('kpiTotalStores')) document.getElementById('kpiTotalStores').innerText = total;
+            if(document.getElementById('kpiSubmittedStores')) document.getElementById('kpiSubmittedStores').innerText = submitted;
+            if(document.getElementById('kpiOnTimeStores')) document.getElementById('kpiOnTimeStores').innerText = onTimeList.length;
+            if(document.getElementById('kpiPassedStores')) document.getElementById('kpiPassedStores').innerText = passedList.length;
+
+            if(document.getElementById('kpiLateNote')) document.getElementById('kpiLateNote').innerText = lateList.length > 0 ? `(Còn ${lateList.length} ST trễ deadline)` : "(100% đúng deadline)";
+            if(document.getElementById('kpiFailNote')) document.getElementById('kpiFailNote').innerText = failList.length > 0 ? `(Còn ${failList.length} ST chưa đạt)` : "(100% đạt chỉ thị)";
+
+            // Update văn bản nhận xét
+            const lateNames = lateList.map(s => s.name).join(', ');
+            const failNames = failList.map(s => s.name).join(' và ');
+
+            const lateTextEl = document.getElementById('reportLateText');
+            if(lateTextEl) {
+                lateTextEl.innerHTML = lateList.length > 0 
+                    ? `Vẫn còn <strong>${lateList.length}/${total}</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>${lateNames}</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.`
+                    : `Tất cả <strong>${total}/${total}</strong> siêu thị đã hoàn thành gửi báo cáo trưng bày <strong>đúng deadline</strong> quy định.`;
+            }
+
+            const passTextEl = document.getElementById('reportPassText');
+            if(passTextEl) {
+                passTextEl.innerHTML = failList.length > 0
+                    ? `Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>${failList.length}/${total}</strong> siêu thị là <strong>${failNames}</strong> chưa đạt theo chỉ thị trưng bày.`
+                    : `<strong>100%</strong> các siêu thị đã hoàn thành xuất sắc và đạt tiêu chuẩn chỉ thị trưng bày CTKM trong tháng.`;
+            }
+
+            renderTrungBayChart();
+        }
+
+        // Thêm / Xóa hàng
+        function addTrungBayRow() {
+            trungbayData.push({ name: "SKK Mới", submitted: true, onTime: true, passed: true, note: "Mới cập nhật" });
+            renderTrungBayTable();
+        }
+
+        function deleteTrungBayRow(index) {
+            trungbayData.splice(index, 1);
+            renderTrungBayTable();
+        }
+
+        // Vẽ biểu đồ Trưng bày CTKM
+        let chartTrungBayInstance = null;
+        function renderTrungBayChart() {
+            const ctx = document.getElementById('trungbayChart');
+            if(!ctx) return;
+
+            if(chartTrungBayInstance) chartTrungBayInstance.destroy();
+
+            const labels = trungbayData.map(d => d.name);
+            const scoreData = trungbayData.map(d => d.passed ? 4 : 3);
+            const deadlineData = trungbayData.map(d => d.onTime ? 1 : 0);
+
+            chartTrungBayInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Tổng Điểm Đạt',
+                            data: scoreData,
+                            backgroundColor: '#4F46E5',
+                            barThickness: 12
+                        },
+                        {
+                            label: 'Điểm Deadline',
+                            data: deadlineData,
+                            backgroundColor: '#38BDF8',
+                            barThickness: 12
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { font: { size: 9 }, rotation: 45 } },
+                        y: { beginAtZero: true, max: 5 }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Nút Cập Nhật Đồng Bộ Lark
+        function syncTrungBayData() {
+            const icon = document.getElementById('trungbaySyncIcon');
+            if(icon) icon.classList.add('fa-spin');
+            setTimeout(() => {
+                if(icon) icon.classList.remove('fa-spin');
+                const now = new Date();
+                const timeStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+                if(document.getElementById('trungbayUpdateTime')) document.getElementById('trungbayUpdateTime').innerText = timeStr;
+                alert("Đã đồng bộ thành công dữ liệu Trưng Bày CTKM mới nhất từ Lark Base!");
+            }, 700);
+        }
+
+        // Copy Báo Cáo Chuẩn Form
+        function copyTrungBayReport() {
+            const reportElement = document.getElementById('trungbayReportPreview');
+            if(!reportElement) return;
+            
+            const range = document.createRange();
+            range.selectNode(reportElement);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                alert('Đã sao chép toàn bộ mẫu Báo Cáo Đánh Giá Trưng Bày CTKM! Bạn có thể dán (Ctrl+V) sang Lark hoặc Email.');
+            } catch (err) {
+                alert('Không thể tự động chép, vui lòng tô đen nội dung và bấm Ctrl+C.');
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        // Đảm bảo khởi tạo bảng khi chuyển sang tab Trưng Bày
+        const originalSwitchTab = window.switchTab;
+        window.switchTab = function(tabId, e) {
+            if (originalSwitchTab) originalSwitchTab(tabId, e);
+            if (tabId === 'trungbay') {
+                setTimeout(() => {
+                    renderTrungBayTable();
+                }, 100);
+            }
         };
     </script>
 </body>
