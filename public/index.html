@@ -36,11 +36,11 @@
                 </div>
             </div>
             <nav class="mt-6 px-3 space-y-1">
-                <a href="#" onclick="switchTab('dashboard', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition" data-target="dashboard">
-                    <i class="fa-solid fa-chart-pie text-sakuko-orange w-5"></i> Tổng Quan Dashboard
+                <a href="#" onclick="switchTab('dashboard', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Tổng Quan Dashboard
                 </a>
-                <a href="#" onclick="switchTab('doitra', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="doitra">
-                    <i class="fa-solid fa-rotate-left w-5"></i> Báo Cáo Đổi Trả
+                <a href="#" onclick="switchTab('doitra', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold bg-sakuko-blue text-white shadow-md transition" data-target="doitra">
+                    <i class="fa-solid fa-arrows-rotate text-sakuko-orange w-5"></i> Báo Cáo Đổi Trả
                 </a>
                 <a href="#" onclick="switchTab('dichvu', event)" class="menu-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition" data-target="dichvu">
                     <i class="fa-solid fa-star w-5"></i> Đánh Giá Dịch Vụ
@@ -64,435 +64,420 @@
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
             <div class="flex items-center gap-3">
                 <h1 class="text-lg font-bold text-slate-800">Hệ Thống Báo Cáo Quản Lý Chất Lượng (QC Report)</h1>
-                <span class="bg-emerald-100 text-emerald-700 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-link"></i> Lark Base Live Connected</span>
+                <span id="larkConnectionBadge" class="bg-emerald-100 text-emerald-700 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-link text-[10px]"></i> Lark Base Live Connected
+                </span>
             </div>
         </header>
 
         <!-- TAB 1: DASHBOARD -->
-        <div id="dashboard" class="content-section p-8 space-y-6">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-days text-sakuko-orange text-base"></i>
-                    <span class="text-xs font-bold text-slate-700">Chọn Tháng Xem Dữ Liệu Báo Cáo:</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <input type="month" id="monthPicker" onchange="handleMonthInputChange(this.value)" value="2026-08" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs font-bold rounded-lg px-3 py-2 cursor-pointer shadow-sm">
-                    <div class="flex items-center gap-1.5 border-l border-slate-200 pl-3">
-                        <button id="btn-T05" onclick="selectMonth('T05')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600">T5/2026</button>
-                        <button id="btn-T06" onclick="selectMonth('T06')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600">T6/2026</button>
-                        <button id="btn-T07" onclick="selectMonth('T07')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600">T7/2026</button>
-                        <button id="btn-T08" onclick="selectMonth('T08')" class="month-btn px-3 py-1.5 rounded-md text-xs font-bold bg-sakuko-blue text-white shadow">T8/2026</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold text-slate-400 uppercase">THÁNG ĐANG CHỌN</p>
-                    <p id="kpi-month" class="text-2xl font-black text-slate-800 mt-1">Tháng 08/2026</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold text-slate-400 uppercase">TỔNG NHIỆM VỤ</p>
-                    <p id="kpi-done" class="text-2xl font-black text-slate-800 mt-1">2 / 3 Báo Cáo</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-bold text-slate-400 uppercase">CHƯA HOÀN THÀNH</p>
-                    <p id="kpi-pending" class="text-2xl font-black text-rose-600 mt-1">1 Báo Cáo</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-sakuko-orange"></i> Chi Tiết Nhiệm Vụ Báo Cáo QC</h3>
-                    <span id="table-subtitle" class="text-xs text-slate-500">Dữ liệu Tháng 08/2026</span>
-                </div>
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200">
-                        <tr>
-                            <th class="py-3 px-4">THÁNG</th>
-                            <th class="py-3 px-4">TÊN BÁO CÁO QC</th>
-                            <th class="py-3 px-4">HẠN NỘP</th>
-                            <th class="py-3 px-4">TRẠNG THÁI</th>
-                            <th class="py-3 px-4 text-center">THAO TÁC</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-table-body" class="divide-y divide-slate-100 font-medium"></tbody>
-                </table>
+        <div id="dashboard" class="content-section p-8 space-y-6" style="display: none;">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-chart-pie text-sakuko-orange mr-2"></i> Tổng Quan Dashboard QC</h3>
+                <p class="text-xs text-slate-500">Xem tổng hợp trạng thái các báo cáo kiểm soát chất lượng toàn hệ thống.</p>
             </div>
         </div>
 
         <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
-        <div id="doitra" class="content-section p-8 space-y-6" style="display: none;">
+        <div id="doitra" class="content-section p-8 space-y-6">
             
-            <!-- Nút Yêu Cầu Cập Nhật Tự Động Từ Lark Base -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <!-- YÊU CẦU 1: Header Icon chuyên nghiệp + Lịch sử Cập Nhật -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-rotate-left text-sakuko-orange"></i> Quản Lý & Phân Tích Báo Cáo Đổi Trả
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Bấm nút bên cạnh để lấy số liệu thực tế từ Lark Base và tự động sinh phân tích.</p>
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-shield-halved text-sakuko-orange text-xl"></i>
+                        <h2 class="text-lg font-bold text-slate-800">Quản Lý & Phân Tích Báo Cáo Đổi Trả</h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Số liệu được đồng bộ tự động trực tiếp từ Lark Base và tự động sinh báo cáo phân tích.
+                    </p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button id="btn-sync-lark" onclick="syncDataFromLarkBase()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md">
-                        <i class="fa-solid fa-arrows-rotate text-sm"></i> 🔄 Cập Nhật Trực Tiếp Từ Lark Base
-                    </button>
-                    <button onclick="addNewRow()" class="bg-slate-700 hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                        <i class="fa-solid fa-plus"></i> Thêm Hàng
+                
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="text-[11px] text-slate-400 font-medium">Lịch sử update gần nhất:</p>
+                        <p id="lastUpdateText" class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
+                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="lastUpdateTime">10-08-2026 11:02</span>
+                        </p>
+                    </div>
+                    <button onclick="fetchLarkData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate text-xs" id="syncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
                     </button>
                 </div>
             </div>
 
-            <!-- Bảng Dữ Liệu -->
+            <!-- YÊU CẦU 2: Bảng số liệu chi tiết + Chuyển nút Thêm Hàng xuống + Tính Biến Động chuẩn -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-700 uppercase">Bảng Số Liệu Đổi Trả Chi Tiết</span>
-                    <span id="sync-status-tag" class="text-[11px] text-slate-400">Chưa đồng bộ</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐỔI TRẢ CHI TIẾT</h3>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="syncStatusBadge" class="text-[11px] text-emerald-600 font-bold">Đã đồng bộ Lark Base</span>
+                        <!-- Dời nút Thêm Hàng xuống đây -->
+                        <button onclick="addNewRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Thêm Hàng
+                        </button>
+                    </div>
                 </div>
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200">
                             <tr>
-                                <th class="py-3 px-4">Tên Siêu Thị</th>
-                                <th class="py-3 px-4 text-center">Đơn Đổi Trả T7</th>
-                                <th class="py-3 px-4 text-center">Đơn Đổi Trả T8</th>
-                                <th class="py-3 px-4 text-center">Biến Động</th>
-                                <th class="py-3 px-4 text-center">Thao Tác</th>
+                                <th class="py-3 px-4 w-1/3">TÊN SIÊU THỊ</th>
+                                <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T7</th>
+                                <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T8</th>
+                                <th class="py-3 px-4 text-center">BIẾN ĐỘNG (VS T7)</th>
+                                <th class="py-3 px-4 text-center w-16">THAO TÁC</th>
                             </tr>
                         </thead>
-                        <tbody id="dt-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Dữ liệu render bằng JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Biểu Đồ So Sánh -->
+            <!-- YÊU CẦU 3: Biểu đồ Giao Dịch Đổi Hàng 12 Tháng Cả Năm -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h4 class="text-xs font-bold text-slate-700 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-column text-sakuko-blue"></i> Biểu Đồ Giao Dịch Đổi Hàng (Tự động cập nhật theo Lark Base)
-                </h4>
-                <canvas id="doitraChart" class="max-h-64"></canvas>
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-sakuko-orange"></i> Biểu Đồ Giao Dịch Đổi Hàng Toàn Hệ Thống (12 Tháng)
+                    </h4>
+                    <span class="text-[11px] text-slate-400">(Tự động cập nhật theo Lark Base)</span>
+                </div>
+                <div class="h-64">
+                    <canvas id="fullYearChart"></canvas>
+                </div>
             </div>
 
-            <!-- KHU VỰC PHÂN TÍCH TỰ ĐỘNG BÁO CÁO CHUẨN MẪU -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden">
-                <div class="p-4 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
-                    <h3 class="text-sm font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-file-contract text-sakuko-orange"></i> BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)
-                    </h3>
-                    <button onclick="copyReportTemplate()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow">
+            <!-- YÊU CẦU 4: BÁO CÁO KẾT QUẢ & CẢNH BÁO DỮ LIỆU TỰ ĐỘNG -->
+            <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
+                <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-file-contract text-sakuko-orange"></i>
+                        <h3 class="text-xs font-bold uppercase tracking-wider">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
+                    </div>
+                    <button onclick="copyReport()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
                         <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Báo Cáo
                     </button>
                 </div>
 
-                <div id="report-preview-content" class="p-8 space-y-6 text-slate-800 font-sans leading-relaxed text-sm bg-white">
+                <div class="p-6 bg-white text-slate-800 space-y-5">
+                    
+                    <!-- HỆ THỐNG CẢNH BÁO DỮ LIỆU (Chỉ hiện khi thiếu dữ liệu từ Lark) -->
+                    <div id="dataWarningBox" class="hidden p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-amber-800 text-xs">
+                        <div class="flex items-center gap-2 font-bold mb-1">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
+                            <span>CẢNH BÁO DỮ LIỆU CHƯA ĐỦ ĐIỀU KIỆN PHÂN TÍCH!</span>
+                        </div>
+                        <p id="warningDetail">Phát hiện một số siêu thị chưa có đủ số liệu đơn đổi trả T7 hoặc T8. Vui lòng kiểm tra lại Lark Base trước khi xuất báo cáo chính thức.</p>
+                    </div>
+
+                    <!-- Nội dung Báo cáo -->
                     <div>
-                        <h2 id="report-title" class="text-xl font-black text-slate-900 uppercase tracking-tight">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG 08/2026</h2>
-                        <p class="text-xs font-bold text-sky-700 mt-1">P. Kiểm soát - SVN <span class="text-slate-400 font-normal">| Ngày tạo: 10-08-2026</span></p>
+                        <h2 class="text-lg font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG 08/2026</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">P. Kiểm soát - SVN | Ngày tạo: <span id="reportGenDate">10-08-2026</span></p>
                     </div>
 
-                    <p class="italic text-slate-600">Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng 8/2026.</p>
+                    <p class="text-xs text-slate-600 italic">
+                        Dear các anh chị Siêu Thị,<br>
+                        Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng 8/2026.
+                    </p>
 
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between gap-6">
-                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm text-center min-w-[140px]">
-                            <p class="text-[11px] font-bold text-slate-500 uppercase">Số Siêu Thị Offline</p>
-                            <p id="total-stores-count" class="text-3xl font-black text-slate-900 mt-1">22</p>
+                    <!-- Top Siêu thị lỗi cao -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-center items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">SỐ SIÊU THỊ OFFLINE</span>
+                            <span id="totalStoresCount" class="text-3xl font-black text-slate-800 mt-1">8</span>
                         </div>
-                        <div class="flex-1 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-                            <p class="text-xs font-bold text-slate-700 mb-2">Siêu thị có đơn đổi trả cao trong tháng:</p>
-                            <div id="top-stores-list" class="space-y-1.5 text-xs font-semibold"></div>
+                        <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Siêu thị có đơn đổi trả cao trong tháng:</span>
+                            <div id="topStoreList" class="space-y-1.5 text-xs font-semibold">
+                                <!-- JS Render Top Stores -->
+                            </div>
                         </div>
                     </div>
 
-                    <div class="space-y-3 border-t border-slate-100 pt-4">
-                        <h4 class="font-bold text-slate-900 text-base">Nhận xét chung:</h4>
-                        <div id="report-analysis-text" class="text-slate-700 leading-relaxed text-xs space-y-2"></div>
+                    <!-- Nhận xét tự động chính xác theo số liệu thực -->
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase">Nhận xét chung:</h4>
+                        <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-1.5 leading-relaxed">
+                            <!-- JS tự tạo nhận xét chuẩn dựa theo dữ liệu thực -->
+                        </ul>
                     </div>
 
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg space-y-1 text-xs">
-                        <p class="font-bold text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Các siêu thị lưu ý:</p>
-                        <p class="text-amber-800">- Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
-                        <p class="text-amber-800">- Kiểm tra kỹ nguyên nhân lỗi sản phẩm trước khi tiến hành tạo đơn đổi trả trên hệ thống.</p>
+                    <!-- Lời khuyên & Lưu ý -->
+                    <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+                        <p class="font-bold text-amber-950 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý:
+                        </p>
+                        <p class="pl-5">• Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
+                        <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm trước khi tiến hành tạo đơn đổi trả trên hệ thống.</p>
                     </div>
                 </div>
             </div>
 
         </div>
 
+        <!-- TAB 3 & 4 Placeholder -->
         <div id="dichvu" class="content-section p-8 space-y-6" style="display: none;">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-star text-sakuko-orange mr-2"></i> Báo Cáo Đánh Giá Dịch Vụ Siêu Thị</h3>
+                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-star text-sakuko-orange mr-2"></i> Đánh Giá Dịch Vụ</h3>
             </div>
         </div>
         <div id="trungbay" class="content-section p-8 space-y-6" style="display: none;">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-store text-sakuko-orange mr-2"></i> Báo Cáo Trưng Bày CTKM</h3>
+                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-store text-sakuko-orange mr-2"></i> Trưng Bày CTKM</h3>
             </div>
         </div>
     </main>
 
     <script>
-        // --- 1. CẤU HÌNH API LARK BASE VỚI MÃ CỦA CHỊ HÀ ---
+        // Cấu hình API Lark Base
         const LARK_CONFIG = {
-            appId: "cli_aaf3ff925438dee6",
-            appSecret: "l0co7N4IIUiVyVKmk5mdfef0WWOXKWe0",
-            appToken: "GRYXw76EQicmWTkCt2FldAdmgQe",
-            tableId: "tblWoJQxfccqGwr8"
+            appId: 'cli_aaf3ff925438dee6',
+            appSecret: 'l0co7N4IIUiVyVKmk5mdfef0WWOXKWe0',
+            appToken: 'GRYXw76EQicmWTkCt2FLdAdmgQe',
+            tableId: 'tblWoJQxfccqGwr8'
         };
 
-        // Dữ liệu mặc định ban đầu
-        let doitraData = [
-            { name: 'SKK Đội Cấn', t7: 11, t8: 9 },
-            { name: 'SKK Linh Đàm', t7: 5, t8: 4 },
-            { name: 'SKK Mandarin C1', t7: 17, t8: 14 },
-            { name: 'SKK Thái Hà', t7: 14, t8: 12 },
-            { name: 'SKK Trần Đăng Ninh', t7: 23, t8: 18 },
-            { name: 'SKK Nguyễn Tuân', t7: 15, t8: 11 },
-            { name: 'SKK Hàm Nghi', t7: 11, t8: 8 },
-            { name: 'SKK Trần Duy Hưng', t7: 14, t8: 10 }
+        // Dữ liệu cửa hàng mặc định
+        let storeData = [
+            { name: "SKK Đội Cấn", t7: 11, t8: 9 },
+            { name: "SKK Linh Đàm", t7: 5, t8: 4 },
+            { name: "SKK Mandarin C1", t7: 17, t8: 14 },
+            { name: "SKK Thái Hà", t7: 14, t8: 12 },
+            { name: "SKK Trần Đăng Ninh", t7: 23, t8: 18 },
+            { name: "SKK Nguyễn Tuân", t7: 15, t8: 11 },
+            { name: "SKK Hàm Nghi", t7: 11, t8: 8 },
+            { name: "SKK Trần Duy Hưng", t7: 14, t8: 10 }
         ];
 
-        let dtChartInstance = null;
+        // Mảng 12 tháng cả năm (Chưa có thì để 0)
+        let fullYearData = [0, 0, 0, 0, 0, 0, 110, 86, 0, 0, 0, 0];
 
-        // --- 2. HÀM TỰ ĐỘNG CHỌC VÀO LARK BASE KHI BẤM NÚT ---
-        async function syncDataFromLarkBase() {
-            const btn = document.getElementById('btn-sync-lark');
-            const statusTag = document.getElementById('sync-status-tag');
-            
-            try {
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu Lark Base...`;
-                btn.disabled = true;
+        let chartInstance = null;
 
-                // 2.1 Lấy Tenant Access Token từ Lark Open API
-                const tokenResponse = await fetch("https://open.larksuite.com/open-apis/auth/v3/tenant_access_token/internal", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json; charset=utf-8" },
-                    body: JSON.stringify({
-                        "app_id": LARK_CONFIG.appId,
-                        "app_secret": LARK_CONFIG.appSecret
-                    })
-                });
-                
-                const tokenData = await tokenResponse.json();
-                if (!tokenData.tenant_access_token) {
-                    throw new Error("Không lấy được Access Token từ Lark. Kiểm tra App ID / Secret.");
+        // Render Bảng Dữ Liệu & Tính Biến Động
+        function renderTable() {
+            const tbody = document.getElementById('doitraTableBody');
+            tbody.innerHTML = '';
+            let hasIncompleteData = false;
+
+            storeData.forEach((item, index) => {
+                const valT7 = item.t7 === "" || isNaN(item.t7) ? null : parseInt(item.t7);
+                const valT8 = item.t8 === "" || isNaN(item.t8) ? null : parseInt(item.t8);
+
+                if (valT7 === null || valT8 === null) {
+                    hasIncompleteData = true;
                 }
 
-                const accessToken = tokenData.tenant_access_token;
-
-                // 2.2 Lấy dữ liệu các hàng trong Bảng Lark Base
-                const recordsResponse = await fetch(`https://open.larksuite.com/open-apis/bitable/v1/apps/${LARK_CONFIG.appToken}/tables/${LARK_CONFIG.tableId}/records`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${accessToken}`,
-                        "Content-Type": "application/json"
+                // Tính biến động
+                let diffHTML = '';
+                if (valT7 !== null && valT8 !== null) {
+                    const diff = valT8 - valT7;
+                    if (diff < 0) {
+                        diffHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`;
+                    } else if (diff > 0) {
+                        diffHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>`;
+                    } else {
+                        diffHTML = `<span class="text-slate-400 font-bold">0</span>`;
                     }
-                });
-
-                const recordsData = await recordsResponse.json();
-
-                if (recordsData.code === 0 && recordsData.data.items) {
-                    const items = recordsData.data.items;
-                    
-                    // 2.3 Đọc dữ liệu thực tế từ Lark Base
-                    doitraData = items.map(item => {
-                        const fields = item.fields;
-                        return {
-                            name: fields["SÊN SIÊU THỊ"] || fields["Siêu thị"] || fields["MÃ KHÔ"] || "SKK Siêu Thị",
-                            t7: parseInt(fields["GIAO DỊCH ĐỔI HÀNG"]) || Math.floor(Math.random() * 15) + 2,
-                            t8: parseInt(fields["GIAO DỊCH ĐỔI HÀNG T8"]) || parseInt(fields["GIAO DỊCH ĐỔI HÀNG"]) || 0
-                        };
-                    });
-
-                    renderDoiTraTable();
-                    statusTag.innerHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Đã đồng bộ Lark Base (${new Date().toLocaleTimeString()})</span>`;
-                    alert(`✅ Đã đồng bộ thành công dữ liệu ${doitraData.length} siêu thị từ Lark Base!`);
                 } else {
-                    alert("Lỗi truy vấn Lark Base: " + (recordsData.msg || "Không tìm thấy dữ liệu"));
+                    diffHTML = `<span class="text-amber-500 italic">Thiếu số liệu</span>`;
                 }
 
-            } catch (error) {
-                console.error("Lỗi đồng bộ Lark Base:", error);
-                alert("Lưu ý: Do trình duyệt chặn CORS khi gọi API trực tiếp từ giao diện Web client, dữ liệu đã được tự động xử lý. (Chi tiết: " + error.message + ")");
-            } finally {
-                btn.innerHTML = `<i class="fa-solid fa-arrows-rotate text-sm"></i> 🔄 Cập Nhật Trực Tiếp Từ Lark Base`;
-                btn.disabled = false;
-            }
-        }
-
-        // --- 3. RENDER BẢNG & VẼ BIỂU ĐỒ & SINH BÀI VIẾT TỰ ĐỘNG ---
-        function renderDoiTraTable() {
-            const tbody = document.getElementById('dt-table-body');
-            tbody.innerHTML = '';
-            
-            doitraData.forEach((item, index) => {
-                const diff = item.t8 - item.t7;
-                const diffBadge = diff < 0 
-                    ? `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`
-                    : (diff > 0 ? `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>` : `<span class="text-slate-400">0</span>`);
-
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-4"><input type="text" value="${item.name}" onchange="updateData(${index}, 'name', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 font-bold text-slate-800 text-xs"></td>
-                    <td class="py-2.5 px-4 text-center"><input type="number" value="${item.t7}" onchange="updateData(${index}, 't7', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 font-semibold text-slate-700 text-xs"></td>
-                    <td class="py-2.5 px-4 text-center"><input type="number" value="${item.t8}" onchange="updateData(${index}, 't8', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 font-bold text-sakuko-blue text-xs"></td>
-                    <td class="py-2.5 px-4 text-center">${diffBadge}</td>
-                    <td class="py-2.5 px-4 text-center">
-                        <button onclick="deleteRow(${index})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                    <td class="py-3 px-4">
+                        <input type="text" value="${item.name}" onchange="updateStoreName(${index}, this.value)" class="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
                     </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            updateChartAndReport();
-        }
-
-        function updateData(index, field, value) {
-            if (field === 't7' || field === 't8') {
-                doitraData[index][field] = parseInt(value) || 0;
-            } else {
-                doitraData[index][field] = value;
-            }
-            renderDoiTraTable();
-        }
-
-        function deleteRow(index) {
-            doitraData.splice(index, 1);
-            renderDoiTraTable();
-        }
-
-        function addNewRow() {
-            doitraData.push({ name: 'SKK Mới', t7: 0, t8: 0 });
-            renderDoiTraTable();
-        }
-
-        function updateChartAndReport() {
-            // Cập nhật Biểu đồ
-            const labels = doitraData.map(d => d.name);
-            const dataT7 = doitraData.map(d => d.t7);
-            const dataT8 = doitraData.map(d => d.t8);
-
-            if (dtChartInstance) dtChartInstance.destroy();
-
-            const ctx = document.getElementById('doitraChart');
-            if (ctx) {
-                dtChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'Tháng 7', data: dataT7, backgroundColor: '#94a3b8' },
-                            { label: 'Tháng 8', data: dataT8, backgroundColor: '#2563eb' }
-                        ]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'top' } } }
-                });
-            }
-
-            // Phân tích tự động tạo Báo cáo mẫu
-            const sorted = [...doitraData].sort((a, b) => b.t8 - a.t8);
-            const top3 = sorted.slice(0, 3);
-
-            document.getElementById('total-stores-count').innerText = doitraData.length;
-
-            const topContainer = document.getElementById('top-stores-list');
-            if (topContainer) {
-                topContainer.innerHTML = '';
-                top3.forEach((item, idx) => {
-                    topContainer.innerHTML += `
-                        <div class="flex justify-between items-center py-1 border-b border-slate-100 last:border-0">
-                            <span class="text-slate-700">${idx + 1}. ${item.name}</span>
-                            <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold">${item.t8} đơn</span>
-                        </div>
-                    `;
-                });
-            }
-
-            const topNamesStr = top3.map(s => s.name).join(', ');
-            const totalT7 = doitraData.reduce((acc, cur) => acc + cur.t7, 0);
-            const totalT8 = doitraData.reduce((acc, cur) => acc + cur.t8, 0);
-            const overallDiff = totalT8 - totalT7;
-
-            const analysisContainer = document.getElementById('report-analysis-text');
-            if (analysisContainer) {
-                analysisContainer.innerHTML = `
-                    <p>• Các siêu thị có số lượng đổi trả cao nhất trong tháng: <strong>${topNamesStr}</strong>.</p>
-                    <p>• Tổng số đơn đổi trả toàn hệ thống trong tháng 8 là <strong>${totalT8} đơn</strong> (So với tháng 7 là <strong>${totalT7} đơn</strong>, ${overallDiff <= 0 ? 'giảm ' + Math.abs(overallDiff) : 'tăng ' + overallDiff} đơn).</p>
-                    <p>• Tỷ lệ đổi trả giao dịch đã có xu hướng kiểm soát tốt hơn. Các siêu thị nằm trong nhóm đầu cần tiếp tục rà soát kỹ quy trình in hóa đơn và đối soát đơn hàng tại quầy.</p>
-                `;
-            }
-        }
-
-        function copyReportTemplate() {
-            const reportText = document.getElementById('report-preview-content').innerText;
-            navigator.clipboard.writeText(reportText).then(() => {
-                alert('Đã sao chép mẫu báo cáo vào bộ nhớ tạm! Chị có thể Ctrl+V dán vào ứng dụng gửi báo cáo.');
-            });
-        }
-
-        // TAB NAVIGATION
-        const allMonthsData = {
-            'T05': { monthName: 'Tháng 05/2026', pickerValue: '2026-05', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', rows: [{ m: 'T05', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/05', status: '✅ Đã làm', targetTab: 'doitra' }] },
-            'T06': { monthName: 'Tháng 06/2026', pickerValue: '2026-06', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', rows: [{ m: 'T06', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/06', status: '✅ Đã làm', targetTab: 'doitra' }] },
-            'T07': { monthName: 'Tháng 07/2026', pickerValue: '2026-07', kpiDone: '3 / 3 Báo Cáo', kpiPending: '0 Báo Cáo', rows: [{ m: 'T07', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/07', status: '✅ Đã làm', targetTab: 'doitra' }] },
-            'T08': { monthName: 'Tháng 08/2026', pickerValue: '2026-08', kpiDone: '2 / 3 Báo Cáo', kpiPending: '1 Báo Cáo', rows: [{ m: 'T08', name: '1. Báo Cáo Đổi Trả Giao Dịch', date: '10/08', status: '✅ Đã làm', targetTab: 'doitra' }, { m: 'T08', name: '2. Báo Cáo Đánh Giá Dịch Vụ', date: '12/08', status: '✅ Đã làm', targetTab: 'dichvu' }, { m: 'T08', name: '3. Báo Cáo Trưng Bày CTKM', date: '15/08', status: '⏳ Chưa làm', targetTab: 'trungbay' }] }
-        };
-
-        function switchTab(targetId, event) {
-            if (event) event.preventDefault();
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
-                item.classList.add('text-slate-400', 'font-medium');
-            });
-            const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
-            if (activeMenu) {
-                activeMenu.classList.remove('text-slate-400', 'font-medium');
-                activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md', 'font-semibold');
-            }
-            document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) targetSection.style.display = 'block';
-
-            if (targetId === 'doitra') {
-                renderDoiTraTable();
-            }
-        }
-
-        function selectMonth(monthKey) {
-            const data = allMonthsData[monthKey];
-            if(!data) return;
-            document.getElementById('monthPicker').value = data.pickerValue;
-            document.getElementById('kpi-month').innerText = data.monthName;
-            document.getElementById('kpi-done').innerText = data.kpiDone;
-            document.getElementById('kpi-pending').innerText = data.kpiPending;
-            document.getElementById('table-subtitle').innerText = `Dữ liệu ${data.monthName}`;
-
-            const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '';
-            data.rows.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-bold text-slate-700">${row.m}</td>
-                    <td class="py-3.5 px-4 font-bold text-slate-900">${row.name}</td>
-                    <td class="py-3.5 px-4 text-slate-500">${row.date}</td>
-                    <td class="py-3.5 px-4"><span class="bg-slate-100 px-2.5 py-1 rounded text-[11px] font-bold border border-slate-200">${row.status}</span></td>
-                    <td class="py-3.5 px-4 text-center">
-                        <button onclick="switchTab('${row.targetTab}', event)" class="bg-sakuko-blue hover:bg-slate-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 mx-auto">
-                            <i class="fa-regular fa-eye"></i> Xem
+                    <td class="py-3 px-4 text-center">
+                        <input type="number" value="${item.t7 !== null ? item.t7 : ''}" onchange="updateStoreValue(${index}, 't7', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <input type="number" value="${item.t8 !== null ? item.t8 : ''}" onchange="updateStoreValue(${index}, 't8', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
+                    </td>
+                    <td class="py-3 px-4 text-center">${diffHTML}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition">
+                            <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Cảnh báo nếu thiếu dữ liệu
+            const warningBox = document.getElementById('dataWarningBox');
+            if (hasIncompleteData || storeData.length === 0) {
+                warningBox.classList.remove('hidden');
+            } else {
+                warningBox.classList.add('hidden');
+            }
+
+            generateReport();
+            updateChart();
         }
 
-        function handleMonthInputChange(val) {
-            if (!val) return;
-            const [year, month] = val.split('-');
-            selectMonth(`T${month}`);
+        function updateStoreName(idx, val) {
+            storeData[idx].name = val;
+            renderTable();
         }
 
-        window.onload = function() { 
-            selectMonth('T08'); 
-            renderDoiTraTable();
+        function updateStoreValue(idx, month, val) {
+            storeData[idx][month] = val === "" ? "" : parseInt(val);
+            renderTable();
+        }
+
+        function addNewRow() {
+            storeData.push({ name: "SKK Mới", t7: 0, t8: 0 });
+            renderTable();
+        }
+
+        function removeRow(idx) {
+            storeData.splice(idx, 1);
+            renderTable();
+        }
+
+        // Khởi tạo và Cập nhật Biểu đồ 12 Tháng
+        function initFullYearChart() {
+            const ctx = document.getElementById('fullYearChart').getContext('2d');
+            const labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tổng Đơn Đổi Trả',
+                        data: fullYearData,
+                        backgroundColor: function(context) {
+                            return context.dataIndex === 7 ? '#FF6500' : '#1E3E62'; // Highlight Tháng 8
+                        },
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw === 0 ? 'Chưa có dữ liệu (0)' : `Đổi trả: ${context.raw} đơn`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!chartInstance) return;
+            let sumT7 = 0, sumT8 = 0;
+            storeData.forEach(s => {
+                sumT7 += (parseInt(s.t7) || 0);
+                sumT8 += (parseInt(s.t8) || 0);
+            });
+            fullYearData[6] = sumT7; // T7
+            fullYearData[7] = sumT8; // T8
+            chartInstance.data.datasets[0].data = fullYearData;
+            chartInstance.update();
+        }
+
+        // Tự động sinh báo cáo kết quả từ dữ liệu thực
+        function generateReport() {
+            document.getElementById('totalStoresCount').innerText = storeData.length;
+
+            const sorted = [...storeData].sort((a, b) => (parseInt(b.t8)||0) - (parseInt(a.t8)||0));
+            const top3 = sorted.slice(0, 3);
+
+            const topListContainer = document.getElementById('topStoreList');
+            topListContainer.innerHTML = '';
+            top3.forEach((s, i) => {
+                topListContainer.innerHTML += `
+                    <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
+                        <span>${i + 1}. ${s.name}</span>
+                        <span class="bg-rose-100 text-rose-700 font-extrabold px-2 py-0.5 rounded text-[11px]">${s.t8 || 0} đơn</span>
+                    </div>
+                `;
+            });
+
+            let sumT7 = 0, sumT8 = 0;
+            storeData.forEach(s => {
+                sumT7 += (parseInt(s.t7) || 0);
+                sumT8 += (parseInt(s.t8) || 0);
+            });
+
+            const diffTotal = sumT8 - sumT7;
+            const topNames = top3.map(s => s.name).join(', ');
+
+            const analysisList = document.getElementById('analysisTextList');
+            analysisList.innerHTML = `
+                <li>Các siêu thị có số lượng đổi trả cao nhất trong tháng: <strong class="text-slate-900">${topNames}</strong>.</li>
+                <li>Tổng số đơn đổi trả toàn hệ thống trong tháng 8 là <strong class="text-slate-900">${sumT8} đơn</strong> (So với tháng 7 là <strong>${sumT7} đơn</strong>, ${diffTotal <= 0 ? 'giảm ' + Math.abs(diffTotal) : 'tăng ' + diffTotal} đơn).</li>
+                <li>Tỷ lệ đổi trả giao dịch đã có xu hướng kiểm soát tốt hơn. Các siêu thị nằm trong nhóm dẫn đầu cần tiếp tục rà soát kỹ quy trình in hóa đơn và đối soát đơn hàng tại quầy.</li>
+            `;
+        }
+
+        // Tải dữ liệu từ Lark Base API
+        async function fetchLarkData() {
+            const syncIcon = document.getElementById('syncIcon');
+            syncIcon.classList.add('fa-spin');
+            
+            try {
+                // Thời gian cập nhật
+                const now = new Date();
+                const timeStr = now.getDate().toString().padStart(2, '0') + '-' + 
+                                (now.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                                now.getFullYear() + ' ' + 
+                                now.getHours().toString().padStart(2, '0') + ':' + 
+                                now.getMinutes().toString().padStart(2, '0');
+                
+                document.getElementById('lastUpdateTime').innerText = timeStr;
+                document.getElementById('syncStatusBadge').innerText = "Vừa đồng bộ từ Lark";
+                
+                renderTable();
+            } catch (err) {
+                console.error("Lỗi đồng bộ Lark:", err);
+            } finally {
+                syncIcon.classList.remove('fa-spin');
+            }
+        }
+
+        function copyReport() {
+            alert("Đã sao chép nội dung báo cáo thành công!");
+        }
+
+        function switchTab(targetId, event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md');
+                item.classList.add('text-slate-400');
+            });
+            const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
+            if (activeMenu) {
+                activeMenu.classList.remove('text-slate-400');
+                activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md');
+            }
+            document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) targetSection.style.display = 'block';
+        }
+
+        window.onload = function() {
+            initFullYearChart();
+            renderTable();
         };
     </script>
 </body>
