@@ -1088,102 +1088,136 @@ function copyServiceEmail() {
     }).catch(() => alert("Không thể sao chép, vui lòng tô đen và bấm Ctrl+C."));
 }
 
-<!-- TAB 4: TRƯNG BÀY CTKM (ĐÃ SỬA LỖI HIỂN THỊ ĐỒ THỊ/ẢNH) -->
-<section id="tab-trungbay" class="tab-content p-8 space-y-6 hidden">
-    <!-- Header Thông Báo -->
-    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-bullhorn text-sakuko-orange text-lg"></i>
-            <h2 class="text-base font-bold text-slate-800">Thông Báo Kết Quả Đánh Giá Trưng Bày CTKM</h2>
-        </div>
-        <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-            Dear các Siêu thị, Phòng Kiểm soát chất lượng xin gửi tới các siêu thị: <strong>Kết quả đánh giá Trưng bày CTKM tháng 08/2026.</strong>
-        </p>
-    </div>
+/* ============================== TAB 4: TRƯNG BÀY CTKM ============================== */
 
-    <!-- KHU VỰC HIỂN THỊ DASHBOARD TRƯNG BÀY -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
-                <i class="fa-solid fa-chart-line text-sakuko-blue"></i> Biểu Đồ Tổng Hợp Tuân Thủ Trưng Bày CTKM T8/2026
-            </h3>
-            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">
-                Tỷ lệ đạt toàn hệ thống: 96.5%
-            </span>
-        </div>
+async function syncTrungBayData() {
+    const icon = document.getElementById('trungbaySyncIcon');
+    if (icon) icon.classList.add('fa-spin');
 
-        <!-- CÁCH 1: VẼ BIỂU ĐỒ TRỰC TIẾP TỰ ĐỘNG (KHÔNG LO LỖI ẢNH) -->
-        <div class="h-72 w-full pt-2">
-            <canvas id="trungBayChart"></canvas>
-        </div>
+    try {
+        const response = await fetch(TRUNGBAY_API_ENDPOINT);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const result = await response.json();
+        const rawItems = result.data?.items || result.items || result || [];
+        if (Array.isArray(rawItems) && rawItems.length > 0) {
+            trungbayData = rawItems.map(item => {
+                const f = item.fields || item;
+                return {
+                    name: f["Tên Siêu Thị"] || f.name || "N/A",
+                    submitted: Boolean(f["Gửi Báo Cáo"] ?? f.submitted ?? true),
+                    onTime: Boolean(f["Đúng Deadline"] ?? f.onTime ?? true),
+                    passed: Boolean(f["Đạt Chỉ Thị"] ?? f.passed ?? true),
+                    note: f["Ghi Chú"] || f.note || "--"
+                };
+            });
+        }
+    } catch (err) {
+        console.warn("Không kết nối được Lark Base (trưng bày), dùng dữ liệu tạm:", err);
+    } finally {
+        if (icon) icon.classList.remove('fa-spin');
+        const t = document.getElementById('trungbayUpdateTime'); if (t) t.innerText = fmtNow();
+        const badge = document.getElementById('trungbaySyncBadge'); if (badge) badge.innerText = `Đã đồng bộ ${trungbayData.length} Cửa hàng`;
+        const rd = document.getElementById('trungbayReportDate'); if (rd) rd.innerText = fmtDate();
+        renderTrungBayTable();
+    }
+}
 
-        <!-- CÁCH 2: NẾU CHỊ VẪN MUỐN ĐỒNG BỘ LINK ẢNH TỪ LARK BASE/DRIVE -->
-        <!-- Chị chỉ cần thay link bên dưới vào biến imageSrc trong script -->
-        <div id="imageWrapper" class="hidden text-center p-2 border border-slate-200 rounded-lg bg-slate-50">
-            <img id="tbImage" src="" alt="Biểu đồ Dashboard Trưng bày CTKM T8/2026" class="max-h-[450px] mx-auto rounded shadow-sm object-contain" onerror="handleImageError()">
-        </div>
-    </div>
+function renderTrungBayTable() {
+    const tbody = document.getElementById('trungbayTableBody');
+    if (!tbody) return;
 
-    <!-- BẢNG BÁO CÁO CHI TIẾT TỪNG SIÊU THỊ -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-slate-100 bg-slate-50">
-            <h4 class="text-xs font-bold text-slate-700 uppercase">Chi Tiết Điểm Tuân Thủ Trưng Bày Theo Siêu Thị</h4>
-        </div>
-        <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center">
-                <span class="font-bold text-emerald-900">SKK Linh Đàm</span>
-                <span class="font-black text-emerald-700">100% (Xuất sắc)</span>
-            </div>
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center">
-                <span class="font-bold text-emerald-900">SKK Nguyễn Tuân</span>
-                <span class="font-black text-emerald-700">98% (Đạt)</span>
-            </div>
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg flex justify-between items-center">
-                <span class="font-bold text-amber-900">SKK Trần Đăng Ninh</span>
-                <span class="font-black text-amber-700">91% (Cần nhắc nhở)</span>
-            </div>
-        </div>
-    </div>
-</section>
+    tbody.innerHTML = trungbayData.map((item, index) => `
+        <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-4 text-center">${item.submitted ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đã gửi</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Chưa gửi</span>'}</td>
+            <td class="py-2.5 px-4 text-center">${item.onTime ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700">Đúng hạn</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Trễ deadline</span>'}</td>
+            <td class="py-2.5 px-4 text-center">${item.passed ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đạt</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Chưa đạt</span>'}</td>
+            <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
+            <td class="py-2.5 px-4 text-center"><button onclick="deleteTrungBayRow(${index})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>`).join('');
 
-<!-- SCRIPT KHỞI TẠO BIỂU ĐỒ CHO TAB TRƯNG BÀY (Thêm đoạn này vào phần <script> của trang) -->
-<script>
-    let trungBayChartInstance = null;
+    updateTrungBayAnalysisAndKPI();
+}
 
-    // Hàm vẽ biểu đồ trưng bày khi bấm vào Tab
-    function initTrungBayChart() {
-        const ctxElem = document.getElementById('trungBayChart');
-        if (!ctxElem) return;
-        
-        const ctx = ctxElem.getContext('2d');
-        if (trungBayChartInstance) trungBayChartInstance.destroy();
+function updateTrungBayAnalysisAndKPI() {
+    const total = trungbayData.length;
+    const submitted = trungbayData.filter(d => d.submitted).length;
+    const onTimeList = trungbayData.filter(d => d.onTime);
+    const lateList = trungbayData.filter(d => !d.onTime);
+    const passedList = trungbayData.filter(d => d.passed);
+    const failList = trungbayData.filter(d => !d.passed);
 
-        trungBayChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-                datasets: [{
-                    label: 'Tỷ lệ tuân thủ trưng bày (%)',
-                    data: [92.0, 94.5, 95.8, 96.5],
-                    borderColor: '#FF6500',
-                    backgroundColor: 'rgba(255, 101, 0, 0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#1E3E62'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { min: 80, max: 100 }
-                }
-            }
-        });
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    set('kpiTotalStores', total);
+    set('kpiSubmittedStores', submitted);
+    set('kpiSubmittedNote', `(${total > 0 ? Math.round(submitted/total*100) : 0}% ST gửi báo cáo)`);
+    set('kpiOnTimeStores', onTimeList.length);
+    set('kpiPassedStores', passedList.length);
+    set('kpiLateNote', lateList.length > 0 ? `(Còn ${lateList.length} ST trễ deadline)` : "(100% đúng deadline)");
+    set('kpiFailNote', failList.length > 0 ? `(Còn ${failList.length} ST chưa đạt)` : "(100% đạt chỉ thị)");
+
+    const lateNames = lateList.map(s => s.name).join(', ');
+    const failNames = failList.map(s => s.name).join(' và ');
+
+    const lateTextEl = document.getElementById('reportLateText');
+    if (lateTextEl) {
+        lateTextEl.innerHTML = lateList.length > 0
+            ? `Vẫn còn <strong>${lateList.length}/${total}</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>${lateNames}</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.`
+            : `Tất cả <strong>${total}/${total}</strong> siêu thị đã hoàn thành gửi báo cáo trưng bày <strong>đúng deadline</strong> quy định.`;
     }
 
-    // Nhớ gọi hàm này trong switchTab('trungbay')
-    // Ví dụ bổ sung vào hàm switchTab cũ:
-    // if (tabName === 'trungbay') { initTrungBayChart(); }
+    const passTextEl = document.getElementById('reportPassText');
+    if (passTextEl) {
+        passTextEl.innerHTML = failList.length > 0
+            ? `Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>${failList.length}/${total}</strong> siêu thị là <strong>${failNames}</strong> chưa đạt theo chỉ thị trưng bày.`
+            : `<strong>100%</strong> các siêu thị đã hoàn thành xuất sắc và đạt tiêu chuẩn chỉ thị trưng bày CTKM trong tháng.`;
+    }
+
+    renderTrungBayChart();
+}
+
+function addTrungBayRow() {
+    trungbayData.push({ name: "SKK Mới", submitted: true, onTime: true, passed: true, note: "Mới cập nhật" });
+    renderTrungBayTable();
+}
+function deleteTrungBayRow(index) { trungbayData.splice(index, 1); renderTrungBayTable(); }
+
+function renderTrungBayChart() {
+    const ctx = document.getElementById('trungbayChart');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (chartTrungBayInstance) chartTrungBayInstance.destroy();
+
+    const labels = trungbayData.map(d => d.name);
+    const scoreData = trungbayData.map(d => d.passed ? 4 : 3);
+    const deadlineData = trungbayData.map(d => d.onTime ? 1 : 0);
+
+    chartTrungBayInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [
+            { label: 'Tổng Điểm Đạt', data: scoreData, backgroundColor: '#4F46E5', barThickness: 12 },
+            { label: 'Điểm Deadline', data: deadlineData, backgroundColor: '#38BDF8', barThickness: 12 }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false,
+            scales: { x: { ticks: { font: { size: 9 }, maxRotation: 45, minRotation: 45 } }, y: { beginAtZero: true, max: 5 } },
+            plugins: { legend: { display: false } } }
+    });
+}
+
+function copyTrungBayReport() {
+    const el = document.getElementById('trungbayReportPreview');
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        alert('Đã sao chép toàn bộ mẫu Báo Cáo Đánh Giá Trưng Bày CTKM!');
+    }).catch(() => alert('Không thể sao chép, vui lòng tô đen nội dung và bấm Ctrl+C.'));
+}
+
+/* ============================== KHỞI TẠO KHI TẢI TRANG ============================== */
+document.addEventListener('DOMContentLoaded', function () {
+    initFullYearChart();
+    fetchLarkData();      // tự động kéo dữ liệu đổi trả thật từ Lark Base
+    syncServiceData();    // tự động kéo dữ liệu dịch vụ thật từ Lark Base
+    syncTrungBayData();   // tự động kéo dữ liệu trưng bày thật từ Lark Base (nếu backend đã có route)
+});
 </script>
+</body>
+</html>
