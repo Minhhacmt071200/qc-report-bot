@@ -174,7 +174,7 @@
             </div>
         </div>
 
-    <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (XỬ LÝ DỮ LIỆU TỐI ƯU) -->
+    <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (CÓ BẢNG DỮ LIỆU CHI TIẾT) -->
 <!-- ========================================== -->
 <div id="doitra" class="content-section p-8 space-y-6">
 
@@ -326,20 +326,59 @@
             </div>
         </div>
     </div>
+
+    <!-- BẢNG DỮ LIỆU CHI TIẾT CÁC ĐƠN ĐỔI TRẢ (DATA TABLE) -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-sakuko-orange"></i>
+                <h3 class="text-xs font-bold uppercase text-slate-800">DANH SÁCH CHI TIẾT ĐƠN ĐỔI TRẢ THÁNG ĐANG CHỌN</h3>
+                <span id="tableRecordCount" class="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded-full">0 đơn</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="tableSearchInput" onkeyup="filterTableData()" placeholder="Tìm theo tên siêu thị, mã đơn..." class="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-60 focus:outline-none focus:border-sky-500">
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                        <th class="p-3 w-12 text-center">STT</th>
+                        <th class="p-3">Ngày Phát Sinh</th>
+                        <th class="p-3">Siêu Thị / Chi Nhánh</th>
+                        <th class="p-3">Mã Đơn / Khách Hàng</th>
+                        <th class="p-3">Lý Do Đổi Trả</th>
+                        <th class="p-3 text-center">Trạng Thái</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody" class="text-xs divide-y divide-slate-100 text-slate-700">
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-slate-400">Vui lòng chọn tháng và bấm "Tìm / Lọc Dữ Liệu" để xem danh sách.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
-<!-- SCRIPT XỬ LÝ DỮ LIỆU THẬT TỪ LARK BASE - KHÔNG BỊA SỐ LIỆU -->
+<!-- SCRIPT XỬ LÝ DỮ LIỆU TỪ LARK BASE & VẼ BẢNG -->
 <script>
     const LARK_API_URL = '/api/lark-base/doitra';
 
-    // ⚠️ QUAN TRỌNG: đổi các tên field dưới đây cho khớp đúng với tên cột thật
-    // trong bảng "BÁO CÁO ĐỔI TRẢ HRV" trên Lark Base của bạn.
-    // Hệ thống sẽ thử lần lượt từng tên trong danh sách để tìm được cột đúng.
     const DATE_FIELD_CANDIDATES = ["Ngày phát sinh", "Ngày tạo", "Ngày đổi trả", "Ngày", "Date", "created_at"];
     const MONTH_FIELD_CANDIDATES = ["Tháng", "Tháng phát sinh", "month"];
     const STORE_FIELD_CANDIDATES = ["Chi nhánh xử lý", "Chi nhánh đặt hàng", "Siêu thị", "Cửa hàng"];
+    const REASON_FIELD_CANDIDATES = ["Lý do đổi trả", "Lý do", "Nguyên nhân", "Ghi chú"];
+    const CODE_FIELD_CANDIDATES = ["Mã đơn hàng", "Mã HD", "Mã đơn", "Khách hàng"];
 
     let globalLarkRecords = [];
+    let currentFilteredRecords = [];
     let fullYearChartInstance = null;
     let hasFetchedOnce = false;
 
@@ -352,16 +391,12 @@
         return null;
     }
 
-    // Trả về {month, year} thật của 1 bản ghi, hoặc null nếu không xác định được
     function extractMonthYear(item) {
         const fields = item.fields || item;
-
-        // Ưu tiên field ngày tháng thật (hỗ trợ cả timestamp số của Lark và chuỗi dd/mm/yyyy)
         const rawDate = getFieldValue(fields, DATE_FIELD_CANDIDATES);
         if (rawDate) {
             let d = null;
             if (typeof rawDate === "number") {
-                // Lark Base date field thường trả về Unix timestamp (ms)
                 d = new Date(rawDate);
             } else {
                 const str = String(rawDate).trim();
@@ -374,17 +409,20 @@
                 }
             }
             if (d && !isNaN(d.getTime())) {
-                return { month: d.getMonth() + 1, year: d.getFullYear() };
+                return { 
+                    month: d.getMonth() + 1, 
+                    year: d.getFullYear(),
+                    formatted: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`
+                };
             }
         }
 
-        // Fallback: field ghi sẵn số tháng (không có năm) -> giả định năm hiện tại đang chọn
         const rawMonth = getFieldValue(fields, MONTH_FIELD_CANDIDATES);
         if (rawMonth) {
             const match = String(rawMonth).match(/\d+/);
             if (match) {
                 const m = parseInt(match[0], 10);
-                if (m >= 1 && m <= 12) return { month: m, year: null };
+                if (m >= 1 && m <= 12) return { month: m, year: null, formatted: `Tháng ${m}` };
             }
         }
 
@@ -436,19 +474,16 @@
         const selectedMonth = Number(document.getElementById('selectMonth')?.value || 8);
         const now = new Date();
 
-        // Đếm số đơn thật theo từng tháng, CHỈ dựa trên dữ liệu đã tải từ Lark Base
         const monthlyCounts = new Array(12).fill(0);
         globalLarkRecords.forEach(item => {
             const my = extractMonthYear(item);
             if (!my) return;
-            // Nếu bản ghi không có năm rõ ràng, coi như thuộc năm đang xem
             const recYear = my.year ?? year;
             if (recYear === year && my.month >= 1 && my.month <= 12) {
                 monthlyCounts[my.month - 1]++;
             }
         });
 
-        // Tháng chưa kết thúc -> để trống (null) thay vì bịa số, Chart.js sẽ không vẽ cột
         const chartDataArray = monthlyCounts.map((count, idx) => {
             const m = idx + 1;
             const isFuture = (year > now.getFullYear()) || (year === now.getFullYear() && m > now.getMonth() + 1);
@@ -495,7 +530,6 @@
 
     function onSearchClick() {
         if (!hasFetchedOnce) {
-            // Chưa có dữ liệu thật trong bộ nhớ -> gọi API trước rồi mới lọc
             fetchLarkDataAndRender().then(filterAndRenderReport);
         } else {
             filterAndRenderReport();
@@ -515,7 +549,6 @@
 
         emptyState.classList.add('hidden');
 
-        // Kiểm tra tháng đã kết thúc hay chưa (so với ngày thực tế hôm nay)
         const now = new Date();
         const isFuture = (selectedYear > now.getFullYear()) || (selectedYear === now.getFullYear() && selectedMonth > now.getMonth() + 1);
         const isCurrentIncomplete = (selectedYear === now.getFullYear() && selectedMonth === now.getMonth() + 1);
@@ -524,6 +557,7 @@
             incompleteState.classList.remove('hidden');
             realContent.classList.add('hidden');
             if (incompleteMonthLabel) incompleteMonthLabel.innerText = `${String(selectedMonth).padStart(2, '0')}/${selectedYear}`;
+            renderTable([]);
             return;
         }
 
@@ -541,17 +575,16 @@
         const currentDateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
         if (reportGenDate) reportGenDate.innerText = currentDateStr;
 
-        // Lọc bản ghi THẬT theo đúng tháng/năm đã chọn - không dùng dữ liệu bịa
-        const filteredRecords = globalLarkRecords.filter(item => {
+        currentFilteredRecords = globalLarkRecords.filter(item => {
             const my = extractMonthYear(item);
             if (!my) return false;
             const recYear = my.year ?? selectedYear;
             return my.month === selectedMonth && recYear === selectedYear;
         });
 
-        const totalOrders = filteredRecords.length;
+        const totalOrders = currentFilteredRecords.length;
         const storeMap = {};
-        filteredRecords.forEach(item => {
+        currentFilteredRecords.forEach(item => {
             const storeName = getStoreName(item);
             storeMap[storeName] = (storeMap[storeName] || 0) + 1;
         });
@@ -604,6 +637,65 @@
                 </div>
             `;
         }
+
+        renderTable(currentFilteredRecords);
+    }
+
+    // VẼ BẢNG DỮ LIỆU
+    function renderTable(records) {
+        const tbody = document.getElementById('dataTableBody');
+        const countBadge = document.getElementById('tableRecordCount');
+
+        if (countBadge) countBadge.innerText = `${records.length} đơn`;
+
+        if (!tbody) return;
+
+        if (records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Không có dữ liệu đơn đổi trả cho tháng này.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = records.map((item, idx) => {
+            const fields = item.fields || item;
+            const my = extractMonthYear(item);
+            const dateStr = my?.formatted || '--';
+            const store = getStoreName(item);
+            const reason = getFieldValue(fields, REASON_FIELD_CANDIDATES) || 'Chưa cập nhật lý do';
+            const code = getFieldValue(fields, CODE_FIELD_CANDIDATES) || 'N/A';
+
+            return `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 text-center font-bold text-slate-400">${idx + 1}</td>
+                    <td class="p-3 font-semibold text-slate-600">${dateStr}</td>
+                    <td class="p-3 font-bold text-slate-800">${store}</td>
+                    <td class="p-3 font-mono text-sky-600 font-semibold">${code}</td>
+                    <td class="p-3 text-slate-600 max-w-xs truncate" title="${reason}">${reason}</td>
+                    <td class="p-3 text-center">
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Đã xử lý</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // TÌM KIẾM NHANH TRONG BẢNG
+    function filterTableData() {
+        const query = document.getElementById('tableSearchInput')?.value.toLowerCase().trim() || '';
+        if (!query) {
+            renderTable(currentFilteredRecords);
+            return;
+        }
+
+        const filtered = currentFilteredRecords.filter(item => {
+            const fields = item.fields || item;
+            const store = getStoreName(item).toLowerCase();
+            const reason = (getFieldValue(fields, REASON_FIELD_CANDIDATES) || '').toLowerCase();
+            const code = (getFieldValue(fields, CODE_FIELD_CANDIDATES) || '').toLowerCase();
+
+            return store.includes(query) || reason.includes(query) || code.includes(query);
+        });
+
+        renderTable(filtered);
     }
 
     function updateLastTime() {
@@ -623,8 +715,6 @@
         alert('Đã sao chép mẫu báo cáo thành công!');
     }
 
-    // Chỉ tải dữ liệu khi trang mở, KHÔNG tự vẽ báo cáo bịa số liệu.
-    // Người dùng phải bấm "Tìm / Lọc Dữ Liệu" để hệ thống đọc & phân tích thật.
     window.addEventListener('DOMContentLoaded', () => {
         fetchLarkDataAndRender();
     });
