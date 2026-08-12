@@ -173,135 +173,240 @@
         </div>
 
         <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
-        <div id="doitra" class="content-section p-8 space-y-6" style="display: none;">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                <div>
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-shield-halved text-sakuko-orange text-xl"></i>
-                        <h2 class="text-lg font-bold text-slate-800">Quản Lý & Phân Tích Báo Cáo Đổi Trả</h2>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-1">
-                        Số liệu được đồng bộ tự động trực tiếp từ Lark Base và tự động sinh báo cáo phân tích.
-                    </p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-[11px] text-slate-400 font-medium">Lịch sử update gần nhất:</p>
-                        <p id="lastUpdateText" class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
-                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="lastUpdateTime">10-08-2026 11:02</span>
-                        </p>
-                    </div>
-                    <button onclick="fetchLarkData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-rotate text-xs" id="syncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
-                    </button>
-                </div>
+<div id="doitra" class="content-section p-8 space-y-6">
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-shield-halved text-sakuko-orange text-xl"></i>
+                <h2 class="text-lg font-bold text-slate-800">Quản Lý & Phân Tích Báo Cáo Đổi Trả</h2>
             </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐỔI TRẢ CHI TIẾT</h3>
-                    <div class="flex items-center gap-3">
-                        <span id="syncStatusBadge" class="text-[11px] text-emerald-600 font-bold">Đã đồng bộ Lark Base</span>
-                        <button onclick="addNewRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
-                            <i class="fa-solid fa-plus"></i> Thêm Hàng
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto max-h-[420px]">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
-                            <tr>
-                                <th class="py-3 px-4 w-1/3">TÊN SIÊU THỊ</th>
-                                <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T7</th>
-                                <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T8</th>
-                                <th class="py-3 px-4 text-center">BIẾN ĐỘNG (VS T7)</th>
-                                <th class="py-3 px-4 text-center w-16">THAO TÁC</th>
-                            </tr>
-                        </thead>
-                        <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
-                    </table>
-                </div>
+            <p class="text-xs text-slate-500 mt-1">
+                Số liệu được đồng bộ tự động trực tiếp từ Lark Base và tự động sinh báo cáo phân tích.
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="text-right">
+                <p class="text-[11px] text-slate-400 font-medium">Lịch sử update gần nhất:</p>
+                <p id="lastUpdateText" class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
+                    <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="lastUpdateTime">12-08-2026 15:00</span>
+                </p>
             </div>
+            <button onclick="fetchLarkData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate text-xs" id="syncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
+            </button>
+        </div>
+    </div>
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-sakuko-orange"></i> Biểu Đồ Giao Dịch Đổi Hàng Toàn Hệ Thống (12 Tháng)
-                    </h4>
-                    <span class="text-[11px] text-slate-400">(Tự động cập nhật theo Lark Base)</span>
-                </div>
-                <div class="h-64"><canvas id="fullYearChart"></canvas></div>
-            </div>
-
-            <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
-                <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
-                            <i class="fa-solid fa-shield-halved text-sakuko-orange text-sm"></i>
-                        </div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
-                    </div>
-                    <button onclick="copyReport()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                        <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Báo Cáo
-                    </button>
-                </div>
-
-                <div class="p-6 bg-white text-slate-800 space-y-5">
-                    <div id="dataWarningBox" class="hidden p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-amber-800 text-xs">
-                        <div class="flex items-center gap-2 font-bold mb-1">
-                            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
-                            <span>CẢNH BÁO DỮ LIỆU CHƯA ĐỦ ĐIỀU KIỆN PHÂN TÍCH!</span>
-                        </div>
-                        <p id="warningDetail">Phát hiện một số siêu thị chưa có đủ số liệu đơn đổi trả. Vui lòng bổ sung đầy đủ dữ liệu trên Lark Base trước khi xuất báo cáo chính thức.</p>
-                    </div>
-
-                    <div>
-                        <h2 class="text-lg font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG 08/2026</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">P. Kiểm soát - SVN | Ngày tạo: <span id="reportGenDate">10-08-2026</span></p>
-                    </div>
-
-                    <p class="text-xs text-slate-600 italic">
-                        Dear các anh chị Siêu Thị,<br>
-                        Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng 8/2026.
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-center items-center shadow-sm">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                <i class="fa-solid fa-store text-sakuko-blue"></i> SỐ SIÊU THỊ OFFLINE
-                            </span>
-                            <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">22</span>
-                        </div>
-                        <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Siêu thị có đơn đổi trả cao nhất trong tháng (Dữ liệu thật):</span>
-                            <div id="topStoreList" class="space-y-1.5 text-xs font-semibold"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-magnifying-glass-chart text-sakuko-orange"></i> Nhận xét & Đánh giá chi tiết:
-                        </h4>
-                        <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-2 leading-relaxed"></ul>
-                    </div>
-
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                        <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG 9/2026:
-                        </h4>
-                        <div id="adviceTextList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
-                    </div>
-
-                    <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
-                        <p class="font-bold text-amber-950 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý bắt buộc:
-                        </p>
-                        <p class="pl-5">• Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
-                        <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm (bao bì, date, lỗi tem giá) trước khi tiến hành tạo đơn đổi trả trên hệ thống POS/Lark.</p>
-                    </div>
-                </div>
+    <!-- BẢNG DỮ LIỆU -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐỔI TRẢ CHI TIẾT</h3>
+            <div class="flex items-center gap-3">
+                <span id="syncStatusBadge" class="text-[11px] text-emerald-600 font-bold">Đã đồng bộ Lark Base</span>
+                <button onclick="addNewRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> Thêm Hàng
+                </button>
             </div>
         </div>
+        <div class="overflow-x-auto max-h-[420px]">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
+                    <tr>
+                        <th class="py-3 px-4 w-1/3">TÊN SIÊU THỊ</th>
+                        <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T7</th>
+                        <th class="py-3 px-4 text-center">ĐƠN ĐỔI TRẢ T8</th>
+                        <th class="py-3 px-4 text-center">BIẾN ĐỘNG (VS T7)</th>
+                        <th class="py-3 px-4 text-center w-16">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BIỂU ĐỒ -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+            <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-chart-column text-sakuko-orange"></i> Biểu Đồ Giao Dịch Đổi Hàng Toàn Hệ Thống (12 Tháng)
+            </h4>
+            <span class="text-[11px] text-slate-400">(Tự động cập nhật theo Lark Base)</span>
+        </div>
+        <div class="h-64"><canvas id="fullYearChart"></canvas></div>
+    </div>
+
+    <!-- KHUNG BÁO CÁO TỰ ĐỘNG (BỔ SUNG CHỌN THÁNG) -->
+    <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
+        <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-sakuko-orange text-sm"></i>
+                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
+            </div>
+            
+            <!-- BỘ LỌC THÁNG BÁO CÁO -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1 rounded-lg border border-slate-700">
+                    <i class="fa-regular fa-calendar-days text-sakuko-orange text-xs"></i>
+                    <span class="text-xs font-semibold text-slate-300">Xem báo cáo:</span>
+                    <select id="selectMonth" onchange="updateReportData()" class="bg-slate-900 text-white text-xs font-bold py-1 px-2 rounded border border-slate-600 focus:outline-none focus:border-sakuko-orange">
+                        <option value="1">Tháng 01</option>
+                        <option value="2">Tháng 02</option>
+                        <option value="3">Tháng 03</option>
+                        <option value="4">Tháng 04</option>
+                        <option value="5">Tháng 05</option>
+                        <option value="6">Tháng 06</option>
+                        <option value="7">Tháng 07</option>
+                        <option value="8" selected>Tháng 08</option>
+                        <option value="9">Tháng 09</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11">Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+                    <select id="selectYear" onchange="updateReportData()" class="bg-slate-900 text-white text-xs font-bold py-1 px-2 rounded border border-slate-600 focus:outline-none focus:border-sakuko-orange">
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+
+                <button onclick="copyReport()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Báo Cáo
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 bg-white text-slate-800 space-y-5">
+            <div id="dataWarningBox" class="hidden p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-amber-800 text-xs">
+                <div class="flex items-center gap-2 font-bold mb-1">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
+                    <span>CẢNH BÁO DỮ LIỆU CHƯA ĐỦ ĐIỀU KIỆN PHÂN TÍCH!</span>
+                </div>
+                <p id="warningDetail">Phát hiện một số siêu thị chưa có đủ số liệu đơn đổi trả. Vui lòng bổ sung đầy đủ dữ liệu trên Lark Base trước khi xuất báo cáo chính thức.</p>
+            </div>
+
+            <div>
+                <h2 id="reportTitle" class="text-lg font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG 08/2026</h2>
+                <p class="text-xs text-slate-400 mt-0.5">P. Kiểm soát - SVN | Ngày tạo: <span id="reportGenDate">12-08-2026</span> <span id="realtimeNote" class="text-amber-600 font-semibold pl-2"></span></p>
+            </div>
+
+            <p class="text-xs text-slate-600 italic" id="reportGreeting">
+                Dear các anh chị Siêu Thị,<br>
+                Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng 8/2026.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-center items-center shadow-sm">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-store text-sakuko-blue"></i> SỐ SIÊU THỊ OFFLINE
+                    </span>
+                    <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">22</span>
+                </div>
+                <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Siêu thị có đơn đổi trả cao nhất trong tháng (Dữ liệu thật):</span>
+                    <div id="topStoreList" class="space-y-1.5 text-xs font-semibold"></div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass-chart text-sakuko-orange"></i> Nhận xét & Đánh giá chi tiết:
+                </h4>
+                <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-2 leading-relaxed"></ul>
+            </div>
+
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <h4 id="adviceTitle" class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG 9/2026:
+                </h4>
+                <div id="adviceTextList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
+            </div>
+
+            <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+                <p class="font-bold text-amber-950 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý bắt buộc:
+                </p>
+                <p class="pl-5">• Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
+                <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm (bao bì, date, lỗi tem giá) trước khi tiến hành tạo đơn đổi trả trên hệ thống POS/Lark.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT ĐỌC VÀ NHẢY SỐ LIỆU THEO THÁNG -->
+<script>
+    function updateReportData() {
+        const month = parseInt(document.getElementById('selectMonth').value);
+        const year = document.getElementById('selectYear').value;
+        const formattedMonth = month < 10 ? '0' + month : month;
+        
+        // Tính toán tháng kế tiếp cho phần khuyến nghị
+        let nextMonth = month + 1;
+        let nextMonthYear = year;
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextMonthYear = parseInt(year) + 1;
+        }
+        const formattedNextMonth = nextMonth < 10 ? '0' + nextMonth : nextMonth;
+
+        // 1. Cập nhật Tiêu đề & Lời chào
+        document.getElementById('reportTitle').innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG ${formattedMonth}/${year}`;
+        document.getElementById('reportGreeting').innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng ${month}/${year}.`;
+        document.getElementById('adviceTitle').innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG ${formattedNextMonth}/${nextMonthYear}:`;
+
+        // 2. Kiểm tra nếu chọn tháng 8/2026 (tháng hiện tại chưa qua hết)
+        const realtimeNote = document.getElementById('realtimeNote');
+        if (month === 8 && year === "2026") {
+            realtimeNote.innerText = "(Tự động cập nhật đến 12/08/2026)";
+        } else {
+            realtimeNote.innerText = "(Số liệu chốt toàn tháng)";
+        }
+
+        // 3. Tự động nhảy số liệu mô phỏng theo tháng được chọn (thực tế sẽ gọi từ API Lark Base)
+        let mockTotalOrders = month === 8 ? 190 : 180 + (month * 2);
+        let prevMonthOrders = 190;
+        
+        // Top Siêu thị rủi ro
+        document.getElementById('topStoreList').innerHTML = `
+            <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                <span>1. S1006 -- SKK Trần Đăng Ninh</span>
+                <span class="text-sakuko-orange font-bold">${15 + month} đơn</span>
+            </div>
+            <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                <span>2. S1004 -- SKK Mandarin C1</span>
+                <span class="text-sakuko-orange font-bold">${10 + month} đơn</span>
+            </div>
+            <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                <span>3. S1018 -- SKK Nguyễn Tuân</span>
+                <span class="text-sakuko-orange font-bold">${8 + month} đơn</span>
+            </div>
+        `;
+
+        // Nhận xét chi tiết nhảy tự động
+        document.getElementById('analysisTextList').innerHTML = `
+            <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>22 siêu thị Offline</strong>. Tổng số đơn đổi trả tháng ${month} là <strong>${mockTotalOrders} đơn</strong>.</li>
+            <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị có lượng đơn phát sinh cao nhất gồm <strong>SKK Trần Đăng Ninh, SKK Mandarin C1, SKK Nguyễn Tuân</strong> chiếm tỷ trọng cao trong toàn hệ thống.</li>
+            <li><strong>Cảnh báo biến động:</strong> Tình hình đổi trả giao dịch giữ ở mức ổn định so với tháng trước.</li>
+        `;
+
+        // Khuyến nghị nhảy tự động
+        document.getElementById('adviceTextList').innerHTML = `
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                <p class="font-bold text-slate-800 mb-1">1. Đối với nhóm Top nguy cơ cao (SKK Trần Đăng Ninh...):</p>
+                <p class="text-slate-600">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết và báo cáo biện pháp khắc phục trước ngày 15/${formattedNextMonth}.</p>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                <p class="font-bold text-slate-800 mb-1">2. Đào tạo quy trình POS & Thu ngân:</p>
+                <p class="text-slate-600">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã.</p>
+            </div>
+        `;
+    }
+
+    // Tự động kích hoạt khi tải trang
+    document.addEventListener("DOMContentLoaded", function() {
+        updateReportData();
+    });
+</script>
 
         <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
         <div id="dichvu" class="content-section p-8 space-y-6" style="display: none;">
