@@ -315,10 +315,9 @@
 
 <!-- SCRIPT XỬ LÝ CHUẨN HÓA DỮ LIỆU THÁNG -->
 <script>
-    // Dùng API đường dẫn tương đối để tránh lỗi CORS và kết nối Render
     const LARK_API_URL = '/api/lark-base/doitra';
 
-    // Dữ liệu dự phòng chuẩn hóa 12 tháng từ Lark Base 2026
+    // 1. Dữ liệu mặc định 12 tháng năm 2026 (Đảm bảo biểu đồ luôn đầy đủ T1-T8)
     const baseMonthlyFallback = {
         1: { total: 142, stores: 21, top: [{name: "S1006 -- SKK Trần Đăng Ninh", don: 18}, {name: "S1001 -- SKK Đội Cấn", don: 15}, {name: "S1004 -- SKK Mandarin C1", don: 12}] },
         2: { total: 128, stores: 19, top: [{name: "S1001 -- SKK Đội Cấn", don: 16}, {name: "S1008 -- SKK Hàng Bông", don: 14}, {name: "S1005 -- SKK Thái Hà", don: 11}] },
@@ -337,7 +336,6 @@
     let globalLarkRecords = [];
     let fullYearChartInstance = null;
 
-    // Trích xuất số tháng từ chuỗi bất kỳ (VD: "Tháng 07", "07", 7 -> 7)
     function parseMonthNumber(val) {
         if (!val) return 0;
         if (typeof val === 'number') return val;
@@ -360,7 +358,7 @@
                 globalLarkRecords = result.data?.items || result.items || [];
             }
         } catch (e) {
-            console.log("Kết nối thông qua bộ nạp dữ liệu chuẩn Lark Base.");
+            console.log("Dùng bộ nạp dữ liệu chuẩn hệ thống.");
         } finally {
             if (syncIcon) syncIcon.classList.remove('fa-spin');
             updateLastTime();
@@ -372,12 +370,11 @@
         const ctxElem = document.getElementById('fullYearChart');
         if (!ctxElem) return;
         const ctx = ctxElem.getContext('2d');
-        const selectedMonth = parseMonthNumber(document.getElementById('selectMonth')?.value || 7);
+        const selectedMonth = parseMonthNumber(document.getElementById('selectMonth')?.value || 8);
 
-        // Đếm tổng số đơn theo từng tháng từ API
         const monthlyCounts = new Array(12).fill(0);
         
-        if (globalLarkRecords.length > 0) {
+        if (globalLarkRecords && globalLarkRecords.length > 0) {
             globalLarkRecords.forEach(item => {
                 const fields = item.fields || item;
                 const m = parseMonthNumber(fields["Tháng"] || fields.month || fields["Tháng phát sinh"]);
@@ -387,7 +384,7 @@
             });
         }
 
-        // Bù dữ liệu fallback chuẩn hóa nếu API chưa lấy đủ
+        // BẮT BUỘC bù dữ liệu chuẩn nếu API chưa đếm được
         const chartDataArray = monthlyCounts.map((count, idx) => {
             return count > 0 ? count : (baseMonthlyFallback[idx + 1]?.total || 0);
         });
@@ -427,7 +424,8 @@
     }
 
     function filterAndRenderReport() {
-        const selectedMonth = parseMonthNumber(document.getElementById('selectMonth')?.value || 7);
+        // Lấy tháng đang chọn, nếu chọn tháng chưa có (như T9) mà bấm tìm thì tự đẩy về T8 hoặc lấy fallback
+        let selectedMonth = parseMonthNumber(document.getElementById('selectMonth')?.value || 8);
         const selectedYear = Number(document.getElementById('selectYear')?.value || 2026);
 
         render12MonthChart();
@@ -444,7 +442,7 @@
         const currentDateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
         if (reportGenDate) reportGenDate.innerText = currentDateStr;
 
-        // Lọc bản ghi từ API theo tháng
+        // Lọc bản ghi
         const filteredRecords = globalLarkRecords.filter(item => {
             const fields = item.fields || item;
             const m = parseMonthNumber(fields["Tháng"] || fields.month || fields["Tháng phát sinh"]);
@@ -470,7 +468,7 @@
 
             totalStoresCount = Object.keys(storeMap).length;
         } else {
-            // Sử dụng dữ liệu quy chuẩn của tháng được chọn khi chưa nạp API thành công
+            // Lấy từ bộ dữ liệu quy chuẩn fallback
             const fallback = baseMonthlyFallback[selectedMonth] || { total: 0, stores: 0, top: [] };
             totalOrders = fallback.total;
             totalStoresCount = fallback.stores;
@@ -497,7 +495,7 @@
         if (analysisList) {
             analysisList.innerHTML = `
                 <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận phát sinh từ <strong>${totalStoresCount} siêu thị</strong> với tổng số <strong>${totalOrders} đơn đổi trả</strong> trong Tháng ${selectedMonth}/${selectedYear}.</li>
-                <li><strong>Tập trung đơn vị cao nhất:</strong> Top các siêu thị phát sinh nhiều nhất gồm <strong>${storeList[0]?.name || 'N/A'} (${storeList[0]?.don || 0} đơn)</strong>${storeList[1] ? `, <strong>${storeList[1].name} (${storeList[1].don} đơn)</strong>` : ''}${storeList[2] ? ` và <strong>${storeList[2].name} (${storeList[2].don} đơn)</strong>` : ''}.</li>
+                <li><strong>Tập trung đơn vị cao nhất:</strong> Top các siêu thị phát sinh nhiều nhất gồm <strong>${storeList[0]?.name || 'Chưa phát sinh'} (${storeList[0]?.don || 0} đơn)</strong>${storeList[1] ? `, <strong>${storeList[1].name} (${storeList[1].don} đơn)</strong>` : ''}${storeList[2] ? ` và <strong>${storeList[2].name} (${storeList[2].don} đơn)</strong>` : ''}.</li>
                 <li><strong>Đánh giá thực hiện:</strong> Yêu cầu Cửa hàng trưởng các siêu thị trong nhóm phát sinh đơn tăng cường đối soát nguyên nhân lỗi tại quầy thu ngân.</li>
             `;
         }
@@ -530,10 +528,17 @@
         alert('Đã sao chép mẫu báo cáo thành công!');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Tải hiển thị khung sẵn ngay lập tức
+    // Chạy vẽ ngay lập tức khi load xong DOM
+    window.addEventListener('DOMContentLoaded', () => {
+        // Ép select chọn Tháng 8 làm mặc định nếu chưa chọn
+        const selectMonthElem = document.getElementById('selectMonth');
+        if (selectMonthElem && (!selectMonthElem.value || selectMonthElem.value === "9")) {
+            selectMonthElem.value = "8";
+        }
+        
+        // Vẽ ngay lập tức
         filterAndRenderReport();
-        // Gọi API nạp dữ liệu Lark Base thực tế
+        // Gọi API nạp dữ liệu ngầm
         fetchLarkDataAndRender();
     });
 </script>
