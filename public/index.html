@@ -22,6 +22,8 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
     </style>
 </head>
 <body class="bg-sakuko-lightBg font-sans text-gray-800 antialiased flex h-screen overflow-hidden">
@@ -71,7 +73,7 @@
         </header>
 
         <!-- TAB 1: TỔNG QUAN DASHBOARD -->
-        <div id="dashboard" class="content-section p-8 space-y-6">
+        <div id="dashboard" class="content-section active p-8 space-y-6">
             <div class="bg-gradient-to-r from-sakuko-navy to-sakuko-blue p-6 rounded-xl text-white shadow-md flex items-center justify-between">
                 <div>
                     <h2 class="text-xl font-black uppercase tracking-wide">Bảng Điều Khiển Tổng Quan QC - Tháng 08/2026</h2>
@@ -174,7 +176,7 @@
 
        <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
 <div id="doitra" class="content-section p-8 space-y-6">
-    
+
     <!-- CONTROLS & STATUS -->
     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
         <div>
@@ -199,6 +201,10 @@
         </div>
     </div>
 
+    <div id="dataWarningBox" class="hidden bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i> Một số siêu thị đang thiếu số liệu, vui lòng kiểm tra và bổ sung.
+    </div>
+
     <!-- BẢNG SỐ LIỆU ĐỔI TRẢ CHI TIẾT -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
@@ -221,9 +227,7 @@
                         <th class="py-3 px-4 text-center w-16">THAO TÁC</th>
                     </tr>
                 </thead>
-                <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium">
-                    <!-- JS tự động chèn dữ liệu bảng -->
-                </tbody>
+                <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
             </table>
         </div>
     </div>
@@ -248,7 +252,7 @@
                 </div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
             </div>
-            
+
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <i class="fa-regular fa-calendar-days text-sakuko-orange text-xs"></i>
@@ -295,7 +299,6 @@
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                         <i class="fa-solid fa-store text-sakuko-blue"></i> SỐ SIÊU THỊ OFFLINE
                     </span>
-                    <!-- Để trống để JS tự động đếm mảng dữ liệu từ Lark Base và điền vào -->
                     <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">--</span>
                 </div>
                 <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
@@ -328,292 +331,6 @@
         </div>
     </div>
 </div>
-
-<!-- JAVASCRIPT XỬ LÝ TỰ ĐỘNG KẾT NỐI LARK BASE -->
-<script>
-    // Endpoint Backend Proxy kết nối Lark Base
-    const LARK_API_ENDPOINT = 'https://qc-report-bot.onrender.com/api/lark-base/doitra';
-
-    // Mảng lưu dữ liệu thực tế tải về từ Lark Base
-    let dynamicLarkData = [];
-    let fullYearChartInstance = null;
-
-    /**
-     * 1. GỌI DỮ LIỆU THẬT TỪ LARK BASE (REAL-TIME FETCH)
-     */
-    async function fetchLarkData() {
-        const syncIcon = document.getElementById('syncIcon');
-        const syncBadge = document.getElementById('syncStatusBadge');
-        
-        if (syncIcon) syncIcon.classList.add('fa-spin');
-        if (syncBadge) {
-            syncBadge.innerText = 'Đang tải dữ liệu từ Lark Base...';
-            syncBadge.className = 'text-[11px] text-amber-500 font-bold';
-        }
-
-        try {
-            const response = await fetch(LARK_API_ENDPOINT);
-            const result = await response.json();
-
-            // Nhận diện linh hoạt cấu trúc JSON trả về từ API
-            const rawItems = result.data?.items || result.items || result || [];
-            
-            // Map trường dữ liệu từ Lark Base về chuẩn JavaScript
-            dynamicLarkData = rawItems.map(item => {
-                const fields = item.fields || item;
-                return {
-                    id: item.record_id || fields.id || Math.random(),
-                    name: fields["Tên Siêu Thị"] || fields["Store_Name"] || fields.name || "Chưa rõ",
-                    donPrev: Number(fields["Đơn Tháng Trước"] || fields.donPrev || 0),
-                    donCurrent: Number(fields["Đơn Tháng Hiện Tại"] || fields.donCurrent || 0)
-                };
-            });
-
-            // Cập nhật mốc thời gian thời gian thực
-            const now = new Date();
-            const timeStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            if (document.getElementById('lastUpdateTime')) {
-                document.getElementById('lastUpdateTime').innerText = timeStr;
-            }
-            if (document.getElementById('reportGenDate')) {
-                document.getElementById('reportGenDate').innerText = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
-            }
-
-            if (syncBadge) {
-                syncBadge.innerText = 'Đã đồng bộ Lark Base';
-                syncBadge.className = 'text-[11px] text-emerald-600 font-bold';
-            }
-
-            // Tiến hành render lại toàn bộ giao diện
-            renderTableData();
-            processAndRenderReport();
-
-        } catch (error) {
-            console.error("Lỗi khi kết nối Lark Base API:", error);
-            if (syncBadge) {
-                syncBadge.innerText = 'Lỗi kết nối API';
-                syncBadge.className = 'text-[11px] text-rose-600 font-bold';
-            }
-        } finally {
-            if (syncIcon) syncIcon.classList.remove('fa-spin');
-        }
-    }
-
-    /**
-     * 2. RENDER BẢNG CHI TIẾT DỮ LIỆU
-     */
-    function renderTableData() {
-        const tbody = document.getElementById('doitraTableBody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (dynamicLarkData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">Không tìm thấy dữ liệu từ Lark Base</td></tr>`;
-            return;
-        }
-
-        dynamicLarkData.forEach((row, index) => {
-            const diff = row.donCurrent - row.donPrev;
-            let diffBadge = `<span class="text-slate-500">0</span>`;
-            if (diff > 0) {
-                diffBadge = `<span class="text-rose-600 font-bold">+${diff} ▲</span>`;
-            } else if (diff < 0) {
-                diffBadge = `<span class="text-emerald-600 font-bold">${diff} ▼</span>`;
-            }
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-2.5 px-4 font-bold text-slate-700">${row.name}</td>
-                    <td class="py-2.5 px-4 text-center text-slate-600">${row.donPrev}</td>
-                    <td class="py-2.5 px-4 text-center font-bold text-slate-900">${row.donCurrent}</td>
-                    <td class="py-2.5 px-4 text-center">${diffBadge}</td>
-                    <td class="py-2.5 px-4 text-center">
-                        <button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    /**
-     * 3. KHỞI TẠO BIỂU ĐỒ 12 THÁNG
-     */
-    function initFullYearChart() {
-        const ctxElem = document.getElementById('fullYearChart');
-        if (!ctxElem) return;
-        const ctx = ctxElem.getContext('2d');
-        if (fullYearChartInstance) fullYearChartInstance.destroy();
-
-        fullYearChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8 (HT)', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-                datasets: [{
-                    label: 'Số đơn đổi trả toàn hệ thống',
-                    data: [140, 155, 160, 145, 170, 185, 190, 50, 0, 0, 0, 0],
-                    backgroundColor: function(context) {
-                        return context.dataIndex === 7 ? '#E60012' : '#003B7A';
-                    },
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-    }
-
-    /**
-     * 4. LOGIC TỰ ĐỘNG TÍNH TOÁN & XUẤT BÁO CÁO PHÂN TÍCH
-     */
-    function processAndRenderReport() {
-        const selectMonthElem = document.getElementById('selectMonth');
-        const selectYearElem = document.getElementById('selectYear');
-
-        const selectedMonth = selectMonthElem ? parseInt(selectMonthElem.value) : 8;
-        const selectedYear = selectYearElem ? parseInt(selectYearElem.value) : 2026;
-
-        // Lấy ngày/tháng/năm thời gian thực
-        const today = new Date();
-        const actualDay = today.getDate();
-        const actualMonth = today.getMonth() + 1;
-        const actualYear = today.getFullYear();
-
-        const isCurrentMonth = (selectedMonth === actualMonth && selectedYear === actualYear);
-
-        // TỰ ĐỘNG ĐẾM SỐ SIÊU THỊ ĐỘNG TỪ LARK BASE
-        const totalStoresFromBase = dynamicLarkData.length;
-        const totalStoresElem = document.getElementById('totalStoresCount');
-        if (totalStoresElem) {
-            totalStoresElem.innerText = totalStoresFromBase;
-        }
-
-        // Tính tổng đơn và lọc Top 3
-        let totalPrev = dynamicLarkData.reduce((sum, item) => sum + item.donPrev, 0);
-        let totalCurrent = dynamicLarkData.reduce((sum, item) => sum + item.donCurrent, 0);
-
-        let sortedStores = [...dynamicLarkData].sort((a, b) => b.donCurrent - a.donCurrent);
-        let top3 = sortedStores.slice(0, 3);
-
-        let monthStr = selectedMonth < 10 ? '0' + selectedMonth : selectedMonth;
-
-        // Cập nhật tiêu đề & Lời chào
-        const titleElem = document.getElementById('reportTitle');
-        const noteElem = document.getElementById('realtimeNote');
-        const greetingElem = document.getElementById('reportGreeting');
-
-        if (isCurrentMonth) {
-            if (titleElem) titleElem.innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH TÍNH ĐẾN NGÀY ${actualDay}/${monthStr}/${selectedYear}`;
-            if (noteElem) noteElem.innerText = `(Lũy kế ${actualDay} ngày đầu tháng - Chưa chốt tháng)`;
-            if (greetingElem) greetingElem.innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tính đến ngày ${actualDay}/${monthStr}/${selectedYear}.`;
-        } else {
-            if (titleElem) titleElem.innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG ${monthStr}/${selectedYear}`;
-            if (noteElem) noteElem.innerText = `(Dữ liệu chốt trọn tháng)`;
-            if (greetingElem) greetingElem.innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng ${selectedMonth}/${selectedYear}.`;
-        }
-
-        // Render danh sách Top 3
-        const topListElem = document.getElementById('topStoreList');
-        if (topListElem) {
-            if (top3.length > 0) {
-                topListElem.innerHTML = top3.map((s, idx) => `
-                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
-                        <span class="text-slate-800 font-bold">${idx + 1}. ${s.name}</span>
-                        <span class="text-sakuko-orange font-black">${s.donCurrent} đơn</span>
-                    </div>
-                `).join('');
-            } else {
-                topListElem.innerHTML = `<p class="text-xs text-slate-400 italic">Đang tải danh sách từ Lark Base...</p>`;
-            }
-        }
-
-        // Tự động sinh nội dung Nhận xét
-        const analysisListElem = document.getElementById('analysisTextList');
-        if (analysisListElem) {
-            let topNames = top3.map(s => s.name.split('--')[1] || s.name).join(', ');
-
-            if (isCurrentMonth) {
-                let estimatedFullMonth = actualDay > 0 ? Math.round((totalCurrent / actualDay) * 31) : 0;
-                analysisListElem.innerHTML = `
-                    <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${totalStoresFromBase} siêu thị Offline</strong>. Tính đến ngày ${actualDay}/${monthStr}, toàn hệ thống phát sinh <strong>${totalCurrent} đơn đổi trả</strong>.</li>
-                    <li><strong>Dự báo tiến độ:</strong> Với tốc độ phát sinh hiện tại, ước tính cả Tháng ${selectedMonth} sẽ đạt khoảng <strong>${estimatedFullMonth} đơn</strong>.</li>
-                    <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị có lượng đơn cao nhất gồm <strong>${topNames || 'N/A'}</strong>.</li>
-                `;
-            } else {
-                let diffVal = totalCurrent - totalPrev;
-                let diffText = diffVal > 0 ? `tăng ${diffVal} đơn` : (diffVal < 0 ? `giảm ${Math.abs(diffVal)} đơn` : `giữ nguyên`);
-                analysisListElem.innerHTML = `
-                    <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${totalStoresFromBase} siêu thị Offline</strong>. Tổng số đơn đổi trả Tháng ${selectedMonth} là <strong>${totalCurrent} đơn</strong> (${diffText} so với Tháng trước).</li>
-                    <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị chiếm tỷ trọng lớn bao gồm <strong>${topNames || 'N/A'}</strong>.</li>
-                `;
-            }
-        }
-
-        // Tự động sinh nội dung Khuyến nghị
-        let nextMonthNum = selectedMonth === 12 ? 1 : selectedMonth + 1;
-        let nextMonthYear = selectedMonth === 12 ? selectedYear + 1 : selectedYear;
-        let nextMonthStr = nextMonthNum < 10 ? '0' + nextMonthNum : nextMonthNum;
-
-        const adviceTitleElem = document.getElementById('adviceTitle');
-        if (adviceTitleElem) adviceTitleElem.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG ${nextMonthStr}/${nextMonthYear}:`;
-
-        const adviceListElem = document.getElementById('adviceTextList');
-        if (adviceListElem) {
-            let top1Name = top3[0] ? (top3[0].name.split('--')[1] || top3[0].name) : "các siêu thị nguy cơ";
-            adviceListElem.innerHTML = `
-                <div class="p-3 bg-white rounded-lg border border-slate-200">
-                    <p class="font-bold text-slate-800 mb-1">1. Tái kiểm tra tại đơn vị có đơn cao (${top1Name}...):</p>
-                    <p class="text-slate-600">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết và báo cáo biện pháp khắc phục trước ngày 15/${nextMonthStr}.</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg border border-slate-200">
-                    <p class="font-bold text-slate-800 mb-1">2. Đào tạo quy trình POS & Thu ngân:</p>
-                    <p class="text-slate-600">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã.</p>
-                </div>
-            `;
-        }
-    }
-
-    /**
-     * 5. THAO TÁC PHỤ (THÊM/XÓA HÀNG/SAO CHÉP)
-     */
-    function addNewRow() {
-        const name = prompt("Nhập tên siêu thị mới:");
-        if (!name) return;
-        const donPrev = parseInt(prompt("Nhập số đơn tháng trước:", "0")) || 0;
-        const donCurrent = parseInt(prompt("Nhập số đơn tháng này:", "0")) || 0;
-
-        dynamicLarkData.unshift({ id: 'CUSTOM_' + Date.now(), name: name, donPrev: donPrev, donCurrent: donCurrent });
-        renderTableData();
-        processAndRenderReport();
-    }
-
-    function removeRow(index) {
-        if (confirm("Xóa dòng này khỏi bảng tạm?")) {
-            dynamicLarkData.splice(index, 1);
-            renderTableData();
-            processAndRenderReport();
-        }
-    }
-
-    function copyReport() {
-        const reportContent = document.getElementById('reportContainer').innerText;
-        navigator.clipboard.writeText(reportContent).then(() => {
-            alert("Đã sao chép nội dung báo cáo!");
-        });
-    }
-
-    // TỰ ĐỘNG KHI MỞ TRANG
-    document.addEventListener("DOMContentLoaded", function() {
-        initFullYearChart();
-        fetchLarkData(); // Tự động kéo dữ liệu thật từ Base
-    });
-</script>
 
         <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
 <div id="dichvu" class="content-section p-8 space-y-6">
@@ -694,9 +411,7 @@
                         <th class="py-3 px-4">GHI CHÚ / HẠNG MỤC LỖI CHÍNH</th>
                     </tr>
                 </thead>
-                <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium">
-                    <!-- Dữ liệu JS renders ở đây -->
-                </tbody>
+                <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
             </table>
         </div>
     </div>
@@ -779,200 +494,8 @@
     </div>
 </div>
 
-<!-- SCRIPT XỬ LÝ TOÀN BỘ LOGIC TAB CHẤM ĐIỂM DỊCH VỤ -->
-<script>
-    // Endpoint API xử lý dữ liệu dịch vụ từ Lark Base
-    const SERVICE_API_ENDPOINT = 'https://qc-report-bot.onrender.com/api/lark-base/dichvu';
-
-    // Biến lưu Chart Instances để destroy trước khi vẽ mới (tránh đè chart cũ)
-    let chartInstances = {
-        scoreByStore: null,
-        errorCategory: null,
-        errorRate: null
-    };
-
-    // Dữ liệu mặc định dự phòng nếu chưa kết nối xong API
-    let serviceStoreData = [
-        { name: "Thái Hà", scoreT6: 84, scoreT7: 100, note: "Cải thiện xuất sắc" },
-        { name: "Đỗ Quang", scoreT6: 88, scoreT7: 94, note: "Tăng trưởng tốt" },
-        { name: "Timecity", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
-        { name: "Nguyễn Du", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
-        { name: "Trần Đăng Ninh", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
-        { name: "Linh Đàm", scoreT6: 92, scoreT7: 95, note: "Duy trì phong độ cao" },
-        { name: "Nguyễn Tuân", scoreT6: 100, scoreT7: 89, note: "Lỗi Vệ sinh trưng bày" },
-        { name: "Green Bay", scoreT6: 88, scoreT7: 81, note: "Sụt giảm điểm dịch vụ" }
-    ];
-
-    /**
-     * 1. GỌI DỮ LIỆU TỪ LARK BASE & CẬP NHẬT GIAO DIỆN REAL-TIME
-     */
-    async function syncServiceData() {
-        const syncIcon = document.getElementById('dichvuSyncIcon');
-        if (syncIcon) syncIcon.classList.add('fa-spin');
-
-        try {
-            const response = await fetch(SERVICE_API_ENDPOINT);
-            if (response.ok) {
-                const result = await response.json();
-                const rawItems = result.data?.items || result.items || result || [];
-                
-                if (rawItems.length > 0) {
-                    serviceStoreData = rawItems.map(item => {
-                        const f = item.fields || item;
-                        return {
-                            name: f["Tên Siêu Thị"] || f["Store_Name"] || f.name || "N/A",
-                            scoreT6: Number(f["Điểm T6"] || f.scoreT6 || 0),
-                            scoreT7: Number(f["Điểm T7"] || f.scoreT7 || 0),
-                            note: f["Ghi Chú"] || f.note || "--"
-                        };
-                    });
-                }
-            }
-        } catch (err) {
-            console.warn("Dùng dữ liệu chuẩn hóa hệ thống do không phản hồi API:", err);
-        } finally {
-            if (syncIcon) syncIcon.classList.remove('fa-spin');
-            
-            // Cập nhật thời gian
-            const now = new Date();
-            const timeStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            if (document.getElementById('dichvuUpdateTime')) {
-                document.getElementById('dichvuUpdateTime').innerText = timeStr;
-            }
-
-            // Render lại toàn bộ
-            renderServiceTable();
-            renderServiceCharts();
-        }
-    }
-
-    /**
-     * 2. VẼ TẤT CẢ BIỂU ĐỒ (CHART.JS)
-     */
-    function renderServiceCharts() {
-        // BIỂU ĐỒ 1: Tỷ lệ đạt điểm theo siêu thị
-        const ctxStore = document.getElementById('scoreByStoreChart')?.getContext('2d');
-        if (ctxStore) {
-            if (chartInstances.scoreByStore) chartInstances.scoreByStore.destroy();
-
-            chartInstances.scoreByStore = new Chart(ctxStore, {
-                type: 'bar',
-                data: {
-                    labels: serviceStoreData.map(s => s.name),
-                    datasets: [
-                        { label: 'Tháng 06 (%)', data: serviceStoreData.map(s => s.scoreT6), backgroundColor: '#94a3b8', borderRadius: 4 },
-                        { label: 'Tháng 07 (%)', data: serviceStoreData.map(s => s.scoreT7), backgroundColor: '#e60012', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { min: 60, max: 100 } },
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
-        }
-
-        // BIỂU ĐỒ 2: Số lượng lỗi theo hạng mục
-        const ctxErrorCategory = document.getElementById('errorCategoryCountChart')?.getContext('2d');
-        if (ctxErrorCategory) {
-            if (chartInstances.errorCategory) chartInstances.errorCategory.destroy();
-
-            chartInstances.errorCategory = new Chart(ctxErrorCategory, {
-                type: 'bar',
-                data: {
-                    labels: ['VS Trưng Bày', 'Tem Phụ/Giá', 'VS Bán Hàng', 'Quầy Thu Ngân', 'Trưng Bày HH', 'Kho', 'Mặt Tiền', 'Diện Mạo NV'],
-                    datasets: [
-                        { label: 'Tháng 6', data: [22, 18, 16, 6, 5, 4, 5, 2], backgroundColor: '#003B7A', borderRadius: 4 },
-                        { label: 'Tháng 7', data: [14, 17, 13, 8, 6, 5, 1, 1], backgroundColor: '#f59e0b', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
-        }
-
-        // BIỂU ĐỒ 3: Tỷ lệ % lỗi theo từng hạng mục
-        const ctxErrorRate = document.getElementById('errorRateChart')?.getContext('2d');
-        if (ctxErrorRate) {
-            if (chartInstances.errorRate) chartInstances.errorRate.destroy();
-
-            chartInstances.errorRate = new Chart(ctxErrorRate, {
-                type: 'doughnut',
-                data: {
-                    labels: ['VS Trưng Bày', 'Tem Phụ/Giá', 'VS Bán Hàng', 'Quầy Thu Ngân', 'Trưng Bày HH', 'Khác'],
-                    datasets: [{
-                        data: [20, 24, 18, 11, 8, 19],
-                        backgroundColor: ['#e60012', '#f59e0b', '#003B7A', '#3b82f6', '#10b981', '#cbd5e1']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right' } }
-                }
-            });
-        }
-    }
-
-    /**
-     * 3. RENDER DỮ LIỆU VÀO BẢNG CHI TIẾT
-     */
-    function renderServiceTable() {
-        const tbody = document.getElementById('serviceTableBody');
-        const badge = document.getElementById('serviceTotalBadge');
-        if (!tbody) return;
-
-        tbody.innerHTML = '';
-        if (badge) badge.innerText = `Đã tổng hợp ${serviceStoreData.length} Siêu Thị`;
-
-        serviceStoreData.forEach(item => {
-            const diff = item.scoreT7 - item.scoreT6;
-            let diffTag = `<span class="text-slate-500 font-bold">0%</span>`;
-            
-            if (diff > 0) {
-                diffTag = `<span class="text-emerald-600 font-bold">+${diff}% ▲</span>`;
-            } else if (diff < 0) {
-                diffTag = `<span class="text-rose-600 font-bold">${diff}% ▼</span>`;
-            }
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                    <td class="py-2.5 px-4 text-center text-slate-600">${item.scoreT6}%</td>
-                    <td class="py-2.5 px-4 text-center font-bold text-slate-900">${item.scoreT7}%</td>
-                    <td class="py-2.5 px-4 text-center">${diffTag}</td>
-                    <td class="py-2.5 px-4 text-slate-600">${item.note}</td>
-                </tr>
-            `;
-        });
-    }
-
-    /**
-     * 4. HÀM SAO CHÉP MẪU EMAIL BÁO CÁO
-     */
-    function copyServiceEmail() {
-        const emailBox = document.getElementById('serviceEmailContainer');
-        if (!emailBox) return;
-
-        navigator.clipboard.writeText(emailBox.innerText).then(() => {
-            alert("Đã sao chép toàn bộ mẫu email báo cáo!");
-        }).catch(err => {
-            alert("Không thể sao chép, vui lòng thử lại!");
-        });
-    }
-
-    // TỰ ĐỘNG KHỞI TẠO KHI TẢI TRANG HẶC CHUYỂN TAB
-    document.addEventListener("DOMContentLoaded", function() {
-        syncServiceData();
-    });
-</script>
-
         <!-- TAB 4: TRƯNG BÀY CTKM -->
-        <div id="trungbay" class="content-section p-8 space-y-6" style="display: none;">
+        <div id="trungbay" class="content-section p-8 space-y-6">
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <div class="flex items-center gap-2.5">
@@ -988,7 +511,7 @@
                     <div class="text-right">
                         <p class="text-[11px] text-slate-400 font-medium">Lịch sử cập nhật gần nhất:</p>
                         <p class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
-                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="trungbayUpdateTime">10-08-2026 14:30</span>
+                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="trungbayUpdateTime">--</span>
                         </p>
                     </div>
                     <button onclick="syncTrungBayData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
@@ -1000,23 +523,23 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
                     <p class="text-[11px] font-bold text-slate-400 uppercase">Số Siêu Thị Offline</p>
-                    <p class="text-3xl font-black text-slate-800 mt-1" id="kpiTotalStores">22</p>
+                    <p class="text-3xl font-black text-slate-800 mt-1" id="kpiTotalStores">--</p>
                     <p class="text-[10px] text-slate-400 font-medium mt-1">(Số siêu thị Offline)</p>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
                     <p class="text-[11px] font-bold text-slate-400 uppercase">Số ST Gửi Báo Cáo</p>
-                    <p class="text-3xl font-black text-emerald-600 mt-1" id="kpiSubmittedStores">22</p>
-                    <p class="text-[10px] text-emerald-600 font-medium mt-1">(100% ST gửi báo cáo)</p>
+                    <p class="text-3xl font-black text-emerald-600 mt-1" id="kpiSubmittedStores">--</p>
+                    <p class="text-[10px] text-emerald-600 font-medium mt-1" id="kpiSubmittedNote">--</p>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
                     <p class="text-[11px] font-bold text-slate-400 uppercase">ST Gửi BC Đúng Deadline</p>
-                    <p class="text-3xl font-black text-sakuko-blue mt-1" id="kpiOnTimeStores">18</p>
-                    <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiLateNote">(Còn 4 ST trễ deadline)</p>
+                    <p class="text-3xl font-black text-sakuko-blue mt-1" id="kpiOnTimeStores">--</p>
+                    <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiLateNote">--</p>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
                     <p class="text-[11px] font-bold text-slate-400 uppercase">ST Trưng Bày Đạt Chỉ Thị</p>
-                    <p class="text-3xl font-black text-sakuko-orange mt-1" id="kpiPassedStores">20</p>
-                    <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiFailNote">(Còn 2 ST chưa đạt)</p>
+                    <p class="text-3xl font-black text-sakuko-orange mt-1" id="kpiPassedStores">--</p>
+                    <p class="text-[10px] text-rose-500 font-bold mt-1" id="kpiFailNote">--</p>
                 </div>
             </div>
 
@@ -1037,7 +560,7 @@
                 <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐÁNH GIÁ TRƯNG BÀY CHI TIẾT (DỮ LIỆU THÁNG 08/2026)</h3>
                     <div class="flex items-center gap-3">
-                        <span class="text-[11px] text-emerald-600 font-bold">Đã đồng bộ 22 Cửa hàng</span>
+                        <span id="trungbaySyncBadge" class="text-[11px] text-emerald-600 font-bold">Đang tải...</span>
                         <button onclick="addTrungBayRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> Thêm Siêu Thị
                         </button>
@@ -1076,7 +599,7 @@
                 <div class="p-6 bg-white text-slate-800 space-y-4">
                     <div class="border-b border-slate-200 pb-3">
                         <h2 class="text-lg font-black text-slate-900 uppercase">KẾT QUẢ ĐÁNH GIÁ TRƯNG BÀY CTKM THÁNG 08/2026</h2>
-                        <p class="text-xs text-slate-500 mt-0.5"><span class="font-bold text-slate-700">P. Kiểm soát - SVN</span> | P. KSCL | Ngày ban hành: 2026-08-05</p>
+                        <p class="text-xs text-slate-500 mt-0.5"><span class="font-bold text-slate-700">P. Kiểm soát - SVN</span> | P. KSCL | Ngày ban hành: <span id="trungbayReportDate">--</span></p>
                     </div>
 
                     <div id="trungbayReportPreview" class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-4 font-sans leading-relaxed">
@@ -1090,16 +613,12 @@
                         <div class="space-y-3 pt-1">
                             <div class="flex items-start gap-2">
                                 <i class="fa-solid fa-bullhorn text-sakuko-orange text-sm mt-0.5"></i>
-                                <p id="reportLateText">
-                                    Vẫn còn <strong>4/22</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>SKK Đội Cấn, SKK Hàng Bông, SKK Ecohome, SKK Văn Phú</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.
-                                </p>
+                                <p id="reportLateText">--</p>
                             </div>
 
                             <div class="flex items-start gap-2">
                                 <i class="fa-solid fa-bullhorn text-sakuko-orange text-sm mt-0.5"></i>
-                                <p id="reportPassText">
-                                    Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>2/22</strong> siêu thị là <strong>SKK Greenbay và SKK Sài Đồng</strong> chưa đạt theo chỉ thị trưng bày.
-                                </p>
+                                <p id="reportPassText">--</p>
                             </div>
                         </div>
 
@@ -1108,8 +627,8 @@
                                 <i class="fa-solid fa-lightbulb text-amber-600"></i> HƯỚNG DẪN RÚT KINH NGHIỆM & CẢI THIỆN CHO THÁNG SAU:
                             </p>
                             <ul class="list-disc list-inside space-y-1.5 text-amber-800 text-[11px]">
-                                <li><strong>Đối với nhóm trễ Deadline (Đội Cấn, Hàng Bông, Ecohome, Văn Phú):</strong> Cần chủ động lên lịch chụp ảnh nghiệm thu ngay trong ngày đầu chạy CTKM, cài đặt nhắc lịch báo cáo trước 12h so với hạn chót trên Lark.</li>
-                                <li><strong>Đối với nhóm chưa Đạt Chỉ Thị (Greenbay, Sài Đồng):</strong> Cần rà soát lại sơ đồ POP/POSM, bổ sung ngay wobbler giá ưu đãi và sắp xếp đúng diện tích mâm kệ theo hướng dẫn của Merchandise trước khi bấm chụp gửi QC.</li>
+                                <li><strong>Đối với nhóm trễ Deadline:</strong> Cần chủ động lên lịch chụp ảnh nghiệm thu ngay trong ngày đầu chạy CTKM, cài đặt nhắc lịch báo cáo trước 12h so với hạn chót trên Lark.</li>
+                                <li><strong>Đối với nhóm chưa Đạt Chỉ Thị:</strong> Cần rà soát lại sơ đồ POP/POSM, bổ sung ngay wobbler giá ưu đãi và sắp xếp đúng diện tích mâm kệ theo hướng dẫn của Merchandise trước khi bấm chụp gửi QC.</li>
                                 <li><strong>Yêu cầu chung:</strong> Tất cả Cửa hàng Trưởng kiểm tra chéo thực tế tại điểm bán trước khi nhấn xác nhận báo cáo trên hệ thống Lark Base.</li>
                             </ul>
                         </div>
@@ -1120,517 +639,585 @@
 
     </main>
 
-    <script>
-        // ================== DỮ LIỆU ĐỔI TRẢ ==================
-        const storeData = [
-            { name: "S1001 -- SKK Đội Cấn", t7: 11, t8: 11 },
-            { name: "S1002 -- SKK Linh Đàm", t7: 5, t8: 5 },
-            { name: "S1004 -- SKK Mandarin C1", t7: 17, t8: 17 },
-            { name: "S1005 -- SKK Thái Hà", t7: 14, t8: 14 },
-            { name: "S1006 -- SKK Trần Đăng Ninh", t7: 23, t8: 23 },
-            { name: "S1007 -- SKK Nguyễn Du", t7: 2, t8: 2 },
-            { name: "S1008 -- SKK Hàng Bông", t7: 14, t8: 14 },
-            { name: "S1011 -- SKK Văn Phú", t7: 6, t8: 6 },
-            { name: "S1015 -- SKK Hàm Nghi", t7: 11, t8: 11 },
-            { name: "S1018 -- SKK Nguyễn Tuân", t7: 15, t8: 15 },
-            { name: "S1020 -- SKK Đỗ Quang", t7: 7, t8: 7 },
-            { name: "S1021 -- SKK Ngoại Giao Đoàn", t7: 6, t8: 6 },
-            { name: "S1022 -- SKK Trần Duy Hưng", t7: 14, t8: 14 },
-            { name: "S1023 -- SKK Nguyễn Văn Lộc", t7: 8, t8: 8 },
-            { name: "S1025 -- SKK T6 Time City", t7: 7, t8: 7 },
-            { name: "S1026 -- SKK Ecohome 3", t7: 1, t8: 1 },
-            { name: "S1027 -- SKK Green Bay", t7: 5, t8: 5 },
-            { name: "S1030 -- SKK Xuân La", t7: 4, t8: 4 },
-            { name: "S1035 -- SKK Nguyễn Khuyến", t7: 5, t8: 5 },
-            { name: "S1036 -- SKK Sài Đồng", t7: 0, t8: 0 },
-            { name: "S1037 -- SKK Bạch Mai", t7: 5, t8: 5 },
-            { name: "S2201 -- SKK Bắc Ninh", t7: 10, t8: 10 }
-        ];
+<script>
+/* ======================================================================
+   SAKUKO QC REPORT PRO - SCRIPT DUY NHẤT (đã gộp, xoá toàn bộ trùng lặp)
+   ====================================================================== */
 
-        // ================== DỮ LIỆU DỊCH VỤ TẬN TÂM TỪ LARK ==================
-        const serviceStoreData = [
-            { name: "SKK Đỗ Quang", t6: 88, t7: 94, note: "Tăng trưởng tốt" },
-            { name: "SKK Đội Cấn", t6: 94, t7: 94, note: "Duy trì ổn định" },
-            { name: "SKK Linh Đàm", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Mandarin", t6: 85, t7: 84, note: "Giảm nhẹ" },
-            { name: "SKK Thái Hà", t6: 84, t7: 100, note: "Tăng trưởng xuất sắc (+16%)" },
-            { name: "SKK Trần Đăng Ninh", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Nguyễn Du", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Hàng Bông", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Văn Phú", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Hàm Nghi", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Nguyễn Tuân", t6: 100, t7: 89, note: "Sụt giảm (-11%), cần lưu ý" },
-            { name: "SKK Ngoại Giao Đoàn", t6: 88, t7: 88, note: "Ổn định" },
-            { name: "SKK Trần Duy Hưng", t6: 90, t7: 90, note: "Ổn định" },
-            { name: "SKK Nguyễn Văn Lộc", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK T6 Timecity", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
-            { name: "SKK Ecohome 3", t6: 91, t7: 91, note: "Ổn định" },
-            { name: "SKK Green Bay", t6: 88, t7: 81, note: "Giảm sâu (-7%), cần cải thiện" },
-            { name: "SKK Xuân La", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Bắc Ninh", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Nguyễn Khuyến", t6: 88, t7: 88, note: "Ổn định" },
-            { name: "SKK Sài Đồng", t6: 94, t7: 94, note: "Ổn định" },
-            { name: "SKK Bạch Mai", t6: 94, t7: 94, note: "Ổn định" }
-        ];
+// ---------- ENDPOINTS LARK BASE (qua backend qc-report-bot trên Render) ----------
+const LARK_API_ENDPOINT       = 'https://qc-report-bot.onrender.com/api/lark-base/doitra';
+const SERVICE_API_ENDPOINT    = 'https://qc-report-bot.onrender.com/api/lark-base/dichvu';
+const TRUNGBAY_API_ENDPOINT   = 'https://qc-report-bot.onrender.com/api/lark-base/trungbay'; // TODO: xác nhận route này đã có trên backend chưa
 
-        // ================== DỮ LIỆU TRƯNG BÀY CTKM ==================
-        let trungbayData = [
-            { name: "SKK Đội Cấn", submitted: true, onTime: false, passed: true, note: "Trễ deadline gửi ảnh" },
-            { name: "SKK Hàng Bông", submitted: true, onTime: false, passed: true, note: "Gửi báo cáo muộn 2 tiếng" },
-            { name: "SKK Linh Đàm", submitted: true, onTime: true, passed: true, note: "Trưng bày chuẩn sơ đồ" },
-            { name: "SKK Đỗ Quang", submitted: true, onTime: true, passed: true, note: "Hình ảnh rõ nét, đạt" },
-            { name: "SKK Trần Đăng Ninh", submitted: true, onTime: true, passed: true, note: "Thi công POP đẹp" },
-            { name: "SKK Greenbay", submitted: true, onTime: true, passed: false, note: "Thiếu wobbler giá CTKM" },
-            { name: "SKK Hàm Nghi", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
-            { name: "SKK Nguyễn Văn Lộc", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
-            { name: "SKK Mandarin C1", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
-            { name: "SKK Nguyễn Tuân", submitted: true, onTime: true, passed: true, note: "Trưng bày ấn tượng" },
-            { name: "SKK Trần Duy Hưng", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
-            { name: "SKK Thái Hà", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
-            { name: "SKK Bắc Ninh", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Nguyễn Du", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Ecohome 3", submitted: true, onTime: false, passed: true, note: "Gửi thiếu ảnh đầu kệ" },
-            { name: "SKK Văn Phú", submitted: true, onTime: false, passed: true, note: "Nộp trễ deadline" },
-            { name: "SKK Ngoại Giao Đoàn", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Nguyễn Khuyến", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Sài Đồng", submitted: true, onTime: true, passed: false, note: "Sai vị trí sản phẩm trọng tâm" },
-            { name: "SKK Bạch Mai", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Times City", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
-            { name: "SKK Xuân La", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" }
-        ];
+// ---------- DỮ LIỆU MẶC ĐỊNH (dùng khi chưa gọi được API / API lỗi) ----------
+let storeData = [
+    { name: "S1001 -- SKK Đội Cấn", t7: 11, t8: 8 },
+    { name: "S1002 -- SKK Linh Đàm", t7: 5, t8: 4 },
+    { name: "S1004 -- SKK Mandarin C1", t7: 14, t8: 17 },
+    { name: "S1005 -- SKK Thái Hà", t7: 12, t8: 14 },
+    { name: "S1006 -- SKK Trần Đăng Ninh", t7: 19, t8: 23 },
+    { name: "S1007 -- SKK Nguyễn Du", t7: 3, t8: 2 },
+    { name: "S1008 -- SKK Hàng Bông", t7: 15, t8: 14 },
+    { name: "S1011 -- SKK Văn Phú", t7: 7, t8: 6 },
+    { name: "S1015 -- SKK Hàm Nghi", t7: 9, t8: 11 },
+    { name: "S1018 -- SKK Nguyễn Tuân", t7: 12, t8: 15 },
+    { name: "S1020 -- SKK Đỗ Quang", t7: 8, t8: 7 },
+    { name: "S1021 -- SKK Ngoại Giao Đoàn", t7: 5, t8: 6 },
+    { name: "S1022 -- SKK Trần Duy Hưng", t7: 13, t8: 14 },
+    { name: "S1023 -- SKK Nguyễn Văn Lộc", t7: 9, t8: 8 },
+    { name: "S1025 -- SKK T6 Time City", t7: 8, t8: 7 },
+    { name: "S1026 -- SKK Ecohome 3", t7: 2, t8: 1 },
+    { name: "S1027 -- SKK Green Bay", t7: 6, t8: 5 },
+    { name: "S1030 -- SKK Xuân La", t7: 3, t8: 4 },
+    { name: "S1035 -- SKK Nguyễn Khuyến", t7: 6, t8: 5 },
+    { name: "S1036 -- SKK Sài Đồng", t7: 1, t8: 0 },
+    { name: "S1037 -- SKK Bạch Mai", t7: 4, t8: 5 },
+    { name: "S2201 -- SKK Bắc Ninh", t7: 9, t8: 10 }
+];
 
-        let fullYearData = [0, 0, 0, 0, 0, 0, 185, 191, 0, 0, 0, 0];
-        let chartInstance = null;
-        let serviceChart1 = null, serviceChart2 = null, serviceChart3 = null;
-        let chartTrungBayInstance = null;
+let serviceStoreData = [
+    { name: "SKK Đỗ Quang", t6: 88, t7: 94, note: "Tăng trưởng tốt" },
+    { name: "SKK Đội Cấn", t6: 94, t7: 94, note: "Duy trì ổn định" },
+    { name: "SKK Linh Đàm", t6: 91, t7: 91, note: "Ổn định" },
+    { name: "SKK Mandarin", t6: 85, t7: 84, note: "Giảm nhẹ" },
+    { name: "SKK Thái Hà", t6: 84, t7: 100, note: "Tăng trưởng xuất sắc (+16%)" },
+    { name: "SKK Trần Đăng Ninh", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
+    { name: "SKK Nguyễn Du", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
+    { name: "SKK Hàng Bông", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK Văn Phú", t6: 91, t7: 91, note: "Ổn định" },
+    { name: "SKK Hàm Nghi", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK Nguyễn Tuân", t6: 100, t7: 89, note: "Sụt giảm (-11%), cần lưu ý" },
+    { name: "SKK Ngoại Giao Đoàn", t6: 88, t7: 88, note: "Ổn định" },
+    { name: "SKK Trần Duy Hưng", t6: 90, t7: 90, note: "Ổn định" },
+    { name: "SKK Nguyễn Văn Lộc", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK T6 Timecity", t6: 100, t7: 100, note: "Đạt điểm tối đa" },
+    { name: "SKK Ecohome 3", t6: 91, t7: 91, note: "Ổn định" },
+    { name: "SKK Green Bay", t6: 88, t7: 81, note: "Giảm sâu (-7%), cần cải thiện" },
+    { name: "SKK Xuân La", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK Bắc Ninh", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK Nguyễn Khuyến", t6: 88, t7: 88, note: "Ổn định" },
+    { name: "SKK Sài Đồng", t6: 94, t7: 94, note: "Ổn định" },
+    { name: "SKK Bạch Mai", t6: 94, t7: 94, note: "Ổn định" }
+];
 
-        // ================== BÁO CÁO ĐỔI TRẢ ==================
-        function renderTable() {
-            const tbody = document.getElementById('doitraTableBody');
-            tbody.innerHTML = '';
-            let hasIncompleteData = false;
+let trungbayData = [
+    { name: "SKK Đội Cấn", submitted: true, onTime: false, passed: true, note: "Trễ deadline gửi ảnh" },
+    { name: "SKK Hàng Bông", submitted: true, onTime: false, passed: true, note: "Gửi báo cáo muộn 2 tiếng" },
+    { name: "SKK Linh Đàm", submitted: true, onTime: true, passed: true, note: "Trưng bày chuẩn sơ đồ" },
+    { name: "SKK Đỗ Quang", submitted: true, onTime: true, passed: true, note: "Hình ảnh rõ nét, đạt" },
+    { name: "SKK Trần Đăng Ninh", submitted: true, onTime: true, passed: true, note: "Thi công POP đẹp" },
+    { name: "SKK Greenbay", submitted: true, onTime: true, passed: false, note: "Thiếu wobbler giá CTKM" },
+    { name: "SKK Hàm Nghi", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+    { name: "SKK Nguyễn Văn Lộc", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+    { name: "SKK Mandarin C1", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
+    { name: "SKK Nguyễn Tuân", submitted: true, onTime: true, passed: true, note: "Trưng bày ấn tượng" },
+    { name: "SKK Trần Duy Hưng", submitted: true, onTime: true, passed: true, note: "Đạt yêu cầu" },
+    { name: "SKK Thái Hà", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn chỉ thị" },
+    { name: "SKK Bắc Ninh", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Nguyễn Du", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Ecohome 3", submitted: true, onTime: false, passed: true, note: "Gửi thiếu ảnh đầu kệ" },
+    { name: "SKK Văn Phú", submitted: true, onTime: false, passed: true, note: "Nộp trễ deadline" },
+    { name: "SKK Ngoại Giao Đoàn", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Nguyễn Khuyến", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Sài Đồng", submitted: true, onTime: true, passed: false, note: "Sai vị trí sản phẩm trọng tâm" },
+    { name: "SKK Bạch Mai", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Times City", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" },
+    { name: "SKK Xuân La", submitted: true, onTime: true, passed: true, note: "Đạt chuẩn" }
+];
 
-            storeData.forEach((item, index) => {
-                const valT7 = item.t7 === "" || isNaN(item.t7) ? null : parseInt(item.t7);
-                const valT8 = item.t8 === "" || isNaN(item.t8) ? null : parseInt(item.t8);
+let fullYearData = [0, 0, 0, 0, 0, 0, 185, 191, 0, 0, 0, 0];
 
-                if (valT7 === null || valT8 === null) hasIncompleteData = true;
+// ---------- CHART INSTANCES (mỗi biểu đồ chỉ khởi tạo 1 lần) ----------
+let chartInstance = null;          // biểu đồ 12 tháng đổi trả
+let serviceChart1 = null, serviceChart2 = null, serviceChart3 = null;
+let chartTrungBayInstance = null;
 
-                let diffHTML = '';
-                if (valT7 !== null && valT8 !== null) {
-                    const diff = valT8 - valT7;
-                    if (diff < 0) diffHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`;
-                    else if (diff > 0) diffHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>`;
-                    else diffHTML = `<span class="text-slate-400 font-bold">0</span>`;
-                } else diffHTML = `<span class="text-amber-500 italic">Thiếu số liệu</span>`;
+function fmtNow() {
+    const now = new Date();
+    return `${String(now.getDate()).padStart(2,'0')}-${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+function fmtDate() {
+    const now = new Date();
+    return `${String(now.getDate()).padStart(2,'0')}-${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()}`;
+}
 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="py-3 px-4">
-                        <input type="text" value="${item.name}" onchange="updateStoreName(${index}, this.value)" class="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <input type="number" value="${item.t7 !== null ? item.t7 : ''}" onchange="updateStoreValue(${index}, 't7', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <input type="number" value="${item.t8 !== null ? item.t8 : ''}" onchange="updateStoreValue(${index}, 't8', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue">
-                    </td>
-                    <td class="py-3 px-4 text-center">${diffHTML}</td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+/* ============================== TAB ĐIỀU HƯỚNG ============================== */
+function switchTab(targetId, event) {
+    if (event) event.preventDefault();
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md');
+        item.classList.add('text-slate-400');
+    });
+    const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
+    if (activeMenu) {
+        activeMenu.classList.remove('text-slate-400');
+        activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md');
+    }
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) targetSection.classList.add('active');
 
-            const warningBox = document.getElementById('dataWarningBox');
-            if (hasIncompleteData || storeData.length === 0) warningBox.classList.remove('hidden');
-            else warningBox.classList.add('hidden');
+    // Resize lại chart khi chuyển tab để canvas hiển thị đúng kích thước
+    if (targetId === 'doitra' && chartInstance) chartInstance.resize();
+    if (targetId === 'dichvu') { if (serviceChart1) serviceChart1.resize(); if (serviceChart2) serviceChart2.resize(); if (serviceChart3) serviceChart3.resize(); }
+    if (targetId === 'trungbay' && chartTrungBayInstance) chartTrungBayInstance.resize();
+}
 
-            generateReport();
-            updateChart();
-        }
+/* ============================== TAB 2: ĐỔI TRẢ ============================== */
 
-        function updateStoreName(idx, val) { storeData[idx].name = val; renderTable(); }
-        function updateStoreValue(idx, month, val) { storeData[idx][month] = val === "" ? "" : parseInt(val); renderTable(); }
-        function addNewRow() { storeData.push({ name: "S" + (1038 + storeData.length) + " -- SKK Mới", t7: 0, t8: 0 }); renderTable(); }
-        function removeRow(idx) { storeData.splice(idx, 1); renderTable(); }
+async function fetchLarkData() {
+    const syncIcon = document.getElementById('syncIcon');
+    const syncBadge = document.getElementById('syncStatusBadge');
+    if (syncIcon) syncIcon.classList.add('fa-spin');
+    if (syncBadge) { syncBadge.innerText = 'Đang tải dữ liệu từ Lark Base...'; syncBadge.className = 'text-[11px] text-amber-500 font-bold'; }
 
-        function initFullYearChart() {
-            const ctx = document.getElementById('fullYearChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-                    datasets: [{
-                        label: 'Tổng Đơn Đổi Trả',
-                        data: fullYearData,
-                        backgroundColor: function(context) { return context.dataIndex === 7 ? '#FF6500' : '#1E3E62'; },
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-                }
+    try {
+        const response = await fetch(LARK_API_ENDPOINT);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const result = await response.json();
+        const rawItems = result.data?.items || result.items || result || [];
+
+        if (Array.isArray(rawItems) && rawItems.length > 0) {
+            storeData = rawItems.map(item => {
+                const f = item.fields || item;
+                return {
+                    name: f["Tên Siêu Thị"] || f["Store_Name"] || f.name || "Chưa rõ",
+                    t7: Number(f["Đơn Tháng Trước"] ?? f.donPrev ?? f.t7 ?? 0),
+                    t8: Number(f["Đơn Tháng Hiện Tại"] ?? f.donCurrent ?? f.t8 ?? 0)
+                };
             });
         }
+        if (syncBadge) { syncBadge.innerText = 'Đã đồng bộ Lark Base'; syncBadge.className = 'text-[11px] text-emerald-600 font-bold'; }
+    } catch (error) {
+        console.warn('Không kết nối được Lark Base, dùng dữ liệu tạm:', error);
+        if (syncBadge) { syncBadge.innerText = 'Lỗi kết nối API - dùng dữ liệu tạm'; syncBadge.className = 'text-[11px] text-rose-600 font-bold'; }
+    } finally {
+        if (syncIcon) syncIcon.classList.remove('fa-spin');
+        const t = document.getElementById('lastUpdateTime'); if (t) t.innerText = fmtNow();
+        renderTable();
+    }
+}
 
-        function updateChart() {
-            if (!chartInstance) return;
-            let sumT7 = 0, sumT8 = 0;
-            storeData.forEach(s => { sumT7 += (parseInt(s.t7) || 0); sumT8 += (parseInt(s.t8) || 0); });
-            fullYearData[6] = sumT7;
-            fullYearData[7] = sumT8;
-            chartInstance.data.datasets[0].data = fullYearData;
-            chartInstance.update();
-        }
+function renderTable() {
+    const tbody = document.getElementById('doitraTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    let hasIncompleteData = false;
 
-        function generateReport() {
-            document.getElementById('totalStoresCount').innerText = storeData.length;
-            const sorted = [...storeData].sort((a, b) => (parseInt(b.t8)||0) - (parseInt(a.t8)||0));
-            const top3 = sorted.slice(0, 3);
+    storeData.forEach((item, index) => {
+        const valT7 = item.t7 === "" || item.t7 === null || isNaN(item.t7) ? null : parseInt(item.t7);
+        const valT8 = item.t8 === "" || item.t8 === null || isNaN(item.t8) ? null : parseInt(item.t8);
+        if (valT7 === null || valT8 === null) hasIncompleteData = true;
 
-            const topListContainer = document.getElementById('topStoreList');
-            topListContainer.innerHTML = '';
-            top3.forEach((s, i) => {
-                topListContainer.innerHTML += `
-                    <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
-                        <span>${i + 1}. ${s.name}</span>
-                        <span class="bg-rose-100 text-rose-700 font-extrabold px-2 py-0.5 rounded text-[11px]">${s.t8 || 0} đơn</span>
-                    </div>
-                `;
-            });
+        let diffHTML = '';
+        if (valT7 !== null && valT8 !== null) {
+            const diff = valT8 - valT7;
+            if (diff < 0) diffHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${Math.abs(diff)}</span>`;
+            else if (diff > 0) diffHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-up"></i> ${diff}</span>`;
+            else diffHTML = `<span class="text-slate-400 font-bold">0</span>`;
+        } else diffHTML = `<span class="text-amber-500 italic">Thiếu số liệu</span>`;
 
-            let sumT7 = 0, sumT8 = 0, increasedStores = [];
-            storeData.forEach(s => {
-                const t7 = parseInt(s.t7) || 0, t8 = parseInt(s.t8) || 0;
-                sumT7 += t7; sumT8 += t8;
-                if (t8 > t7) increasedStores.push(s.name.replace(/S\d+\s*--\s*/, ''));
-            });
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+            <td class="py-3 px-4"><input type="text" value="${item.name}" onchange="updateStoreName(${index}, this.value)" class="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue"></td>
+            <td class="py-3 px-4 text-center"><input type="number" value="${item.t7 !== null ? item.t7 : ''}" onchange="updateStoreValue(${index}, 't7', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue"></td>
+            <td class="py-3 px-4 text-center"><input type="number" value="${item.t8 !== null ? item.t8 : ''}" onchange="updateStoreValue(${index}, 't8', this.value)" class="w-20 text-center bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sakuko-blue"></td>
+            <td class="py-3 px-4 text-center">${diffHTML}</td>
+            <td class="py-3 px-4 text-center"><button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition"><i class="fa-regular fa-trash-can"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+    });
 
-            const diffTotal = sumT8 - sumT7;
-            const topNames = top3.map(s => s.name.replace(/S\d+\s*--\s*/, '')).join(', ');
+    const warningBox = document.getElementById('dataWarningBox');
+    if (warningBox) { if (hasIncompleteData || storeData.length === 0) warningBox.classList.remove('hidden'); else warningBox.classList.add('hidden'); }
 
-            document.getElementById('analysisTextList').innerHTML = `
-                <li><strong>Quy mô kiểm soát:</strong> Hệ thống hiện ghi nhận số liệu từ <strong class="text-slate-900">${storeData.length} siêu thị Offline</strong>. Tổng số đơn đổi trả tháng 8 là <strong class="text-slate-900">${sumT8} đơn</strong> (Tháng 7: <strong>${sumT7} đơn</strong>, ${diffTotal < 0 ? 'giảm ' + Math.abs(diffTotal) : (diffTotal > 0 ? 'tăng ' + diffTotal : 'giữ nguyên')} đơn).</li>
-                <li><strong>Mức độ tập trung rủi ro:</strong> 3 siêu thị có lượng đơn phát sinh cao nhất gồm <strong class="text-rose-600">${topNames}</strong> chiếm tỷ trọng lớn trong toàn hệ thống.</li>
-                <li><strong class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo biến động:</strong> ${increasedStores.length > 0 ? `Các cửa hàng ghi nhận số đơn tăng so với tháng trước bao gồm: <strong>${increasedStores.join(', ')}</strong>.` : 'Không có siêu thị nào tăng đơn đột biến so với tháng trước.'}</li>
+    updateChart();
+    processAndRenderReport();
+}
+
+function updateStoreName(idx, val) { storeData[idx].name = val; renderTable(); }
+function updateStoreValue(idx, month, val) { storeData[idx][month] = val === "" ? "" : parseInt(val); renderTable(); }
+function addNewRow() { storeData.push({ name: "S" + (1038 + storeData.length) + " -- SKK Mới", t7: 0, t8: 0 }); renderTable(); }
+function removeRow(idx) { storeData.splice(idx, 1); renderTable(); }
+
+function initFullYearChart() {
+    const ctxElem = document.getElementById('fullYearChart');
+    if (!ctxElem) return;
+    const ctx = ctxElem.getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'],
+            datasets: [{ label: 'Tổng Đơn Đổi Trả', data: fullYearData, backgroundColor: c => c.dataIndex === 7 ? '#FF6500' : '#1E3E62', borderRadius: 4 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+    });
+}
+
+function updateChart() {
+    if (!chartInstance) return;
+    let sumT7 = 0, sumT8 = 0;
+    storeData.forEach(s => { sumT7 += (parseInt(s.t7) || 0); sumT8 += (parseInt(s.t8) || 0); });
+    fullYearData[6] = sumT7;
+    fullYearData[7] = sumT8;
+    chartInstance.data.datasets[0].data = fullYearData;
+    chartInstance.update();
+}
+
+function processAndRenderReport() {
+    const selectMonthElem = document.getElementById('selectMonth');
+    const selectYearElem = document.getElementById('selectYear');
+    const selectedMonth = selectMonthElem ? parseInt(selectMonthElem.value) : 8;
+    const selectedYear = selectYearElem ? parseInt(selectYearElem.value) : 2026;
+
+    const today = new Date();
+    const actualDay = today.getDate();
+    const actualMonth = today.getMonth() + 1;
+    const actualYear = today.getFullYear();
+    const isCurrentMonth = (selectedMonth === actualMonth && selectedYear === actualYear);
+    let monthStr = selectedMonth < 10 ? '0' + selectedMonth : '' + selectedMonth;
+
+    const totalStoresElem = document.getElementById('totalStoresCount');
+    if (totalStoresElem) totalStoresElem.innerText = storeData.length;
+
+    const genDateElem = document.getElementById('reportGenDate');
+    if (genDateElem) genDateElem.innerText = fmtDate();
+
+    let sumT7 = 0, sumT8 = 0, increasedStores = [];
+    storeData.forEach(s => {
+        const t7 = parseInt(s.t7) || 0, t8 = parseInt(s.t8) || 0;
+        sumT7 += t7; sumT8 += t8;
+        if (t8 > t7) increasedStores.push(s.name.replace(/S\d+\s*--\s*/, ''));
+    });
+
+    const sorted = [...storeData].sort((a, b) => (parseInt(b.t8) || 0) - (parseInt(a.t8) || 0));
+    const top3 = sorted.slice(0, 3);
+    const topNames = top3.map(s => s.name.replace(/S\d+\s*--\s*/, '')).join(', ');
+
+    // Tiêu đề & lời chào
+    const titleElem = document.getElementById('reportTitle');
+    const noteElem = document.getElementById('realtimeNote');
+    const greetingElem = document.getElementById('reportGreeting');
+    if (isCurrentMonth) {
+        if (titleElem) titleElem.innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH TÍNH ĐẾN NGÀY ${actualDay}/${monthStr}/${selectedYear}`;
+        if (noteElem) noteElem.innerText = `(Lũy kế ${actualDay} ngày đầu tháng - Chưa chốt tháng)`;
+        if (greetingElem) greetingElem.innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tính đến ngày ${actualDay}/${monthStr}/${selectedYear}.`;
+    } else {
+        if (titleElem) titleElem.innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH SIÊU THỊ THÁNG ${monthStr}/${selectedYear}`;
+        if (noteElem) noteElem.innerText = `(Dữ liệu chốt trọn tháng)`;
+        if (greetingElem) greetingElem.innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng ${selectedMonth}/${selectedYear}.`;
+    }
+
+    // Top 3
+    const topListElem = document.getElementById('topStoreList');
+    if (topListElem) {
+        topListElem.innerHTML = top3.length > 0 ? top3.map((s, i) => `
+            <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
+                <span class="text-slate-800 font-bold">${i + 1}. ${s.name}</span>
+                <span class="text-sakuko-orange font-black">${s.t8 || 0} đơn</span>
+            </div>`).join('') : `<p class="text-xs text-slate-400 italic">Chưa có dữ liệu</p>`;
+    }
+
+    // Nhận xét
+    const analysisListElem = document.getElementById('analysisTextList');
+    if (analysisListElem) {
+        if (isCurrentMonth) {
+            let estimatedFullMonth = actualDay > 0 ? Math.round((sumT8 / actualDay) * 31) : 0;
+            analysisListElem.innerHTML = `
+                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${storeData.length} siêu thị Offline</strong>. Tính đến ngày ${actualDay}/${monthStr}, toàn hệ thống phát sinh <strong>${sumT8} đơn đổi trả</strong>.</li>
+                <li><strong>Dự báo tiến độ:</strong> Với tốc độ phát sinh hiện tại, ước tính cả Tháng ${selectedMonth} sẽ đạt khoảng <strong>${estimatedFullMonth} đơn</strong>.</li>
+                <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị có lượng đơn cao nhất gồm <strong>${topNames || 'N/A'}</strong>.</li>
+                <li><strong class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo biến động:</strong> ${increasedStores.length > 0 ? `Các cửa hàng ghi nhận số đơn tăng so với tháng trước gồm: <strong>${increasedStores.join(', ')}</strong>.` : 'Không có siêu thị nào tăng đơn đột biến so với tháng trước.'}</li>
             `;
-
-            document.getElementById('adviceTextList').innerHTML = `
-                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1"><i class="fa-solid fa-user-gear text-sakuko-blue"></i> 1. Đối với nhóm Top nguy cơ cao (${top3[0] ? top3[0].name.replace(/S\d+\s*--\s*/, '') : 'Top 1'}...):</p>
-                    <p class="text-slate-600 text-[11px] leading-relaxed">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết và báo cáo biện pháp khắc phục trước ngày 15/09.</p>
-                </div>
-                <div class="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                    <p class="font-bold text-slate-800 text-xs flex items-center gap-1"><i class="fa-solid fa-graduation-cap text-emerald-600"></i> 2. Đào tạo quy trình POS & Thu ngân:</p>
-                    <p class="text-slate-600 text-[11px] leading-relaxed">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã.</p>
-                </div>
+        } else {
+            let diffVal = sumT8 - sumT7;
+            let diffText = diffVal > 0 ? `tăng ${diffVal} đơn` : (diffVal < 0 ? `giảm ${Math.abs(diffVal)} đơn` : `giữ nguyên`);
+            analysisListElem.innerHTML = `
+                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${storeData.length} siêu thị Offline</strong>. Tổng số đơn đổi trả Tháng ${selectedMonth} là <strong>${sumT8} đơn</strong> (${diffText} so với Tháng trước).</li>
+                <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị chiếm tỷ trọng lớn bao gồm <strong>${topNames || 'N/A'}</strong>.</li>
+                <li><strong class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo biến động:</strong> ${increasedStores.length > 0 ? `Các cửa hàng ghi nhận số đơn tăng so với tháng trước gồm: <strong>${increasedStores.join(', ')}</strong>.` : 'Không có siêu thị nào tăng đơn đột biến so với tháng trước.'}</li>
             `;
         }
+    }
 
-        async function fetchLarkData() {
-            const syncIcon = document.getElementById('syncIcon');
-            syncIcon.classList.add('fa-spin');
-            setTimeout(() => {
-                const now = new Date();
-                document.getElementById('lastUpdateTime').innerText = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                syncIcon.classList.remove('fa-spin');
-            }, 800);
-        }
+    // Khuyến nghị
+    let nextMonthNum = selectedMonth === 12 ? 1 : selectedMonth + 1;
+    let nextMonthYear = selectedMonth === 12 ? selectedYear + 1 : selectedYear;
+    let nextMonthStr = nextMonthNum < 10 ? '0' + nextMonthNum : '' + nextMonthNum;
 
-        function copyReport() { alert("Đã sao chép nội dung báo cáo đổi trả!"); }
+    const adviceTitleElem = document.getElementById('adviceTitle');
+    if (adviceTitleElem) adviceTitleElem.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU CHO THÁNG ${nextMonthStr}/${nextMonthYear}:`;
 
-        // ================== CHẤM ĐIỂM DỊCH VỤ ==================
-        function initServiceCharts() {
-            const ctx1 = document.getElementById('scoreByStoreChart').getContext('2d');
-            const labels1 = serviceStoreData.map(s => s.name);
-            const dataT7 = serviceStoreData.map(s => s.t7);
+    const adviceListElem = document.getElementById('adviceTextList');
+    if (adviceListElem) {
+        let top1Name = top3[0] ? top3[0].name.replace(/S\d+\s*--\s*/, '') : "các siêu thị nguy cơ";
+        adviceListElem.innerHTML = `
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                <p class="font-bold text-slate-800 mb-1">1. Tái kiểm tra tại đơn vị có đơn cao (${top1Name}...):</p>
+                <p class="text-slate-600">Yêu cầu Cửa hàng trưởng rà soát lại nguyên nhân chi tiết và báo cáo biện pháp khắc phục trước ngày 15/${nextMonthStr}.</p>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                <p class="font-bold text-slate-800 mb-1">2. Đào tạo quy trình POS & Thu ngân:</p>
+                <p class="text-slate-600">Tăng cường tái đào tạo quy trình thao tác trên phần mềm bán hàng để tránh phát sinh đơn đổi trả do lỗi ấn nhầm mã.</p>
+            </div>
+        `;
+    }
+}
 
-            serviceChart1 = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: labels1,
-                    datasets: [{
-                        label: 'Tỷ lệ đạt T7 (%)',
-                        data: dataT7,
-                        backgroundColor: '#1E3E62',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { min: 60, max: 100 } }
-                }
-            });
+function copyReport() {
+    const el = document.getElementById('reportContainer');
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        alert("Đã sao chép nội dung báo cáo đổi trả!");
+    }).catch(() => alert("Không thể sao chép, vui lòng tô đen và bấm Ctrl+C."));
+}
 
-            const ctx2 = document.getElementById('errorCategoryCountChart').getContext('2d');
-            serviceChart2 = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: ['VS Trưng bày', 'Tem phụ/giá', 'VS Bán hàng', 'Thu ngân', 'Trưng bày HH', 'Kho'],
-                    datasets: [
-                        { label: 'Tháng 6', data: [22, 18, 16, 6, 5, 4], backgroundColor: '#94a3b8' },
-                        { label: 'Tháng 7', data: [14, 17, 13, 8, 6, 5], backgroundColor: '#FF6500' }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
+/* ============================== TAB 3: CHẤM ĐIỂM DỊCH VỤ ============================== */
 
-            const ctx3 = document.getElementById('errorRateChart').getContext('2d');
-            serviceChart3 = new Chart(ctx3, {
-                type: 'line',
-                data: {
-                    labels: ['VS Trưng bày', 'Tem phụ/giá', 'VS Bán hàng', 'Thu ngân', 'Trưng bày HH', 'Kho'],
-                    datasets: [
-                        { label: 'Tỷ lệ lỗi T6 (%)', data: [26, 24, 19, 7, 6, 5], borderColor: '#94a3b8', tension: 0.2 },
-                        { label: 'Tỷ lệ lỗi T7 (%)', data: [20, 24, 18, 11, 8, 7], borderColor: '#1E3E62', backgroundColor: '#1E3E62', tension: 0.2 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
+async function syncServiceData() {
+    const icon = document.getElementById('dichvuSyncIcon');
+    if (icon) icon.classList.add('fa-spin');
+
+    try {
+        const response = await fetch(SERVICE_API_ENDPOINT);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const result = await response.json();
+        const rawItems = result.data?.items || result.items || result || [];
+        if (Array.isArray(rawItems) && rawItems.length > 0) {
+            serviceStoreData = rawItems.map(item => {
+                const f = item.fields || item;
+                return {
+                    name: f["Tên Siêu Thị"] || f["Store_Name"] || f.name || "N/A",
+                    t6: Number(f["Điểm T6"] ?? f.scoreT6 ?? f.t6 ?? 0),
+                    t7: Number(f["Điểm T7"] ?? f.scoreT7 ?? f.t7 ?? 0),
+                    note: f["Ghi Chú"] || f.note || "--"
+                };
             });
         }
+    } catch (err) {
+        console.warn("Không kết nối được Lark Base (dịch vụ), dùng dữ liệu tạm:", err);
+    } finally {
+        if (icon) icon.classList.remove('fa-spin');
+        const t = document.getElementById('dichvuUpdateTime'); if (t) t.innerText = fmtNow();
+        renderServiceTable();
+        renderServiceCharts();
+    }
+}
 
-        function renderServiceTable() {
-            const tbody = document.getElementById('serviceTableBody');
-            tbody.innerHTML = '';
-            serviceStoreData.forEach(item => {
-                const diff = item.t7 - item.t6;
-                let diffBadge = '';
-                if (diff > 0) diffBadge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-up"></i> +${diff}%</span>`;
-                else if (diff < 0) diffBadge = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${diff}%</span>`;
-                else diffBadge = `<span class="text-slate-400 font-bold">0%</span>`;
+function initServiceCharts() { renderServiceCharts(); }
 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                    <td class="py-2.5 px-4 text-center font-semibold text-slate-600">${item.t6}%</td>
-                    <td class="py-2.5 px-4 text-center font-bold text-slate-900">${item.t7}%</td>
-                    <td class="py-2.5 px-4 text-center">${diffBadge}</td>
-                    <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
-                `;
-                tbody.appendChild(tr);
+function renderServiceCharts() {
+    const ctx1 = document.getElementById('scoreByStoreChart')?.getContext('2d');
+    if (ctx1) {
+        if (serviceChart1) serviceChart1.destroy();
+        serviceChart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: serviceStoreData.map(s => s.name),
+                datasets: [
+                    { label: 'Tháng 06 (%)', data: serviceStoreData.map(s => s.t6), backgroundColor: '#94a3b8', borderRadius: 4 },
+                    { label: 'Tháng 07 (%)', data: serviceStoreData.map(s => s.t7), backgroundColor: '#e60012', borderRadius: 4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 60, max: 100 } }, plugins: { legend: { position: 'top' } } }
+        });
+    }
+
+    const ctx2 = document.getElementById('errorCategoryCountChart')?.getContext('2d');
+    if (ctx2) {
+        if (serviceChart2) serviceChart2.destroy();
+        serviceChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['VS Trưng Bày','Tem Phụ/Giá','VS Bán Hàng','Quầy Thu Ngân','Trưng Bày HH','Kho','Mặt Tiền','Diện Mạo NV'],
+                datasets: [
+                    { label: 'Tháng 6', data: [22,18,16,6,5,4,5,2], backgroundColor: '#003B7A', borderRadius: 4 },
+                    { label: 'Tháng 7', data: [14,17,13,8,6,5,1,1], backgroundColor: '#f59e0b', borderRadius: 4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'top' } } }
+        });
+    }
+
+    const ctx3 = document.getElementById('errorRateChart')?.getContext('2d');
+    if (ctx3) {
+        if (serviceChart3) serviceChart3.destroy();
+        serviceChart3 = new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: ['VS Trưng Bày','Tem Phụ/Giá','VS Bán Hàng','Quầy Thu Ngân','Trưng Bày HH','Khác'],
+                datasets: [{ data: [20,24,18,11,8,19], backgroundColor: ['#e60012','#f59e0b','#003B7A','#3b82f6','#10b981','#cbd5e1'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+    }
+}
+
+function renderServiceTable() {
+    const tbody = document.getElementById('serviceTableBody');
+    const badge = document.getElementById('serviceTotalBadge');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (badge) badge.innerText = `Đã tổng hợp ${serviceStoreData.length} Siêu Thị`;
+
+    serviceStoreData.forEach(item => {
+        const diff = item.t7 - item.t6;
+        let diffTag = `<span class="text-slate-500 font-bold">0%</span>`;
+        if (diff > 0) diffTag = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-arrow-up"></i> +${diff}%</span>`;
+        else if (diff < 0) diffTag = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-arrow-down"></i> ${diff}%</span>`;
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                <td class="py-2.5 px-4 text-center text-slate-600">${item.t6}%</td>
+                <td class="py-2.5 px-4 text-center font-bold text-slate-900">${item.t7}%</td>
+                <td class="py-2.5 px-4 text-center">${diffTag}</td>
+                <td class="py-2.5 px-4 text-slate-600">${item.note}</td>
+            </tr>`;
+    });
+}
+
+function copyServiceEmail() {
+    const el = document.getElementById('serviceEmailContainer');
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        alert("Đã sao chép toàn bộ mẫu email báo cáo dịch vụ!");
+    }).catch(() => alert("Không thể sao chép, vui lòng tô đen và bấm Ctrl+C."));
+}
+
+/* ============================== TAB 4: TRƯNG BÀY CTKM ============================== */
+
+async function syncTrungBayData() {
+    const icon = document.getElementById('trungbaySyncIcon');
+    if (icon) icon.classList.add('fa-spin');
+
+    try {
+        const response = await fetch(TRUNGBAY_API_ENDPOINT);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const result = await response.json();
+        const rawItems = result.data?.items || result.items || result || [];
+        if (Array.isArray(rawItems) && rawItems.length > 0) {
+            trungbayData = rawItems.map(item => {
+                const f = item.fields || item;
+                return {
+                    name: f["Tên Siêu Thị"] || f.name || "N/A",
+                    submitted: Boolean(f["Gửi Báo Cáo"] ?? f.submitted ?? true),
+                    onTime: Boolean(f["Đúng Deadline"] ?? f.onTime ?? true),
+                    passed: Boolean(f["Đạt Chỉ Thị"] ?? f.passed ?? true),
+                    note: f["Ghi Chú"] || f.note || "--"
+                };
             });
         }
+    } catch (err) {
+        console.warn("Không kết nối được Lark Base (trưng bày), dùng dữ liệu tạm:", err);
+    } finally {
+        if (icon) icon.classList.remove('fa-spin');
+        const t = document.getElementById('trungbayUpdateTime'); if (t) t.innerText = fmtNow();
+        const badge = document.getElementById('trungbaySyncBadge'); if (badge) badge.innerText = `Đã đồng bộ ${trungbayData.length} Cửa hàng`;
+        const rd = document.getElementById('trungbayReportDate'); if (rd) rd.innerText = fmtDate();
+        renderTrungBayTable();
+    }
+}
 
-        function syncServiceData() {
-            const icon = document.getElementById('dichvuSyncIcon');
-            icon.classList.add('fa-spin');
-            setTimeout(() => {
-                const now = new Date();
-                document.getElementById('dichvuUpdateTime').innerText = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                icon.classList.remove('fa-spin');
-            }, 800);
-        }
+function renderTrungBayTable() {
+    const tbody = document.getElementById('trungbayTableBody');
+    if (!tbody) return;
 
-        function copyServiceEmail() {
-            const emailContainer = document.getElementById('serviceEmailContainer');
-            const range = document.createRange();
-            range.selectNode(emailContainer);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            alert("Đã sao chép toàn bộ mẫu email báo cáo dịch vụ vào bộ nhớ tạm!");
-        }
+    tbody.innerHTML = trungbayData.map((item, index) => `
+        <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+            <td class="py-2.5 px-4 text-center">${item.submitted ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đã gửi</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Chưa gửi</span>'}</td>
+            <td class="py-2.5 px-4 text-center">${item.onTime ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700">Đúng hạn</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Trễ deadline</span>'}</td>
+            <td class="py-2.5 px-4 text-center">${item.passed ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đạt</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Chưa đạt</span>'}</td>
+            <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
+            <td class="py-2.5 px-4 text-center"><button onclick="deleteTrungBayRow(${index})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>`).join('');
 
-        // ================== TRƯNG BÀY CTKM ==================
-        function renderTrungBayTable() {
-            const tbody = document.getElementById('trungbayTableBody');
-            if (!tbody) return;
+    updateTrungBayAnalysisAndKPI();
+}
 
-            tbody.innerHTML = trungbayData.map((item, index) => {
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
-                        <td class="py-2.5 px-4 text-center">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đã gửi</span>
-                        </td>
-                        <td class="py-2.5 px-4 text-center">
-                            ${item.onTime
-                                ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700">Đúng hạn</span>'
-                                : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">Trễ deadline</span>'}
-                        </td>
-                        <td class="py-2.5 px-4 text-center">
-                            ${item.passed
-                                ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Đạt</span>'
-                                : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Chưa đạt</span>'}
-                        </td>
-                        <td class="py-2.5 px-4 text-slate-500">${item.note}</td>
-                        <td class="py-2.5 px-4 text-center">
-                            <button onclick="deleteTrungBayRow(${index})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+function updateTrungBayAnalysisAndKPI() {
+    const total = trungbayData.length;
+    const submitted = trungbayData.filter(d => d.submitted).length;
+    const onTimeList = trungbayData.filter(d => d.onTime);
+    const lateList = trungbayData.filter(d => !d.onTime);
+    const passedList = trungbayData.filter(d => d.passed);
+    const failList = trungbayData.filter(d => !d.passed);
 
-            updateTrungBayAnalysisAndKPI();
-        }
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    set('kpiTotalStores', total);
+    set('kpiSubmittedStores', submitted);
+    set('kpiSubmittedNote', `(${total > 0 ? Math.round(submitted/total*100) : 0}% ST gửi báo cáo)`);
+    set('kpiOnTimeStores', onTimeList.length);
+    set('kpiPassedStores', passedList.length);
+    set('kpiLateNote', lateList.length > 0 ? `(Còn ${lateList.length} ST trễ deadline)` : "(100% đúng deadline)");
+    set('kpiFailNote', failList.length > 0 ? `(Còn ${failList.length} ST chưa đạt)` : "(100% đạt chỉ thị)");
 
-        function updateTrungBayAnalysisAndKPI() {
-            const total = trungbayData.length;
-            const submitted = trungbayData.filter(d => d.submitted).length;
-            const onTimeList = trungbayData.filter(d => d.onTime);
-            const lateList = trungbayData.filter(d => !d.onTime);
-            const passedList = trungbayData.filter(d => d.passed);
-            const failList = trungbayData.filter(d => !d.passed);
+    const lateNames = lateList.map(s => s.name).join(', ');
+    const failNames = failList.map(s => s.name).join(' và ');
 
-            if (document.getElementById('kpiTotalStores')) document.getElementById('kpiTotalStores').innerText = total;
-            if (document.getElementById('kpiSubmittedStores')) document.getElementById('kpiSubmittedStores').innerText = submitted;
-            if (document.getElementById('kpiOnTimeStores')) document.getElementById('kpiOnTimeStores').innerText = onTimeList.length;
-            if (document.getElementById('kpiPassedStores')) document.getElementById('kpiPassedStores').innerText = passedList.length;
+    const lateTextEl = document.getElementById('reportLateText');
+    if (lateTextEl) {
+        lateTextEl.innerHTML = lateList.length > 0
+            ? `Vẫn còn <strong>${lateList.length}/${total}</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>${lateNames}</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.`
+            : `Tất cả <strong>${total}/${total}</strong> siêu thị đã hoàn thành gửi báo cáo trưng bày <strong>đúng deadline</strong> quy định.`;
+    }
 
-            if (document.getElementById('kpiLateNote')) document.getElementById('kpiLateNote').innerText = lateList.length > 0 ? `(Còn ${lateList.length} ST trễ deadline)` : "(100% đúng deadline)";
-            if (document.getElementById('kpiFailNote')) document.getElementById('kpiFailNote').innerText = failList.length > 0 ? `(Còn ${failList.length} ST chưa đạt)` : "(100% đạt chỉ thị)";
+    const passTextEl = document.getElementById('reportPassText');
+    if (passTextEl) {
+        passTextEl.innerHTML = failList.length > 0
+            ? `Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>${failList.length}/${total}</strong> siêu thị là <strong>${failNames}</strong> chưa đạt theo chỉ thị trưng bày.`
+            : `<strong>100%</strong> các siêu thị đã hoàn thành xuất sắc và đạt tiêu chuẩn chỉ thị trưng bày CTKM trong tháng.`;
+    }
 
-            const lateNames = lateList.map(s => s.name).join(', ');
-            const failNames = failList.map(s => s.name).join(' và ');
+    renderTrungBayChart();
+}
 
-            const lateTextEl = document.getElementById('reportLateText');
-            if (lateTextEl) {
-                lateTextEl.innerHTML = lateList.length > 0
-                    ? `Vẫn còn <strong>${lateList.length}/${total}</strong> siêu thị gửi báo cáo chưa đúng hạn (chưa đạt deadline) là <strong>${lateNames}</strong>. Đề nghị từ các lần triển khai tới, các siêu thị chú ý xem thông báo và gửi báo cáo đúng deadline theo quy định theo chỉ thị từ ngành hàng.`
-                    : `Tất cả <strong>${total}/${total}</strong> siêu thị đã hoàn thành gửi báo cáo trưng bày <strong>đúng deadline</strong> quy định.`;
-            }
+function addTrungBayRow() {
+    trungbayData.push({ name: "SKK Mới", submitted: true, onTime: true, passed: true, note: "Mới cập nhật" });
+    renderTrungBayTable();
+}
+function deleteTrungBayRow(index) { trungbayData.splice(index, 1); renderTrungBayTable(); }
 
-            const passTextEl = document.getElementById('reportPassText');
-            if (passTextEl) {
-                passTextEl.innerHTML = failList.length > 0
-                    ? `Hầu hết các siêu thị đã nghiêm túc thực hiện việc trưng bày, tuy nhiên vẫn còn <strong>${failList.length}/${total}</strong> siêu thị là <strong>${failNames}</strong> chưa đạt theo chỉ thị trưng bày.`
-                    : `<strong>100%</strong> các siêu thị đã hoàn thành xuất sắc và đạt tiêu chuẩn chỉ thị trưng bày CTKM trong tháng.`;
-            }
+function renderTrungBayChart() {
+    const ctx = document.getElementById('trungbayChart');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (chartTrungBayInstance) chartTrungBayInstance.destroy();
 
-            renderTrungBayChart();
-        }
+    const labels = trungbayData.map(d => d.name);
+    const scoreData = trungbayData.map(d => d.passed ? 4 : 3);
+    const deadlineData = trungbayData.map(d => d.onTime ? 1 : 0);
 
-        function addTrungBayRow() {
-            trungbayData.push({ name: "SKK Mới", submitted: true, onTime: true, passed: true, note: "Mới cập nhật" });
-            renderTrungBayTable();
-        }
+    chartTrungBayInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [
+            { label: 'Tổng Điểm Đạt', data: scoreData, backgroundColor: '#4F46E5', barThickness: 12 },
+            { label: 'Điểm Deadline', data: deadlineData, backgroundColor: '#38BDF8', barThickness: 12 }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false,
+            scales: { x: { ticks: { font: { size: 9 }, maxRotation: 45, minRotation: 45 } }, y: { beginAtZero: true, max: 5 } },
+            plugins: { legend: { display: false } } }
+    });
+}
 
-        function deleteTrungBayRow(index) {
-            trungbayData.splice(index, 1);
-            renderTrungBayTable();
-        }
+function copyTrungBayReport() {
+    const el = document.getElementById('trungbayReportPreview');
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        alert('Đã sao chép toàn bộ mẫu Báo Cáo Đánh Giá Trưng Bày CTKM!');
+    }).catch(() => alert('Không thể sao chép, vui lòng tô đen nội dung và bấm Ctrl+C.'));
+}
 
-        function renderTrungBayChart() {
-            const ctx = document.getElementById('trungbayChart');
-            if (!ctx || typeof Chart === 'undefined') return;
-
-            if (chartTrungBayInstance) chartTrungBayInstance.destroy();
-
-            const labels = trungbayData.map(d => d.name);
-            const scoreData = trungbayData.map(d => d.passed ? 4 : 3);
-            const deadlineData = trungbayData.map(d => d.onTime ? 1 : 0);
-
-            chartTrungBayInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Tổng Điểm Đạt',
-                            data: scoreData,
-                            backgroundColor: '#4F46E5',
-                            barThickness: 12
-                        },
-                        {
-                            label: 'Điểm Deadline',
-                            data: deadlineData,
-                            backgroundColor: '#38BDF8',
-                            barThickness: 12
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { font: { size: 9 }, rotation: 45 } },
-                        y: { beginAtZero: true, max: 5 }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function syncTrungBayData() {
-            const icon = document.getElementById('trungbaySyncIcon');
-            if (icon) icon.classList.add('fa-spin');
-            setTimeout(() => {
-                if (icon) icon.classList.remove('fa-spin');
-                const now = new Date();
-                const timeStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
-                if (document.getElementById('trungbayUpdateTime')) document.getElementById('trungbayUpdateTime').innerText = timeStr;
-                alert("Đã đồng bộ thành công dữ liệu Trưng Bày CTKM mới nhất từ Lark Base!");
-            }, 700);
-        }
-
-        function copyTrungBayReport() {
-            const reportElement = document.getElementById('trungbayReportPreview');
-            if (!reportElement) return;
-
-            const range = document.createRange();
-            range.selectNode(reportElement);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-
-            try {
-                document.execCommand('copy');
-                alert('Đã sao chép toàn bộ mẫu Báo Cáo Đánh Giá Trưng Bày CTKM!');
-            } catch (err) {
-                alert('Vui lòng tô đen nội dung và bấm Ctrl+C để chép.');
-            }
-            window.getSelection().removeAllRanges();
-        }
-
-        // ================== ĐIỀU HƯỚNG TAB ==================
-        function switchTab(targetId, event) {
-            if (event) event.preventDefault();
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('bg-sakuko-blue', 'text-white', 'shadow-md');
-                item.classList.add('text-slate-400');
-            });
-            const activeMenu = document.querySelector(`[data-target="${targetId}"]`);
-            if (activeMenu) {
-                activeMenu.classList.remove('text-slate-400');
-                activeMenu.classList.add('bg-sakuko-blue', 'text-white', 'shadow-md');
-            }
-            document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) targetSection.style.display = 'block';
-
-            // Vẽ lại biểu đồ Trưng Bày khi mở tab (đảm bảo canvas có kích thước đúng)
-            if (targetId === 'trungbay' && chartTrungBayInstance) {
-                chartTrungBayInstance.resize();
-            }
-        }
-
-        // ================== KHỞI TẠO KHI LOAD TRANG ==================
-        window.onload = function() {
-            initFullYearChart();
-            renderTable();
-            initServiceCharts();
-            renderServiceTable();
-            renderTrungBayTable();
-        };
-    </script>
+/* ============================== KHỞI TẠO KHI TẢI TRANG ============================== */
+document.addEventListener('DOMContentLoaded', function () {
+    initFullYearChart();
+    fetchLarkData();      // tự động kéo dữ liệu đổi trả thật từ Lark Base
+    syncServiceData();    // tự động kéo dữ liệu dịch vụ thật từ Lark Base
+    syncTrungBayData();   // tự động kéo dữ liệu trưng bày thật từ Lark Base (nếu backend đã có route)
+});
+</script>
 </body>
 </html>
