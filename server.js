@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
+const axios = require('axios'); // Thêm axios để gọi API Lark Base
 
 const db = require('./db');
 const { extractText } = require('./parsers');
@@ -22,6 +23,69 @@ app.get('/', (req, res) => {
 });
 const UPLOAD_ROOT = path.join(__dirname, '..', 'data', 'uploads');
 const REPORT_ROOT = path.join(__dirname, '..', 'data', 'reports');
+
+// ---- API LARK BASE: ĐỒNG BỘ DỮ LIỆU ĐỔI TRẢ (TỰ ĐỘNG LẶP PAGINATION HAS_MORE) ----
+app.get('/api/lark-base/doitra', async (req, res) => {
+  try {
+    const APP_TOKEN = process.env.LARK_APP_TOKEN || 'GRYXw76EQicmWTkCt2FldAdmgQe';
+    const TABLE_ID = process.env.LARK_TABLE_ID || 'tblLWHnMB0T58jor';
+    const APP_ID = process.env.LARK_APP_ID;
+    const APP_SECRET = process.env.LARK_APP_SECRET;
+
+    let headers = {};
+
+    // 1. Lấy tenant_access_token nếu có cấu hình APP_ID & APP_SECRET
+    if (APP_ID && APP_SECRET) {
+      const authRes = await axios.post('https://open.larksuite.com/open-apis/auth/v3/tenant_access_token/internal', {
+        "app_id": APP_ID,
+        "app_secret": APP_SECRET
+      });
+      const token = authRes.data?.tenant_access_token;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    let allItems = [];
+    let hasMore = true;
+    let pageToken = '';
+
+    console.log('[Lark Base] Bắt đầu đồng bộ dữ liệu...');
+
+    // 2. Vòng lặp kéo sạch dữ liệu qua từng trang page_token cho tới khi hasMore = false
+    while (hasMore) {
+      let url = `https://open.larksuite.com/open-apis/bitable/v1/apps/${APP_TOKEN}/tables/${TABLE_ID}/records?page_size=500`;
+      if (pageToken) {
+        url += `&page_token=${pageToken}`;
+      }
+
+      const response = await axios.get(url, { headers });
+      const data = response.data?.data;
+
+      if (data && data.items) {
+        allItems = allItems.concat(data.items);
+      }
+
+      hasMore = data?.has_more || false;
+      pageToken = data?.page_token || '';
+    }
+
+    console.log(`[Lark Base] Đã tải thành công tổng cộng ${allItems.length} bản ghi.`);
+
+    res.json({
+      code: 0,
+      msg: "success",
+      data: {
+        total: allItems.length,
+        items: allItems
+      }
+    });
+
+  } catch (e) {
+    console.error('[Lark Base Error]', e.message);
+    res.status(500).json({ error: 'Lỗi đồng bộ dữ liệu Lark Base', details: e.message });
+  }
+});
 
 // ---- 1. Upload dữ liệu thô của 1 tháng (nhiều file, nhiều định dạng) ----
 const upload = multer({ dest: path.join(__dirname, '..', 'data', 'tmp') });
