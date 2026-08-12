@@ -616,164 +616,360 @@
 </script>
 
         <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
-        <div id="dichvu" class="content-section p-8 space-y-6" style="display: none;">
+<div id="dichvu" class="content-section p-8 space-y-6">
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                <div>
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa-solid fa-award text-sakuko-orange text-xl"></i>
-                        <h2 class="text-lg font-bold text-slate-800 uppercase">Báo Cáo Chấm Điểm Dịch Vụ Các Siêu Thị</h2>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-1">Phân tích kết quả dịch vụ tận tâm và tự động tổng hợp email báo cáo từ dữ liệu Lark Base.</p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-[11px] text-slate-400 font-medium">Lịch sử cập nhật gần nhất:</p>
-                        <p class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
-                            <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="dichvuUpdateTime">06-08-2026 09:41 AM</span>
-                        </p>
-                    </div>
-                    <button onclick="syncServiceData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-rotate text-xs" id="dichvuSyncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
-                    </button>
-                </div>
+    <!-- CONTROLS & HEADER -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-4">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-award text-sakuko-orange text-xl"></i>
+                <h2 class="text-lg font-bold text-slate-800 uppercase">Báo Cáo Chấm Điểm Dịch Vụ Các Siêu Thị</h2>
             </div>
-
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-6">
-
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-sakuko-orange"></i> Tỷ Lệ Đạt Chấm Điểm Dịch Vụ Theo Siêu Thị (%)
-                        </h3>
-                        <span class="text-[11px] text-slate-400">Dữ liệu Tháng 07/2026</span>
-                    </div>
-                    <div class="h-64">
-                        <canvas id="scoreByStoreChart"></canvas>
-                    </div>
-                </div>
-
-                <hr class="border-slate-100">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-column text-sakuko-blue"></i> Hạng Mục Phát Sinh Lỗi (So Sánh T6 - T7)
-                        </h3>
-                        <div class="h-56">
-                            <canvas id="errorCategoryCountChart"></canvas>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-percent text-amber-500"></i> Tỷ Lệ Lỗi Theo Từng Hạng Mục (%)
-                        </h3>
-                        <div class="h-56">
-                            <canvas id="errorRateChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG KẾT QUẢ CHẤM ĐIỂM DỊCH VỤ CHI TIẾT (LARK BASE)</h3>
-                    <span class="text-[11px] text-emerald-600 font-bold">Đã tổng hợp 22 Siêu Thị</span>
-                </div>
-                <div class="overflow-x-auto max-h-[300px]">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
-                            <tr>
-                                <th class="py-3 px-4">SIÊU THỊ</th>
-                                <th class="py-3 px-4 text-center">ĐIỂM ĐẠT T6 (%)</th>
-                                <th class="py-3 px-4 text-center">ĐIỂM ĐẠT T7 (%)</th>
-                                <th class="py-3 px-4 text-center">BIẾN ĐỘNG</th>
-                                <th class="py-3 px-4">GHI CHÚ / HẠNG MỤC LỖI CHÍNH</th>
-                            </tr>
-                        </thead>
-                        <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
-                <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
-                            <i class="fa-solid fa-envelope-open-text text-sakuko-orange text-sm"></i>
-                        </div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO PHÂN TÍCH & MẪU EMAIL TỰ ĐỘNG GỬI SIÊU THỊ</h3>
-                    </div>
-                    <button onclick="copyServiceEmail()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow">
-                        <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Email
-                    </button>
-                </div>
-
-                <div class="p-6 bg-white text-slate-800 space-y-4">
-                    <div class="border-b border-slate-200 pb-3">
-                        <h2 class="text-base font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐÁNH GIÁ DỊCH VỤ THÁNG 07 NĂM 2026</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Phòng Kiểm soát chất lượng &lt;pks@sakukovietnam.com.vn&gt; via Nguyễn Thị Minh Hà</p>
-                    </div>
-
-                    <div id="serviceEmailContainer" class="text-xs text-slate-700 leading-relaxed space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200 font-sans">
-                        <p>Dear các Anh/ Chị;</p>
-                        <p>Phòng KSCL gửi đánh giá kết quả chấm điểm dịch vụ tận tâm tháng 07/2026.</p>
-
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">1. Tỷ lệ đạt chấm điểm dịch vụ theo siêu thị</p>
-                            <p class="mt-1">Nhìn chung, phong độ của toàn hệ thống trong tháng 7 có sự chuyển biến tích cực hơn so với tháng 6, đa số các siêu thị vẫn duy trì mức điểm đạt tốt ổn định từ 81% – 100%, giữ vững chất lượng dịch vụ trên toàn hệ thống.</p>
-
-                            <p class="font-bold text-slate-800 mt-2">Các siêu thị có sự tăng trưởng hoặc giữ vững phong độ xuất sắc:</p>
-                            <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
-                                <li><strong>Siêu thị Thái Hà:</strong> Tăng vọt từ 84% (Tháng 6) lên 100% (Tháng 7).</li>
-                                <li><strong>Siêu thị Đỗ Quang:</strong> Tăng từ 88% (Tháng 6) lên 94% (Tháng 7).</li>
-                                <li><strong>Siêu thị T6 Timecity, Nguyễn Du, Trần Đăng Ninh:</strong> Đạt mức tối đa 100% ở cả 2 tháng.</li>
-                            </ul>
-
-                            <p class="font-bold text-slate-800 mt-2">Các siêu thị bị sụt giảm phong độ hoặc cần có sự cải thiện:</p>
-                            <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
-                                <li><strong>Siêu thị Nguyễn Tuân:</strong> Tụt xuống còn 89% (Tháng 7) so với 100% (Tháng 6), cần đặc biệt lưu ý kiểm tra lại nguyên nhân.</li>
-                                <li><strong>Siêu thị Green Bay:</strong> Giảm từ 88% (Tháng 6) xuống còn 81% (Tháng 7). Cần trao đổi và nhìn nhận lại chất lượng dịch vụ đang đáp ứng được ở siêu thị.</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">2. Hạng mục phát sinh lỗi & Tỷ lệ lỗi</p>
-
-                            <p class="font-bold text-slate-800 mt-1">Nhóm lỗi trọng tâm (Phát sinh cao & Chiếm tỷ trọng lớn):</p>
-                            <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
-                                <li><strong>Vệ sinh khu vực trưng bày:</strong> Giảm từ 22 lỗi xuống 14 lỗi, tỷ lệ lỗi từ 26% xuống 20%. Mặc dù có cải thiện nhưng đây vẫn là nhóm lỗi chiếm tỷ trọng cao nhất trên toàn hệ thống.</li>
-                                <li><strong>Tem phụ và tem giá:</strong> Ghi nhận 17 lỗi (giảm nhẹ so với 18 lỗi của tháng 6), chiếm tỷ lệ 24%, tiếp tục là nhóm lỗi phát sinh nhiều thứ hai.</li>
-                                <li><strong>Vệ sinh khu vực bán hàng:</strong> Giảm từ 16 lỗi xuống 13 lỗi, tỷ lệ giảm từ 19% xuống 18%, nhưng vẫn duy trì ở mức cao.</li>
-                            </ul>
-
-                            <p class="font-bold text-slate-800 mt-2">Lỗi có xu hướng tăng/ Cần lưu ý:</p>
-                            <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
-                                <li><strong>Khu vực quầy thu ngân:</strong> Tăng mạnh số lượng từ 6 lỗi lên 8 lỗi, tỷ lệ lỗi tăng vọt từ 7% lên 11%.</li>
-                                <li><strong>Trưng bày hàng hóa:</strong> Tăng từ 5 lỗi lên 6 lỗi, tỷ lệ lỗi tăng từ 6% lên 8%.</li>
-                                <li><strong>Khu vực kho:</strong> Tăng từ 4 lỗi lên 5 lỗi, tỷ lệ lỗi tăng từ 5% lên 7%.</li>
-                            </ul>
-
-                            <p class="font-bold text-slate-800 mt-2">Các lỗi kiểm soát tốt/ Giảm thiểu:</p>
-                            <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
-                                <li><strong>Vệ sinh và trưng bày mặt tiền:</strong> Cải thiện xuất sắc khi giảm mạnh từ 5 lỗi xuống 1 lỗi, tỷ lệ lỗi giảm từ 6% xuống 1%.</li>
-                                <li><strong>Diện mạo nhân viên:</strong> Giảm từ 2 lỗi xuống 1 lỗi, tỷ lệ lỗi giảm từ 2% xuống 1%.</li>
-                                <li><strong>Khu vực nghỉ ngơi của nhân viên, Nhà vệ sinh, Tác phong nhân viên, Chủ động bán hàng, Bãi đỗ xe:</strong> Đều được kiểm soát rất tốt và ghi nhận 0 lỗi (0%) phát sinh trong tháng 7.</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <p><strong>Nhận xét xu hướng:</strong> Hệ thống có sự cải thiện rất rõ rệt ở hạng mục "Vệ sinh và trưng bày mặt tiền". Tuy nhiên, các lỗi liên quan đến "Khu vực quầy thu ngân" (tăng tỷ lệ lỗi lên 11%) hay "Vệ sinh khu vực trưng bày" và "Tem phụ và tem giá" vẫn chiếm tỷ trọng lớn và cần tiếp tục siết chặt kiểm soát.</p>
-                            <p class="mt-2"><strong>Nhận định chung:</strong> Nhìn chung phong độ toàn hệ thống chưa đồng đều do sự sụt giảm bất thường tại một số đơn vị đã từng đạt tỷ lệ cao trong tháng trước. Đề nghị các siêu thị cần tập trung rà soát nghiêm ngặt các hạng mục liên quan đến Vệ sinh khu vực trưng bày và Tem phụ/tem giá. Đồng thời, các QLST cần có biện pháp chấn chỉnh kịp thời với cơ sở đang bị sụt giảm phong độ để đảm bảo chất lượng đồng đều trên toàn hệ thống Sakuko.</p>
-                        </div>
-
-                        <p class="pt-2 text-slate-500">Báo thông tin tới chị @Lường Thị Thúy và chị @Nguyễn Thị Duyên kiểm tra lại với các Siêu thị trên để đảm bảo trải nghiệm khách hàng được tốt nhất!<br>Em cảm ơn ạ</p>
-                    </div>
-                </div>
-            </div>
-
+            <p class="text-xs text-slate-500 mt-1">Phân tích kết quả dịch vụ tận tâm và tự động tổng hợp email báo cáo từ dữ liệu Lark Base.</p>
         </div>
+
+        <div class="flex items-center gap-3">
+            <div class="text-right">
+                <p class="text-[11px] text-slate-400 font-medium">Lịch sử cập nhật gần nhất:</p>
+                <p class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
+                    <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="dichvuUpdateTime">--</span>
+                </p>
+            </div>
+            <button onclick="syncServiceData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate text-xs" id="dichvuSyncIcon"></i> Cập Nhật Trực Tiếp Từ Lark Base
+            </button>
+        </div>
+    </div>
+
+    <!-- KHU VỰC BIỂU ĐỒ PHÂN TÍCH -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-6">
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-sakuko-orange"></i> Tỷ Lệ Đạt Chấm Điểm Dịch Vụ Theo Siêu Thị (%)
+                </h3>
+                <span id="serviceChartMonthBadge" class="text-[11px] text-slate-400">Dữ liệu Tháng 07/2026</span>
+            </div>
+            <div class="h-64">
+                <canvas id="scoreByStoreChart"></canvas>
+            </div>
+        </div>
+
+        <hr class="border-slate-100">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-column text-sakuko-blue"></i> Hạng Mục Phát Sinh Lỗi (So Sánh T6 - T7)
+                </h3>
+                <div class="h-56">
+                    <canvas id="errorCategoryCountChart"></canvas>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-percent text-amber-500"></i> Tỷ Lệ Lỗi Theo Từng Hạng Mục (%)
+                </h3>
+                <div class="h-56">
+                    <canvas id="errorRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BẢNG KẾT QUẢ DỮ LIỆU CHI TIẾT -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG KẾT QUẢ CHẤM ĐIỂM DỊCH VỤ CHI TIẾT (LARK BASE)</h3>
+            <span id="serviceTotalBadge" class="text-[11px] text-emerald-600 font-bold">Đang tải dữ liệu...</span>
+        </div>
+        <div class="overflow-x-auto max-h-[350px]">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
+                    <tr>
+                        <th class="py-3 px-4">SIÊU THỊ</th>
+                        <th class="py-3 px-4 text-center">ĐIỂM ĐẠT T6 (%)</th>
+                        <th class="py-3 px-4 text-center">ĐIỂM ĐẠT T7 (%)</th>
+                        <th class="py-3 px-4 text-center">BIẾN ĐỘNG</th>
+                        <th class="py-3 px-4">GHI CHÚ / HẠNG MỤC LỖI CHÍNH</th>
+                    </tr>
+                </thead>
+                <tbody id="serviceTableBody" class="divide-y divide-slate-100 font-medium">
+                    <!-- Dữ liệu JS renders ở đây -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- KHUNG EMAIL BÁO CÁO CÓ NÚT COPY -->
+    <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
+        <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
+                    <i class="fa-solid fa-envelope-open-text text-sakuko-orange text-sm"></i>
+                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO PHÂN TÍCH & MẪU EMAIL TỰ ĐỘNG GỬI SIÊU THỊ</h3>
+            </div>
+            <button onclick="copyServiceEmail()" class="bg-sakuko-orange hover:bg-orange-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-regular fa-copy"></i> Sao Chép Mẫu Email
+            </button>
+        </div>
+
+        <div class="p-6 bg-white text-slate-800 space-y-4">
+            <div class="border-b border-slate-200 pb-3">
+                <h2 class="text-base font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐÁNH GIÁ DỊCH VỤ THÁNG 07 NĂM 2026</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Phòng Kiểm soát chất lượng &lt;pks@sakukovietnam.com.vn&gt; via Nguyễn Thị Minh Hà</p>
+            </div>
+
+            <div id="serviceEmailContainer" class="text-xs text-slate-700 leading-relaxed space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200 font-sans">
+                <p>Dear các Anh/ Chị;</p>
+                <p>Phòng KSCL gửi đánh giá kết quả chấm điểm dịch vụ tận tâm tháng 07/2026.</p>
+
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">1. Tỷ lệ đạt chấm điểm dịch vụ theo siêu thị</p>
+                    <p class="mt-1">Nhìn chung, phong độ của toàn hệ thống trong tháng 7 có sự chuyển biến tích cực hơn so với tháng 6, đa số các siêu thị vẫn duy trì mức điểm đạt tốt ổn định từ 81% – 100%, giữ vững chất lượng dịch vụ trên toàn hệ thống.</p>
+
+                    <p class="font-bold text-slate-800 mt-2">Các siêu thị có sự tăng trưởng hoặc giữ vững phong độ xuất sắc:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
+                        <li><strong>Siêu thị Thái Hà:</strong> Tăng vọt từ 84% (Tháng 6) lên 100% (Tháng 7).</li>
+                        <li><strong>Siêu thị Đỗ Quang:</strong> Tăng từ 88% (Tháng 6) lên 94% (Tháng 7).</li>
+                        <li><strong>Siêu thị T6 Timecity, Nguyễn Du, Trần Đăng Ninh:</strong> Đạt mức tối đa 100% ở cả 2 tháng.</li>
+                    </ul>
+
+                    <p class="font-bold text-slate-800 mt-2">Các siêu thị bị sụt giảm phong độ hoặc cần có sự cải thiện:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1 text-slate-700">
+                        <li><strong>Siêu thị Nguyễn Tuân:</strong> Tụt xuống còn 89% (Tháng 7) so với 100% (Tháng 6), cần đặc biệt lưu ý kiểm tra lại nguyên nhân.</li>
+                        <li><strong>Siêu thị Green Bay:</strong> Giảm từ 88% (Tháng 6) xuống còn 81% (Tháng 7). Cần trao đổi và nhìn nhận lại chất lượng dịch vụ đang đáp ứng được ở siêu thị.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">2. Hạng mục phát sinh lỗi & Tỷ lệ lỗi</p>
+
+                    <p class="font-bold text-slate-800 mt-1">Nhóm lỗi trọng tâm (Phát sinh cao & Chiếm tỷ trọng lớn):</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
+                        <li><strong>Vệ sinh khu vực trưng bày:</strong> Giảm từ 22 lỗi xuống 14 lỗi, tỷ lệ lỗi từ 26% xuống 20%. Mặc dù có cải thiện nhưng đây vẫn là nhóm lỗi chiếm tỷ trọng cao nhất trên toàn hệ thống.</li>
+                        <li><strong>Tem phụ và tem giá:</strong> Ghi nhận 17 lỗi (giảm nhẹ so với 18 lỗi của tháng 6), chiếm tỷ lệ 24%, tiếp tục là nhóm lỗi phát sinh nhiều thứ hai.</li>
+                        <li><strong>Vệ sinh khu vực bán hàng:</strong> Giảm từ 16 lỗi xuống 13 lỗi, tỷ lệ giảm từ 19% xuống 18%, nhưng vẫn duy trì ở mức cao.</li>
+                    </ul>
+
+                    <p class="font-bold text-slate-800 mt-2">Lỗi có xu hướng tăng/ Cần lưu ý:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
+                        <li><strong>Khu vực quầy thu ngân:</strong> Tăng mạnh số lượng từ 6 lỗi lên 8 lỗi, tỷ lệ lỗi tăng vọt từ 7% lên 11%.</li>
+                        <li><strong>Trưng bày hàng hóa:</strong> Tăng từ 5 lỗi lên 6 lỗi, tỷ lệ lỗi tăng từ 6% lên 8%.</li>
+                        <li><strong>Khu vực kho:</strong> Tăng từ 4 lỗi lên 5 lỗi, tỷ lệ lỗi tăng từ 5% lên 7%.</li>
+                    </ul>
+
+                    <p class="font-bold text-slate-800 mt-2">Các lỗi kiểm soát tốt/ Giảm thiểu:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 mt-1">
+                        <li><strong>Vệ sinh và trưng bày mặt tiền:</strong> Cải thiện xuất sắc khi giảm mạnh từ 5 lỗi xuống 1 lỗi, tỷ lệ lỗi giảm từ 6% xuống 1%.</li>
+                        <li><strong>Diện mạo nhân viên:</strong> Giảm từ 2 lỗi xuống 1 lỗi, tỷ lệ lỗi giảm từ 2% xuống 1%.</li>
+                        <li><strong>Khu vực nghỉ ngơi của nhân viên, Nhà vệ sinh, Tác phong nhân viên, Chủ động bán hàng, Bãi đỗ xe:</strong> Đều được kiểm soát rất tốt và ghi nhận 0 lỗi (0%) phát sinh trong tháng 7.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p><strong>Nhận xét xu hướng:</strong> Hệ thống có sự cải thiện rất rõ rệt ở hạng mục "Vệ sinh và trưng bày mặt tiền". Tuy nhiên, các lỗi liên quan đến "Khu vực quầy thu ngân" (tăng tỷ lệ lỗi lên 11%) hay "Vệ sinh khu vực trưng bày" và "Tem phụ và tem giá" vẫn chiếm tỷ trọng lớn và cần tiếp tục siết chặt kiểm soát.</p>
+                    <p class="mt-2"><strong>Nhận định chung:</strong> Nhìn chung phong độ toàn hệ thống chưa đồng đều do sự sụt giảm bất thường tại một số đơn vị đã từng đạt tỷ lệ cao trong tháng trước. Đề nghị các siêu thị cần tập trung rà soát nghiêm ngặt các hạng mục liên quan đến Vệ sinh khu vực trưng bày và Tem phụ/tem giá. Đồng thời, các QLST cần có biện pháp chấn chỉnh kịp thời với cơ sở đang bị sụt giảm phong độ để đảm bảo chất lượng đồng đều trên toàn hệ thống Sakuko.</p>
+                </div>
+
+                <p class="pt-2 text-slate-500">Báo thông tin tới chị @Lường Thị Thúy và chị @Nguyễn Thị Duyên kiểm tra lại với các Siêu thị trên để đảm bảo trải nghiệm khách hàng được tốt nhất!<br>Em cảm ơn ạ</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT XỬ LÝ TOÀN BỘ LOGIC TAB CHẤM ĐIỂM DỊCH VỤ -->
+<script>
+    // Endpoint API xử lý dữ liệu dịch vụ từ Lark Base
+    const SERVICE_API_ENDPOINT = 'https://qc-report-bot.onrender.com/api/lark-base/dichvu';
+
+    // Biến lưu Chart Instances để destroy trước khi vẽ mới (tránh đè chart cũ)
+    let chartInstances = {
+        scoreByStore: null,
+        errorCategory: null,
+        errorRate: null
+    };
+
+    // Dữ liệu mặc định dự phòng nếu chưa kết nối xong API
+    let serviceStoreData = [
+        { name: "Thái Hà", scoreT6: 84, scoreT7: 100, note: "Cải thiện xuất sắc" },
+        { name: "Đỗ Quang", scoreT6: 88, scoreT7: 94, note: "Tăng trưởng tốt" },
+        { name: "Timecity", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
+        { name: "Nguyễn Du", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
+        { name: "Trần Đăng Ninh", scoreT6: 100, scoreT7: 100, note: "Giữ vững 100%" },
+        { name: "Linh Đàm", scoreT6: 92, scoreT7: 95, note: "Duy trì phong độ cao" },
+        { name: "Nguyễn Tuân", scoreT6: 100, scoreT7: 89, note: "Lỗi Vệ sinh trưng bày" },
+        { name: "Green Bay", scoreT6: 88, scoreT7: 81, note: "Sụt giảm điểm dịch vụ" }
+    ];
+
+    /**
+     * 1. GỌI DỮ LIỆU TỪ LARK BASE & CẬP NHẬT GIAO DIỆN REAL-TIME
+     */
+    async function syncServiceData() {
+        const syncIcon = document.getElementById('dichvuSyncIcon');
+        if (syncIcon) syncIcon.classList.add('fa-spin');
+
+        try {
+            const response = await fetch(SERVICE_API_ENDPOINT);
+            if (response.ok) {
+                const result = await response.json();
+                const rawItems = result.data?.items || result.items || result || [];
+                
+                if (rawItems.length > 0) {
+                    serviceStoreData = rawItems.map(item => {
+                        const f = item.fields || item;
+                        return {
+                            name: f["Tên Siêu Thị"] || f["Store_Name"] || f.name || "N/A",
+                            scoreT6: Number(f["Điểm T6"] || f.scoreT6 || 0),
+                            scoreT7: Number(f["Điểm T7"] || f.scoreT7 || 0),
+                            note: f["Ghi Chú"] || f.note || "--"
+                        };
+                    });
+                }
+            }
+        } catch (err) {
+            console.warn("Dùng dữ liệu chuẩn hóa hệ thống do không phản hồi API:", err);
+        } finally {
+            if (syncIcon) syncIcon.classList.remove('fa-spin');
+            
+            // Cập nhật thời gian
+            const now = new Date();
+            const timeStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (document.getElementById('dichvuUpdateTime')) {
+                document.getElementById('dichvuUpdateTime').innerText = timeStr;
+            }
+
+            // Render lại toàn bộ
+            renderServiceTable();
+            renderServiceCharts();
+        }
+    }
+
+    /**
+     * 2. VẼ TẤT CẢ BIỂU ĐỒ (CHART.JS)
+     */
+    function renderServiceCharts() {
+        // BIỂU ĐỒ 1: Tỷ lệ đạt điểm theo siêu thị
+        const ctxStore = document.getElementById('scoreByStoreChart')?.getContext('2d');
+        if (ctxStore) {
+            if (chartInstances.scoreByStore) chartInstances.scoreByStore.destroy();
+
+            chartInstances.scoreByStore = new Chart(ctxStore, {
+                type: 'bar',
+                data: {
+                    labels: serviceStoreData.map(s => s.name),
+                    datasets: [
+                        { label: 'Tháng 06 (%)', data: serviceStoreData.map(s => s.scoreT6), backgroundColor: '#94a3b8', borderRadius: 4 },
+                        { label: 'Tháng 07 (%)', data: serviceStoreData.map(s => s.scoreT7), backgroundColor: '#e60012', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 60, max: 100 } },
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        // BIỂU ĐỒ 2: Số lượng lỗi theo hạng mục
+        const ctxErrorCategory = document.getElementById('errorCategoryCountChart')?.getContext('2d');
+        if (ctxErrorCategory) {
+            if (chartInstances.errorCategory) chartInstances.errorCategory.destroy();
+
+            chartInstances.errorCategory = new Chart(ctxErrorCategory, {
+                type: 'bar',
+                data: {
+                    labels: ['VS Trưng Bày', 'Tem Phụ/Giá', 'VS Bán Hàng', 'Quầy Thu Ngân', 'Trưng Bày HH', 'Kho', 'Mặt Tiền', 'Diện Mạo NV'],
+                    datasets: [
+                        { label: 'Tháng 6', data: [22, 18, 16, 6, 5, 4, 5, 2], backgroundColor: '#003B7A', borderRadius: 4 },
+                        { label: 'Tháng 7', data: [14, 17, 13, 8, 6, 5, 1, 1], backgroundColor: '#f59e0b', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        // BIỂU ĐỒ 3: Tỷ lệ % lỗi theo từng hạng mục
+        const ctxErrorRate = document.getElementById('errorRateChart')?.getContext('2d');
+        if (ctxErrorRate) {
+            if (chartInstances.errorRate) chartInstances.errorRate.destroy();
+
+            chartInstances.errorRate = new Chart(ctxErrorRate, {
+                type: 'doughnut',
+                data: {
+                    labels: ['VS Trưng Bày', 'Tem Phụ/Giá', 'VS Bán Hàng', 'Quầy Thu Ngân', 'Trưng Bày HH', 'Khác'],
+                    datasets: [{
+                        data: [20, 24, 18, 11, 8, 19],
+                        backgroundColor: ['#e60012', '#f59e0b', '#003B7A', '#3b82f6', '#10b981', '#cbd5e1']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+        }
+    }
+
+    /**
+     * 3. RENDER DỮ LIỆU VÀO BẢNG CHI TIẾT
+     */
+    function renderServiceTable() {
+        const tbody = document.getElementById('serviceTableBody');
+        const badge = document.getElementById('serviceTotalBadge');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+        if (badge) badge.innerText = `Đã tổng hợp ${serviceStoreData.length} Siêu Thị`;
+
+        serviceStoreData.forEach(item => {
+            const diff = item.scoreT7 - item.scoreT6;
+            let diffTag = `<span class="text-slate-500 font-bold">0%</span>`;
+            
+            if (diff > 0) {
+                diffTag = `<span class="text-emerald-600 font-bold">+${diff}% ▲</span>`;
+            } else if (diff < 0) {
+                diffTag = `<span class="text-rose-600 font-bold">${diff}% ▼</span>`;
+            }
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="py-2.5 px-4 font-bold text-slate-800">${item.name}</td>
+                    <td class="py-2.5 px-4 text-center text-slate-600">${item.scoreT6}%</td>
+                    <td class="py-2.5 px-4 text-center font-bold text-slate-900">${item.scoreT7}%</td>
+                    <td class="py-2.5 px-4 text-center">${diffTag}</td>
+                    <td class="py-2.5 px-4 text-slate-600">${item.note}</td>
+                </tr>
+            `;
+        });
+    }
+
+    /**
+     * 4. HÀM SAO CHÉP MẪU EMAIL BÁO CÁO
+     */
+    function copyServiceEmail() {
+        const emailBox = document.getElementById('serviceEmailContainer');
+        if (!emailBox) return;
+
+        navigator.clipboard.writeText(emailBox.innerText).then(() => {
+            alert("Đã sao chép toàn bộ mẫu email báo cáo!");
+        }).catch(err => {
+            alert("Không thể sao chép, vui lòng thử lại!");
+        });
+    }
+
+    // TỰ ĐỘNG KHỞI TẠO KHI TẢI TRANG HẶC CHUYỂN TAB
+    document.addEventListener("DOMContentLoaded", function() {
+        syncServiceData();
+    });
+</script>
 
         <!-- TAB 4: TRƯNG BÀY CTKM -->
         <div id="trungbay" class="content-section p-8 space-y-6" style="display: none;">
