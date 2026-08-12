@@ -174,7 +174,7 @@
             </div>
         </div>
 
-    <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (CÓ BẢNG DỮ LIỆU CHI TIẾT) -->
+   <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (TÍCH HỢP FORM NHẬP LIỆU & BẢNG DỮ LIỆU) -->
 <!-- ========================================== -->
 <div id="doitra" class="content-section p-8 space-y-6">
 
@@ -186,7 +186,7 @@
                 <h2 class="text-lg font-bold text-slate-800">Quản Lý & Phân Tích Báo Cáo Đổi Trả</h2>
             </div>
             <p class="text-xs text-slate-500 mt-1">
-                Dữ liệu đồng bộ trực tiếp từ Lark Base (BÁO CÁO ĐỔI TRẢ 2026).
+                Nhập liệu thủ công hoặc Đồng bộ tự động từ Lark Base.
             </p>
         </div>
         <div class="flex items-center gap-3">
@@ -202,6 +202,53 @@
         </div>
     </div>
 
+    <!-- FORM NHẬP LIỆU ĐƠN ĐỔI TRẢ MỚI -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <div class="w-7 h-7 rounded-lg bg-orange-100 text-sakuko-orange flex items-center justify-center font-bold">
+                <i class="fa-solid fa-pen-to-square text-sm"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 uppercase">Nhập Liệu Đơn Đổi Trả Mới</h3>
+        </div>
+
+        <form id="formNhapDoiTra" onsubmit="handleAddNewRecord(event)" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Ngày Phát Sinh <span class="text-rose-500">*</span></label>
+                <input type="date" id="inputDate" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sakuko-orange focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Siêu Thị / Chi Nhánh <span class="text-rose-500">*</span></label>
+                <input type="text" id="inputStore" required placeholder="VD: SKK Nguyễn Tuân, SKK Linh Đàm..." class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sakuko-orange focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mã Đơn / Hóa Đơn <span class="text-rose-500">*</span></label>
+                <input type="text" id="inputCode" required placeholder="VD: HD123456" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sakuko-orange focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Trạng Thái <span class="text-rose-500">*</span></label>
+                <select id="inputStatus" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sakuko-orange focus:outline-none">
+                    <option value="Đã xử lý">Đã xử lý</option>
+                    <option value="Đang chờ">Đang chờ</option>
+                    <option value="Tự chối">Từ chối</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-3 lg:col-span-3">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Lý Do Đổi Trả / Nguyên Nhân <span class="text-rose-500">*</span></label>
+                <input type="text" id="inputReason" required placeholder="VD: Khách đổi size, sản phẩm lỗi bao bì..." class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sakuko-orange focus:outline-none">
+            </div>
+
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-sakuko-orange hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-xs shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Thêm Dữ Liệu
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- BIỂU ĐỒ 12 THÁNG NĂM 2026 -->
     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
         <div class="flex justify-between items-center mb-4">
@@ -209,28 +256,28 @@
                 <i class="fa-solid fa-chart-column text-sakuko-orange"></i> Biểu Đồ Giao Dịch Đổi Hàng Toàn Hệ Thống (12 Tháng Năm <span id="chartYearLabel">2026</span>)
             </h4>
             <span class="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
-                ● Tự động đồng bộ từ Lark Base
+                ● Tự động đồng bộ & Cập nhật
             </span>
         </div>
         <div class="h-64"><canvas id="fullYearChart"></canvas></div>
         <p id="chartDataStatus" class="text-[11px] text-slate-400 mt-2"></p>
     </div>
 
-    <!-- KHUNG BÁO CÁO CÓ BỘ LỌC THÁNG & NÚT TÌM KIẾM -->
+    <!-- BÁO CÁO KẾT QUẢ VÀ BỘ LỌC -->
     <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
         <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-lg bg-sakuko-orange/20 border border-sakuko-orange/40 flex items-center justify-center">
                     <i class="fa-solid fa-shield-halved text-sakuko-orange text-sm"></i>
                 </div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH</h3>
             </div>
 
             <!-- BỘ LỌC + NÚT TÌM KIẾM -->
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <i class="fa-regular fa-calendar-days text-sakuko-orange text-xs"></i>
-                    <span class="text-xs font-semibold text-slate-300">Chọn thời gian:</span>
+                    <span class="text-xs font-semibold text-slate-300">Thời gian:</span>
                     <select id="selectMonth" class="bg-slate-900 text-white text-xs font-bold py-1 px-2 rounded border border-slate-600 focus:outline-none focus:border-sakuko-orange cursor-pointer">
                         <option value="1">Tháng 01</option>
                         <option value="2">Tháng 02</option>
@@ -251,7 +298,7 @@
                     </select>
 
                     <button onclick="onSearchClick()" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1 shadow">
-                        <i class="fa-solid fa-magnifying-glass"></i> Tìm / Lọc Dữ Liệu
+                        <i class="fa-solid fa-magnifying-glass"></i> Lọc Dữ Liệu
                     </button>
                 </div>
 
@@ -262,21 +309,17 @@
         </div>
 
         <div id="reportContainer" class="p-6 bg-white text-slate-800 space-y-5">
-
-            <!-- TRẠNG THÁI CHƯA CÓ TRUY VẤN -->
             <div id="reportEmptyState" class="text-center py-10 text-slate-400 text-sm">
                 <i class="fa-solid fa-filter-circle-xmark text-2xl mb-2 block"></i>
-                Chọn tháng/năm rồi bấm "Tìm / Lọc Dữ Liệu" để hệ thống đọc và phân tích dữ liệu thật từ Lark Base.
+                Chọn tháng/năm rồi bấm "Lọc Dữ Liệu" để hệ thống phân tích.
             </div>
 
-            <!-- TRẠNG THÁI CHƯA ĐỦ DỮ LIỆU (THÁNG CHƯA KẾT THÚC) -->
             <div id="reportIncompleteState" class="hidden text-center py-10">
                 <i class="fa-solid fa-hourglass-half text-3xl text-amber-500 mb-3 block"></i>
-                <p class="text-sm font-bold text-slate-700">Chưa hết tháng nên chưa đủ dữ liệu để tổng hợp báo cáo.</p>
+                <p class="text-sm font-bold text-slate-700">Chưa hết tháng nên chưa đủ dữ liệu tổng hợp.</p>
                 <p class="text-xs text-slate-400 mt-1">Vui lòng quay lại sau khi tháng <span id="incompleteMonthLabel"></span> kết thúc.</p>
             </div>
 
-            <!-- NỘI DUNG BÁO CÁO THẬT -->
             <div id="reportRealContent" class="hidden space-y-5">
                 <div>
                     <h2 id="reportTitle" class="text-lg font-black text-slate-900 uppercase">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH</h2>
@@ -285,7 +328,6 @@
 
                 <p id="reportGreeting" class="text-xs text-slate-600 italic"></p>
 
-                <!-- KẾT QUẢ THỐNG KÊ CHI TIẾT -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-center items-center shadow-sm">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -294,45 +336,27 @@
                         <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">0</span>
                     </div>
                     <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SIÊU THỊ CÓ ĐƠN ĐỔI TRẢ CAO NHẤT TRONG THÁNG (DỮ LIỆU LARK BASE):</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SIÊU THỊ CÓ ĐƠN ĐỔI TRẢ CAO NHẤT TRONG THÁNG:</span>
                         <div id="topStoreList" class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs font-semibold"></div>
                     </div>
                 </div>
 
-                <!-- NHẬN XÉT & ĐÁNH GIÁ TỰ ĐỘNG -->
                 <div class="space-y-3">
                     <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
                         <i class="fa-solid fa-magnifying-glass-chart text-sakuko-orange"></i> NHẬN XÉT & ĐÁNH GIÁ CHI TIẾT:
                     </h4>
                     <ul id="analysisTextList" class="list-disc list-inside text-xs text-slate-600 space-y-2 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200"></ul>
                 </div>
-
-                <!-- KHUYẾN NGHỊ TỰ ĐỘNG THEO DỮ LIỆU -->
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                    <h4 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                        <i class="fa-solid fa-lightbulb text-amber-500"></i> KHUYẾN NGHỊ & HƯỚNG DẪN TỐI ƯU:
-                    </h4>
-                    <div id="adviceTextList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700"></div>
-                </div>
-
-                <!-- QUY ĐỊNH BẮT BUỘC -->
-                <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
-                    <p class="font-bold text-amber-950 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-exclamation text-amber-600"></i> Các siêu thị lưu ý bắt buộc:
-                    </p>
-                    <p class="pl-5">• Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán: 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</p>
-                    <p class="pl-5">• Kiểm tra kỹ nguyên nhân lỗi sản phẩm (bao bì, date, lỗi tem giá) trước khi tiến hành tạo đơn đổi trả trên hệ thống POS/Lark Base.</p>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- BẢNG DỮ LIỆU CHI TIẾT CÁC ĐƠN ĐỔI TRẢ (DATA TABLE) -->
+    <!-- BẢNG DỮ LIỆU CHI TIẾT CÁC ĐƠN ĐỔI TRẢ -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-list-check text-sakuko-orange"></i>
-                <h3 class="text-xs font-bold uppercase text-slate-800">DANH SÁCH CHI TIẾT ĐƠN ĐỔI TRẢ THÁNG ĐANG CHỌN</h3>
+                <h3 class="text-xs font-bold uppercase text-slate-800">DANH SÁCH CHI TIẾT CÁC ĐƠN ĐỔI TRẢ</h3>
                 <span id="tableRecordCount" class="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded-full">0 đơn</span>
             </div>
             
@@ -351,14 +375,15 @@
                         <th class="p-3 w-12 text-center">STT</th>
                         <th class="p-3">Ngày Phát Sinh</th>
                         <th class="p-3">Siêu Thị / Chi Nhánh</th>
-                        <th class="p-3">Mã Đơn / Khách Hàng</th>
+                        <th class="p-3">Mã Đơn / Hóa Đơn</th>
                         <th class="p-3">Lý Do Đổi Trả</th>
                         <th class="p-3 text-center">Trạng Thái</th>
+                        <th class="p-3 text-center">Thao Tác</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody" class="text-xs divide-y divide-slate-100 text-slate-700">
                     <tr>
-                        <td colspan="6" class="text-center py-8 text-slate-400">Vui lòng chọn tháng và bấm "Tìm / Lọc Dữ Liệu" để xem danh sách.</td>
+                        <td colspan="7" class="text-center py-8 text-slate-400">Chưa có dữ liệu đơn đổi trả. Vui lòng thêm mới ở form trên hoặc chọn tháng/năm để lọc.</td>
                     </tr>
                 </tbody>
             </table>
@@ -367,7 +392,7 @@
 
 </div>
 
-<!-- SCRIPT XỬ LÝ DỮ LIỆU TỪ LARK BASE & VẼ BẢNG -->
+<!-- SCRIPT XỬ LÝ NHẬP LIỆU & BẢNG DỮ LIỆU -->
 <script>
     const LARK_API_URL = '/api/lark-base/doitra';
 
@@ -434,6 +459,42 @@
         return getFieldValue(fields, STORE_FIELD_CANDIDATES) || "Siêu thị khác";
     }
 
+    // XỬ LÝ KHI NGƯỜI DÙNG THÊM MỚI DỮ LIỆU TỪ FORM
+    function handleAddNewRecord(e) {
+        e.preventDefault();
+        const dateVal = document.getElementById('inputDate').value;
+        const storeVal = document.getElementById('inputStore').value;
+        const codeVal = document.getElementById('inputCode').value;
+        const statusVal = document.getElementById('inputStatus').value;
+        const reasonVal = document.getElementById('inputReason').value;
+
+        const newRecord = {
+            fields: {
+                "Ngày phát sinh": dateVal,
+                "Siêu thị": storeVal,
+                "Mã đơn hàng": codeVal,
+                "Lý do đổi trả": reasonVal,
+                "Trạng thái": statusVal
+            }
+        };
+
+        globalLarkRecords.unshift(newRecord);
+        document.getElementById('formNhapDoiTra').reset();
+        alert('Thêm đơn đổi trả thành công!');
+
+        // Render lại dữ liệu ngay sau khi thêm
+        filterAndRenderReport();
+    }
+
+    // XÓA BẢN GHI KHỎI BẢNG
+    function deleteRecord(idx) {
+        if (confirm('Bạn có chắc chắn muốn xóa đơn này?')) {
+            currentFilteredRecords.splice(idx, 1);
+            renderTable(currentFilteredRecords);
+            updateLastTime();
+        }
+    }
+
     async function fetchLarkDataAndRender() {
         const syncIcon = document.getElementById('syncIcon');
         if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -445,22 +506,20 @@
             const response = await fetch(LARK_API_URL, { signal: controller.signal });
             clearTimeout(timeoutId);
 
-            if (!response.ok) throw new Error("API trả về lỗi HTTP " + response.status);
+            if (!response.ok) throw new Error("API lỗi HTTP " + response.status);
 
             const result = await response.json();
             globalLarkRecords = result.data?.items || result.items || result.data || [];
             hasFetchedOnce = true;
 
-            if (statusElem) statusElem.innerText = `Đã tải ${globalLarkRecords.length} bản ghi thật từ Lark Base.`;
+            if (statusElem) statusElem.innerText = `Đã tải ${globalLarkRecords.length} bản ghi từ Lark Base.`;
         } catch (e) {
-            console.error("Lỗi khi tải dữ liệu từ Lark Base:", e);
-            globalLarkRecords = [];
-            hasFetchedOnce = false;
-            if (statusElem) statusElem.innerText = "⚠ Không thể tải dữ liệu từ Lark Base. Vui lòng bấm Đồng Bộ Lại.";
+            console.error("Lỗi khi tải từ Lark Base:", e);
+            statusElem.innerText = "Chưa kết nối được Lark Base. Bạn có thể nhập dữ liệu thủ công ở form phía trên.";
         } finally {
             if (syncIcon) syncIcon.classList.remove('fa-spin');
             updateLastTime();
-            renderChartForYear(Number(document.getElementById('selectYear')?.value || 2026));
+            filterAndRenderReport();
         }
     }
 
@@ -511,14 +570,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => context.raw === null
-                                ? ' Chưa đủ dữ liệu (tháng chưa kết thúc)'
-                                : ` Tổng: ${context.raw} đơn đổi trả`
-                        }
-                    }
+                    legend: { display: false }
                 },
                 scales: {
                     y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
@@ -529,11 +581,7 @@
     }
 
     function onSearchClick() {
-        if (!hasFetchedOnce) {
-            fetchLarkDataAndRender().then(filterAndRenderReport);
-        } else {
-            filterAndRenderReport();
-        }
+        filterAndRenderReport();
     }
 
     function filterAndRenderReport() {
@@ -545,7 +593,6 @@
         const emptyState = document.getElementById('reportEmptyState');
         const incompleteState = document.getElementById('reportIncompleteState');
         const realContent = document.getElementById('reportRealContent');
-        const incompleteMonthLabel = document.getElementById('incompleteMonthLabel');
 
         emptyState.classList.add('hidden');
 
@@ -556,7 +603,6 @@
         if (isFuture || isCurrentIncomplete) {
             incompleteState.classList.remove('hidden');
             realContent.classList.add('hidden');
-            if (incompleteMonthLabel) incompleteMonthLabel.innerText = `${String(selectedMonth).padStart(2, '0')}/${selectedYear}`;
             renderTable([]);
             return;
         }
@@ -570,14 +616,13 @@
         const totalStoresElem = document.getElementById('totalStoresCount');
         const topStoreList = document.getElementById('topStoreList');
         const analysisList = document.getElementById('analysisTextList');
-        const adviceList = document.getElementById('adviceTextList');
 
         const currentDateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
         if (reportGenDate) reportGenDate.innerText = currentDateStr;
 
         currentFilteredRecords = globalLarkRecords.filter(item => {
             const my = extractMonthYear(item);
-            if (!my) return false;
+            if (!my) return true; // Hiển thị cả các đơn nhập thủ công
             const recYear = my.year ?? selectedYear;
             return my.month === selectedMonth && recYear === selectedYear;
         });
@@ -591,11 +636,10 @@
         const storeList = Object.keys(storeMap)
             .map(name => ({ name, don: storeMap[name] }))
             .sort((a, b) => b.don - a.don);
-        const totalStoresCount = storeList.length;
 
-        if (totalStoresElem) totalStoresElem.innerText = totalStoresCount;
+        if (totalStoresElem) totalStoresElem.innerText = storeList.length;
         if (reportTitle) reportTitle.innerText = `BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH THÁNG ${String(selectedMonth).padStart(2, '0')}/${selectedYear}`;
-        if (reportGreeting) reportGreeting.innerText = `Dear các anh chị Siêu Thị,\nPhòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch Tháng ${selectedMonth}/${selectedYear}.`;
+        if (reportGreeting) reportGreeting.innerText = `Dear các anh chị Siêu Thị,\nPhòng Kiểm Soát Chất Lượng gửi Báo Cáo Kết Quả Đổi Trả Tháng ${selectedMonth}/${selectedYear}.`;
 
         if (topStoreList) {
             topStoreList.innerHTML = storeList.length > 0
@@ -608,60 +652,39 @@
                         <span class="text-sm font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded border border-rose-100">${item.don} đơn</span>
                     </div>
                 `).join('')
-                : `<p class="text-slate-400 text-xs col-span-3">Không phát sinh đơn đổi trả nào trong tháng này.</p>`;
+                : `<p class="text-slate-400 text-xs col-span-3">Không phát sinh đơn đổi trả nào.</p>`;
         }
 
         if (analysisList) {
-            if (totalOrders === 0) {
-                analysisList.innerHTML = `<li>Trong Tháng ${selectedMonth}/${selectedYear}, hệ thống <strong>không ghi nhận đơn đổi trả nào</strong> theo dữ liệu Lark Base hiện có.</li>`;
-            } else {
-                analysisList.innerHTML = `
-                    <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận phát sinh từ <strong>${totalStoresCount} siêu thị</strong> với tổng số <strong>${totalOrders} đơn đổi trả</strong> trong Tháng ${selectedMonth}/${selectedYear}.</li>
-                    <li><strong>Tập trung đơn vị cao nhất:</strong> Top các siêu thị phát sinh nhiều nhất gồm <strong>${storeList[0]?.name || 'Chưa phát sinh'} (${storeList[0]?.don || 0} đơn)</strong>${storeList[1] ? `, <strong>${storeList[1].name} (${storeList[1].don} đơn)</strong>` : ''}${storeList[2] ? ` và <strong>${storeList[2].name} (${storeList[2].don} đơn)</strong>` : ''}.</li>
-                    <li><strong>Đánh giá thực hiện:</strong> Yêu cầu Cửa hàng trưởng các siêu thị trong nhóm phát sinh đơn tăng cường đối soát nguyên nhân lỗi tại quầy thu ngân.</li>
-                `;
-            }
-        }
-
-        if (adviceList) {
-            adviceList.innerHTML = totalOrders === 0
-                ? `<div class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm col-span-2 text-slate-500">Chưa có dữ liệu để đưa ra khuyến nghị cho tháng này.</div>`
-                : `
-                <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
-                    <p class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 1. Rà soát đơn vị trọng điểm (${storeList[0]?.name.replace(/^S\d+\s*--\s*/, '') || 'Siêu thị'}):</p>
-                    <p class="text-slate-500 mt-1 leading-relaxed">Kiểm tra lại toàn bộ quy trình nhận đơn đổi trả và phân tích nguyên nhân lỗi do sản phẩm hay thao tác thu ngân.</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
-                    <p class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-sky-500"></i> 2. Chuẩn hóa quy trình thanh toán:</p>
-                    <p class="text-slate-500 mt-1 leading-relaxed">Đảm bảo 100% nhân viên thu ngân in hóa đơn và đối soát kỹ thông tin tem nhãn sản phẩm trước khi bàn giao cho khách.</p>
-                </div>
+            analysisList.innerHTML = `
+                <li>Ghi nhận tổng số <strong>${totalOrders} đơn đổi trả</strong> từ <strong>${storeList.length} siêu thị</strong>.</li>
+                <li>Siêu thị phát sinh nhiều nhất: <strong>${storeList[0]?.name || 'Chưa phát sinh'} (${storeList[0]?.don || 0} đơn)</strong>.</li>
             `;
         }
 
         renderTable(currentFilteredRecords);
     }
 
-    // VẼ BẢNG DỮ LIỆU
     function renderTable(records) {
         const tbody = document.getElementById('dataTableBody');
         const countBadge = document.getElementById('tableRecordCount');
 
         if (countBadge) countBadge.innerText = `${records.length} đơn`;
-
         if (!tbody) return;
 
         if (records.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Không có dữ liệu đơn đổi trả cho tháng này.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Không có dữ liệu đơn đổi trả nào.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = records.map((item, idx) => {
             const fields = item.fields || item;
             const my = extractMonthYear(item);
-            const dateStr = my?.formatted || '--';
+            const dateStr = my?.formatted || fields["Ngày phát sinh"] || '--';
             const store = getStoreName(item);
-            const reason = getFieldValue(fields, REASON_FIELD_CANDIDATES) || 'Chưa cập nhật lý do';
-            const code = getFieldValue(fields, CODE_FIELD_CANDIDATES) || 'N/A';
+            const reason = getFieldValue(fields, REASON_FIELD_CANDIDATES) || fields["Lý do đổi trả"] || 'Chưa cập nhật';
+            const code = getFieldValue(fields, CODE_FIELD_CANDIDATES) || fields["Mã đơn hàng"] || 'N/A';
+            const status = fields["Trạng thái"] || "Đã xử lý";
 
             return `
                 <tr class="hover:bg-slate-50 transition">
@@ -671,14 +694,18 @@
                     <td class="p-3 font-mono text-sky-600 font-semibold">${code}</td>
                     <td class="p-3 text-slate-600 max-w-xs truncate" title="${reason}">${reason}</td>
                     <td class="p-3 text-center">
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Đã xử lý</span>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${status}</span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteRecord(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             `;
         }).join('');
     }
 
-    // TÌM KIẾM NHANH TRONG BẢNG
     function filterTableData() {
         const query = document.getElementById('tableSearchInput')?.value.toLowerCase().trim() || '';
         if (!query) {
@@ -689,8 +716,8 @@
         const filtered = currentFilteredRecords.filter(item => {
             const fields = item.fields || item;
             const store = getStoreName(item).toLowerCase();
-            const reason = (getFieldValue(fields, REASON_FIELD_CANDIDATES) || '').toLowerCase();
-            const code = (getFieldValue(fields, CODE_FIELD_CANDIDATES) || '').toLowerCase();
+            const reason = (getFieldValue(fields, REASON_FIELD_CANDIDATES) || fields["Lý do đổi trả"] || '').toLowerCase();
+            const code = (getFieldValue(fields, CODE_FIELD_CANDIDATES) || fields["Mã đơn hàng"] || '').toLowerCase();
 
             return store.includes(query) || reason.includes(query) || code.includes(query);
         });
@@ -708,14 +735,19 @@
     function copyReport() {
         const container = document.getElementById('reportRealContent');
         if (!container || container.classList.contains('hidden')) {
-            alert('Chưa có báo cáo để sao chép. Vui lòng bấm "Tìm / Lọc Dữ Liệu" trước.');
+            alert('Chưa có báo cáo để sao chép.');
             return;
         }
         navigator.clipboard.writeText(container.innerText);
-        alert('Đã sao chép mẫu báo cáo thành công!');
+        alert('Đã sao chép báo cáo!');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+        // Tự động thiết lập ngày hôm nay cho ô Ngày Phát Sinh
+        const today = new Date().toISOString().split('T')[0];
+        const inputDate = document.getElementById('inputDate');
+        if (inputDate) inputDate.value = today;
+
         fetchLarkDataAndRender();
     });
 </script>
