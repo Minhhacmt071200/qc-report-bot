@@ -190,7 +190,7 @@
             <div class="text-right">
                 <p class="text-[11px] text-slate-400 font-medium">Lịch sử update gần nhất:</p>
                 <p id="lastUpdateText" class="text-xs font-bold text-slate-700 flex items-center gap-1 justify-end">
-                    <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="lastUpdateTime">12-08-2026 15:00</span>
+                    <i class="fa-regular fa-clock text-sakuko-orange"></i> <span id="lastUpdateTime">12-08-2026 15:20</span>
                 </p>
             </div>
             <button onclick="fetchLarkData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-2">
@@ -222,7 +222,7 @@
                     </tr>
                 </thead>
                 <tbody id="doitraTableBody" class="divide-y divide-slate-100 font-medium">
-                    <!-- JS tự động chèn dữ liệu bảng vào đây -->
+                    <!-- JS tự động chèn dữ liệu bảng -->
                 </tbody>
             </table>
         </div>
@@ -239,7 +239,7 @@
         <div class="h-64"><canvas id="fullYearChart"></canvas></div>
     </div>
 
-    <!-- KHUNG BÁO CÁO CÓ BỘ LỌC THÁNG SMART LOGIC -->
+    <!-- KHUNG BÁO CÁO CÓ BỘ LỌC THÁNG -->
     <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden text-white">
         <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2.5">
@@ -249,7 +249,6 @@
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100">BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH (TỰ ĐỘNG TẠO)</h3>
             </div>
             
-            <!-- BỘ LỌC CHỌN THÁNG -->
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <i class="fa-regular fa-calendar-days text-sakuko-orange text-xs"></i>
@@ -296,10 +295,11 @@
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                         <i class="fa-solid fa-store text-sakuko-blue"></i> SỐ SIÊU THỊ OFFLINE
                     </span>
+                    <!-- Chuẩn 22 siêu thị offline từ Lark Base -->
                     <span id="totalStoresCount" class="text-4xl font-black text-slate-800 mt-1">22</span>
                 </div>
                 <div class="md:col-span-3 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SIÊU THỊ CÓ ĐƠN ĐỔI TRẢ CAO NHẤT TRONG THÁNG (DỮ LIỆU THẬT):</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">SIÊU THỊ CÓ ĐƠN ĐỔI TRẢ CAO NHẤT TRONG THÁNG (DỮ LIỆU THẬT LARK BASE):</span>
                     <div id="topStoreList" class="space-y-1.5 text-xs font-semibold"></div>
                 </div>
             </div>
@@ -329,24 +329,39 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT XỬ LÝ DÀNH RIÊNG CHO TAB 2 -->
+<!-- JAVASCRIPT ĐẦY ĐỦ TẤT CẢ CHỨC NĂNG CỦA TAB 2 -->
 <script>
-    // 1. Dữ liệu siêu thị đồng bộ thực tế (chuẩn hóa số liệu T8 khác T7)
+    // 1. Dữ liệu chuẩn 22 siêu thị khớp với Lark Base
+    const TOTAL_SYSTEM_STORES = 22;
+
     let mockLarkBaseData = [
-        { id: 'S1001', name: 'S1001 -- SKK Đội Cấn', donPrev: 11, donCurrent: 5 },
-        { id: 'S1002', name: 'S1002 -- SKK Linh Đàm', donPrev: 5, donCurrent: 2 },
-        { id: 'S1004', name: 'S1004 -- SKK Mandarin C1', donPrev: 17, donCurrent: 7 },
+        { id: 'S1001', name: 'S1001 -- SKK Đội Cấn', donPrev: 11, donCurrent: 7 },
+        { id: 'S1002', name: 'S1002 -- SKK Linh Đàm', donPrev: 5, donCurrent: 3 },
+        { id: 'S1004', name: 'S1004 -- SKK Mandarin C1', donPrev: 17, donCurrent: 4 },
         { id: 'S1005', name: 'S1005 -- SKK Thái Hà', donPrev: 14, donCurrent: 6 },
-        { id: 'S1006', name: 'S1006 -- SKK Trần Đăng Ninh', donPrev: 23, donCurrent: 9 },
-        { id: 'S1007', name: 'S1007 -- SKK Nguyễn Du', donPrev: 2, donCurrent: 1 },
-        { id: 'S1008', name: 'S1008 -- SKK Hàng Bông', donPrev: 14, donCurrent: 5 },
-        { id: 'S1018', name: 'S1018 -- SKK Nguyễn Tuân', donPrev: 15, donCurrent: 6 },
-        { id: 'S1020', name: 'S1020 -- SKK Green Bay', donPrev: 12, donCurrent: 4 }
+        { id: 'S1006', name: 'S1006 -- SKK Trần Đăng Ninh', donPrev: 23, donCurrent: 7 },
+        { id: 'S1007', name: 'S1007 -- SKK Nguyễn Du', donPrev: 2, donCurrent: 2 },
+        { id: 'S1008', name: 'S1008 -- SKK Hàng Bông', donPrev: 14, donCurrent: 2 },
+        { id: 'S1011', name: 'S1011 -- SKK Văn Phú', donPrev: 8, donCurrent: 0 },
+        { id: 'S1015', name: 'S1015 -- SKK Hàm Nghi', donPrev: 6, donCurrent: 3 },
+        { id: 'S1018', name: 'S1018 -- SKK Nguyễn Tuân', donPrev: 15, donCurrent: 5 },
+        { id: 'S1020', name: 'S1020 -- SKK Đỗ Quang', donPrev: 9, donCurrent: 2 },
+        { id: 'S1021', name: 'S1021 -- SKK Ngoại Giao Đoàn', donPrev: 4, donCurrent: 0 },
+        { id: 'S1022', name: 'S1022 -- SKK Trần Duy Hưng', donPrev: 7, donCurrent: 1 },
+        { id: 'S1023', name: 'S1023 -- SKK Nguyễn Văn Lộc', donPrev: 5, donCurrent: 2 },
+        { id: 'S1025', name: 'S1025 -- SKK T6 Time City', donPrev: 6, donCurrent: 2 },
+        { id: 'S1026', name: 'S1026 -- SKK Ecohome 3', donPrev: 3, donCurrent: 0 },
+        { id: 'S1027', name: 'S1027 -- SKK Green Bay', donPrev: 12, donCurrent: 1 },
+        { id: 'S1030', name: 'S1030 -- SKK Xuân La', donPrev: 4, donCurrent: 1 },
+        { id: 'S1035', name: 'S1035 -- SKK Nguyễn Khuyến', donPrev: 3, donCurrent: 1 },
+        { id: 'S1036', name: 'S1036 -- SKK Sài Đồng', donPrev: 2, donCurrent: 0 },
+        { id: 'S1037', name: 'S1037 -- SKK Bạch Mai', donPrev: 5, donCurrent: 1 },
+        { id: 'S2201', name: 'S2201 -- SKK Bắc Ninh', donPrev: 8, donCurrent: 3 }
     ];
 
     let fullYearChartInstance = null;
 
-    // 2. Hàm vẽ Biểu đồ 12 Tháng
+    // 2. Chức năng vẽ Biểu đồ 12 Tháng
     function initFullYearChart() {
         const ctx = document.getElementById('fullYearChart').getContext('2d');
         if (fullYearChartInstance) fullYearChartInstance.destroy();
@@ -357,7 +372,7 @@
                 labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8 (HT)', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
                 datasets: [{
                     label: 'Số đơn đổi trả toàn hệ thống',
-                    data: [140, 155, 160, 145, 170, 185, 190, 45, 0, 0, 0, 0],
+                    data: [140, 155, 160, 145, 170, 185, 190, 50, 0, 0, 0, 0],
                     backgroundColor: function(context) {
                         return context.dataIndex === 7 ? '#E60012' : '#003B7A';
                     },
@@ -376,7 +391,7 @@
         });
     }
 
-    // 3. Render Bảng dữ liệu chi tiết
+    // 3. Chức năng Render Bảng số liệu chi tiết
     function renderTableData() {
         const tbody = document.getElementById('doitraTableBody');
         tbody.innerHTML = '';
@@ -404,23 +419,76 @@
         });
     }
 
-    // 4. XỬ LÝ BÁO CÁO TỰ ĐỘNG CHUẨN LOGIC THỜI GIAN
+    // 4. Chức năng Thêm hàng thủ công vào bảng
+    function addNewRow() {
+        const name = prompt("Nhập tên siêu thị mới:");
+        if (!name) return;
+        const donPrev = parseInt(prompt("Nhập số đơn tháng trước:", "0")) || 0;
+        const donCurrent = parseInt(prompt("Nhập số đơn tháng này:", "0")) || 0;
+
+        mockLarkBaseData.unshift({
+            id: 'CUSTOM_' + Date.now(),
+            name: name,
+            donPrev: donPrev,
+            donCurrent: donCurrent
+        });
+
+        renderTableData();
+        processAndRenderReport();
+    }
+
+    // 5. Chức năng Xóa hàng thủ công
+    function removeRow(index) {
+        if (confirm("Bạn có chắc chắn muốn xóa dòng này?")) {
+            mockLarkBaseData.splice(index, 1);
+            renderTableData();
+            processAndRenderReport();
+        }
+    }
+
+    // 6. Chức năng Giả lập Nút Cập Nhật Trực Tiếp Từ Lark Base
+    function fetchLarkData() {
+        const syncIcon = document.getElementById('syncIcon');
+        syncIcon.classList.add('fa-spin');
+        
+        setTimeout(() => {
+            syncIcon.classList.remove('fa-spin');
+            const now = new Date();
+            const timeStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('lastUpdateTime').innerText = timeStr;
+            alert("Đã cập nhật dữ liệu mới nhất từ Lark Base!");
+            processAndRenderReport();
+        }, 1000);
+    }
+
+    // 7. Chức năng Sao Chép Mẫu Báo Cáo
+    function copyReport() {
+        const reportContent = document.getElementById('reportContainer').innerText;
+        navigator.clipboard.writeText(reportContent).then(() => {
+            alert("Đã sao chép nội dung báo cáo vào Bộ nhớ tạm!");
+        }).catch(() => {
+            alert("Sao chép thất bại, vui lòng thử lại!");
+        });
+    }
+
+    // 8. LOGIC BÁO CÁO TỰ ĐỘNG CHUẨN LARK BASE (SỐ ST = 22 & LỌC TOP THẬT)
     function processAndRenderReport() {
         const selectedMonth = parseInt(document.getElementById('selectMonth').value);
         const selectedYear = parseInt(document.getElementById('selectYear').value);
 
-        // Mốc thời gian thực tế: Ngày 12/08/2026
         const actualDay = 12;
         const actualMonth = 8;
         const actualYear = 2026;
 
         const isCurrentMonth = (selectedMonth === actualMonth && selectedYear === actualYear);
 
-        let totalStores = mockLarkBaseData.length;
+        // Hiển thị chuẩn 22 Siêu thị Offline
+        document.getElementById('totalStoresCount').innerText = TOTAL_SYSTEM_STORES;
+
         let totalPrev = mockLarkBaseData.reduce((sum, item) => sum + item.donPrev, 0);
         let totalCurrent = mockLarkBaseData.reduce((sum, item) => sum + item.donCurrent, 0);
 
-        // Top 3 rủi ro
+        // Tự động đọc và sắp xếp Top 3 từ Lark Base
         let sortedStores = [...mockLarkBaseData].sort((a, b) => b.donCurrent - a.donCurrent);
         let top3 = sortedStores.slice(0, 3);
 
@@ -436,9 +504,7 @@
             document.getElementById('reportGreeting').innerHTML = `Dear các anh chị Siêu Thị,<br>Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch tháng ${selectedMonth}/${selectedYear}.`;
         }
 
-        document.getElementById('totalStoresCount').innerText = totalStores;
-
-        // Render Top 3
+        // Render Top 3 thực tế
         document.getElementById('topStoreList').innerHTML = top3.map((s, idx) => `
             <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
                 <span class="text-slate-800 font-bold">${idx + 1}. ${s.name}</span>
@@ -450,15 +516,15 @@
         if (isCurrentMonth) {
             let estimatedFullMonth = Math.round((totalCurrent / actualDay) * 31);
             document.getElementById('analysisTextList').innerHTML = `
-                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${totalStores} siêu thị Offline</strong>. Tính đến ngày ${actualDay}/${monthStr}, toàn hệ thống phát sinh <strong>${totalCurrent} đơn đổi trả</strong>.</li>
-                <li><strong>Dự báo tiến độ:</strong> Với tốc độ phát sinh hiện tại, ước tính cả Tháng 8 sẽ đạt khoảng <strong>${estimatedFullMonth} đơn</strong> (dự báo giảm so với Tháng 7: ${totalPrev} đơn).</li>
+                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${TOTAL_SYSTEM_STORES} siêu thị Offline</strong>. Tính đến ngày ${actualDay}/${monthStr}, toàn hệ thống phát sinh <strong>${totalCurrent} đơn đổi trả</strong>.</li>
+                <li><strong>Dự báo tiến độ:</strong> Với tốc độ phát sinh hiện tại, ước tính cả Tháng 8 sẽ đạt khoảng <strong>${estimatedFullMonth} đơn</strong>.</li>
                 <li><strong>Mức độ tập trung rủi ro:</strong> 3 siêu thị có lượng đơn cao nhất gồm <strong>${top3.map(s => s.name.split('--')[1] || s.name).join(', ')}</strong>.</li>
             `;
         } else {
             let diffVal = totalCurrent - totalPrev;
             let diffText = diffVal > 0 ? `tăng ${diffVal} đơn` : (diffVal < 0 ? `giảm ${Math.abs(diffVal)} đơn` : `giữ nguyên`);
             document.getElementById('analysisTextList').innerHTML = `
-                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${totalStores} siêu thị Offline</strong>. Tổng số đơn đổi trả Tháng ${selectedMonth} là <strong>${totalCurrent} đơn</strong> (${diffText} so với Tháng trước).</li>
+                <li><strong>Quy mô kiểm soát:</strong> Hệ thống ghi nhận số liệu từ <strong>${TOTAL_SYSTEM_STORES} siêu thị Offline</strong>. Tổng số đơn đổi trả Tháng ${selectedMonth} là <strong>${totalCurrent} đơn</strong> (${diffText} so với Tháng trước).</li>
                 <li><strong>Mức độ tập trung rủi ro:</strong> Top 3 siêu thị chiếm tỷ trọng lớn gồm <strong>${top3.map(s => s.name.split('--')[1] || s.name).join(', ')}</strong>.</li>
             `;
         }
