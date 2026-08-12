@@ -174,7 +174,8 @@
             </div>
         </div>
 
-       <!-- TAB 2: BÁO CÁO ĐỔI TRẢ -->
+       <!-- TAB 2: BÁO CÁO ĐỔI TRẢ (ĐÃ SỬA HOÀN CHỈNH)  -->
+<!-- ========================================== -->
 <div id="doitra" class="content-section p-8 space-y-6">
 
     <!-- CONTROLS & STATUS -->
@@ -210,7 +211,9 @@
         <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
             <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">BẢNG SỐ LIỆU ĐỔI TRẢ CHI TIẾT</h3>
             <div class="flex items-center gap-3">
-                <span id="syncStatusBadge" class="text-[11px] text-amber-500 font-bold">Đang chuẩn bị...</span>
+                <span id="syncStatusBadge" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
+                    Đang kết nối API...
+                </span>
                 <button onclick="addNewRow()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
                     <i class="fa-solid fa-plus"></i> Thêm Hàng
                 </button>
@@ -331,6 +334,232 @@
         </div>
     </div>
 </div>
+
+<!-- SCRIPT XỬ LÝ DỮ LIỆU VÀ API CHO TAB BÁO CÁO ĐỔI TRẢ -->
+<script>
+    const LARK_API_URL = 'https://qc-report-bot.onrender.com/api/lark-base/doitra';
+
+    // Dữ liệu nội bộ dự phòng
+    const localFallbackStores = [
+        { id: 1, name: "S1001 -- SKK Đội Cấn", donPrev: 11, donCurrent: 8 },
+        { id: 2, name: "S1002 -- SKK Linh Đàm", donPrev: 5, donCurrent: 4 },
+        { id: 3, name: "S1004 -- SKK Mandarin C1", donPrev: 14, donCurrent: 17 },
+        { id: 4, name: "S1005 -- SKK Thái Hà", donPrev: 12, donCurrent: 14 },
+        { id: 5, name: "S1006 -- SKK Trần Đăng Ninh", donPrev: 19, donCurrent: 23 },
+        { id: 6, name: "S1007 -- SKK Nguyễn Du", donPrev: 3, donCurrent: 2 }
+    ];
+
+    let dynamicLarkData = [...localFallbackStores];
+    let fullYearChartInstance = null;
+
+    // 1. Hàm gọi API từ Server Render có xử lý Timeout & Fallback
+    async function fetchLarkData() {
+        const syncIcon = document.getElementById('syncIcon');
+        const syncBadge = document.getElementById('syncStatusBadge');
+        
+        if (syncIcon) syncIcon.classList.add('fa-spin');
+        if (syncBadge) {
+            syncBadge.innerText = 'Đang khởi động Server...';
+            syncBadge.className = 'text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-200';
+        }
+
+        try {
+            // Tăng thời gian chờ lên 35 giây để đợi Render thức dậy (Cold Start)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+            const response = await fetch(LARK_API_URL, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const result = await response.json();
+            const rawItems = result.data?.items || result.items || (Array.isArray(result) ? result : []);
+
+            if (rawItems.length > 0) {
+                dynamicLarkData = rawItems.map(item => {
+                    const fields = item.fields || item;
+                    return {
+                        id: item.record_id || Math.random(),
+                        name: fields["Tên Siêu Thị"] || fields.name || "Siêu thị chưa tên",
+                        donPrev: Number(fields["Đơn Tháng Trước"] || fields.donPrev || 0),
+                        donCurrent: Number(fields["Đơn Tháng Hiện Tại"] || fields.donCurrent || 0)
+                    };
+                });
+            }
+
+            if (syncBadge) {
+                syncBadge.innerText = 'Đã đồng bộ Lark Base (Live)';
+                syncBadge.className = 'text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200';
+            }
+
+        } catch (error) {
+            console.warn("Dùng dữ liệu tạm do không thể kết nối API Render:", error.message);
+            if (syncBadge) {
+                syncBadge.innerText = 'Offline - Dùng dữ liệu nội bộ';
+                syncBadge.className = 'text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-300';
+            }
+        } finally {
+            if (syncIcon) syncIcon.classList.remove('fa-spin');
+            updateLastTime();
+            renderTableData();
+            processAndRenderReport();
+        }
+    }
+
+    // 2. Render dữ liệu ra bảng HTML
+    function renderTableData() {
+        const tbody = document.getElementById('doitraTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        dynamicLarkData.forEach((row, index) => {
+            const diff = row.donCurrent - row.donPrev;
+            let diffBadge = `<span class="text-slate-500 font-bold">0</span>`;
+            if (diff > 0) diffBadge = `<span class="text-rose-600 font-bold">↑ ${diff}</span>`;
+            if (diff < 0) diffBadge = `<span class="text-emerald-600 font-bold">↓ ${Math.abs(diff)}</span>`;
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="py-3 px-4 font-bold text-slate-700">${row.name}</td>
+                    <td class="py-3 px-4 text-center text-slate-600 font-semibold">${row.donPrev}</td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-900">${row.donCurrent}</td>
+                    <td class="py-3 px-4 text-center">${diffBadge}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="removeRow(${index})" class="text-slate-400 hover:text-rose-600 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // 3. Tự động xử lý và tạo nội dung Báo Cáo
+    function processAndRenderReport() {
+        const month = document.getElementById('selectMonth')?.value || "8";
+        const year = document.getElementById('selectYear')?.value || "2026";
+        
+        // Cập nhật số lượng cửa hàng
+        const totalStoresElem = document.getElementById('totalStoresCount');
+        if (totalStoresElem) totalStoresElem.innerText = dynamicLarkData.length;
+
+        // Cập nhật thời gian tạo báo cáo
+        const reportGenDate = document.getElementById('reportGenDate');
+        if (reportGenDate) reportGenDate.innerText = `12/${month.padStart(2, '0')}/${year}`;
+
+        // Tìm siêu thị có đơn đổi trả cao nhất
+        const sortedData = [...dynamicLarkData].sort((a, b) => b.donCurrent - a.donCurrent);
+        const topStoreList = document.getElementById('topStoreList');
+        if (topStoreList) {
+            topStoreList.innerHTML = sortedData.slice(0, 3).map((item, idx) => `
+                <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-200">
+                    <span class="text-slate-700 font-bold">Top ${idx + 1}: ${item.name}</span>
+                    <span class="text-rose-600 font-black">${item.donCurrent} đơn</span>
+                </div>
+            `).join('');
+        }
+
+        // Tự động tạo nhận xét
+        const analysisList = document.getElementById('analysisTextList');
+        if (analysisList) {
+            const totalCurrent = dynamicLarkData.reduce((acc, curr) => acc + curr.donCurrent, 0);
+            const totalPrev = dynamicLarkData.reduce((acc, curr) => acc + curr.donPrev, 0);
+            const diffTotal = totalCurrent - totalPrev;
+
+            analysisList.innerHTML = `
+                <li>Tổng số giao dịch đổi trả trong Tháng ${month}/${year} toàn hệ thống là <strong>${totalCurrent} đơn</strong> (${diffTotal >= 0 ? 'Tăng' : 'Giảm'} ${Math.abs(diffTotal)} đơn so với tháng trước).</li>
+                <li>Siêu thị phát sinh đơn đổi trả nhiều nhất là <strong>${sortedData[0]?.name || 'N/A'}</strong> với <strong>${sortedData[0]?.donCurrent || 0} đơn</strong>.</li>
+                <li>Đánh giá chung: Các cửa hàng đã tuân thủ việc cập nhật thông tin đổi hàng, tuy nhiên cần chú ý giảm thiểu lỗi chủ quan do nhân viên.</li>
+            `;
+        }
+
+        // Khuyến nghị
+        const adviceList = document.getElementById('adviceTextList');
+        if (adviceList) {
+            adviceList.innerHTML = `
+                <div class="p-3 bg-white rounded border border-slate-200 shadow-sm">
+                    <p class="font-bold text-slate-800">1. Tối ưu khâu tư vấn:</p>
+                    <p class="text-slate-500 mt-1">Hướng dẫn khách hàng kiểm tra kỹ thông tin sản phẩm và hạn sử dụng ngay tại quầy.</p>
+                </div>
+                <div class="p-3 bg-white rounded border border-slate-200 shadow-sm">
+                    <p class="font-bold text-slate-800">2. Rà soát tem giá:</p>
+                    <p class="text-slate-500 mt-1">Cập nhật đúng giá chương trình khuyến mãi, tránh việc lệch giá dẫn tới đổi trả.</p>
+                </div>
+            `;
+        }
+
+        initFullYearChart();
+    }
+
+    // 4. Các hàm hỗ trợ Thêm / Xóa / Sao Chép / Thời gian
+    function addNewRow() {
+        const name = prompt("Nhập tên Siêu Thị mới:");
+        if (!name) return;
+        const donPrev = Number(prompt("Số đơn tháng trước:", "0")) || 0;
+        const donCurrent = Number(prompt("Số đơn tháng chọn:", "0")) || 0;
+
+        dynamicLarkData.push({ id: Math.random(), name, donPrev, donCurrent });
+        renderTableData();
+        processAndRenderReport();
+    }
+
+    function removeRow(index) {
+        if (confirm("Chị có chắc chắn muốn xóa hàng này?")) {
+            dynamicLarkData.splice(index, 1);
+            renderTableData();
+            processAndRenderReport();
+        }
+    }
+
+    function updateLastTime() {
+        const now = new Date();
+        const timeStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const elem = document.getElementById('lastUpdateTime');
+        if (elem) elem.innerText = timeStr;
+    }
+
+    function copyReport() {
+        const container = document.getElementById('reportContainer');
+        if (!container) return;
+        navigator.clipboard.writeText(container.innerText);
+        alert('Đã sao chép nội dung báo cáo thành công!');
+    }
+
+    function initFullYearChart() {
+        const ctxElem = document.getElementById('fullYearChart');
+        if (!ctxElem) return;
+        const ctx = ctxElem.getContext('2d');
+        if (fullYearChartInstance) fullYearChartInstance.destroy();
+
+        fullYearChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                datasets: [{
+                    label: 'Số đơn đổi trả',
+                    data: [0, 0, 0, 0, 0, 0, 190, 192, 0, 0, 0, 0],
+                    backgroundColor: function(context) {
+                        return context.dataIndex === 7 ? '#FF6500' : '#1E3E62';
+                    },
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // Tự động thực thi khi tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLarkData();
+    });
+</script>
 
         <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
 <div id="dichvu" class="content-section p-8 space-y-6">
