@@ -175,7 +175,7 @@
         </div>
 
 <!-- ========================================================= -->
-<!-- TAB 2: BÁO CÁO ĐỔI TRẢ (ĐÃ CẬP NHẬT CHÍNH XÁC THEO MÃ CỦA CHỊ) -->
+<!-- TAB 2: BÁO CÁO ĐỔI TRẢ (NÂNG CẤP PHÂN TÍCH LOGIC CHI TIẾT & LỜI KHUYÊN) -->
 <!-- ========================================================= -->
 <div id="doitra" class="content-section p-8 space-y-6">
 
@@ -234,15 +234,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-sky-50/50 p-3.5 rounded-xl border border-sky-200">
         <label class="block text-xs font-bold text-sky-800 mb-1">1. Do Khách (Đơn)</label>
-        <input type="number" id="input-cust-orders" value="135" min="0" class="w-full bg-white border border-sky-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-sky-500">
+        <input type="number" id="input-cust-orders" value="165" min="0" class="w-full bg-white border border-sky-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-sky-500">
       </div>
       <div class="bg-rose-50/50 p-3.5 rounded-xl border border-rose-200">
         <label class="block text-xs font-bold text-rose-800 mb-1">2. Do Siêu Thị (Đơn)</label>
-        <input type="number" id="input-store-orders" value="40" min="0" class="w-full bg-white border border-rose-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-rose-500">
+        <input type="number" id="input-store-orders" value="58" min="0" class="w-full bg-white border border-rose-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-rose-500">
       </div>
       <div class="bg-amber-50/50 p-3.5 rounded-xl border border-amber-200">
         <label class="block text-xs font-bold text-amber-800 mb-1">3. Lý Do Khác (Đơn)</label>
-        <input type="number" id="input-other-orders" value="15" min="0" class="w-full bg-white border border-amber-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-amber-500">
+        <input type="number" id="input-other-orders" value="14" min="0" class="w-full bg-white border border-amber-300 text-slate-800 text-sm font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-amber-500">
       </div>
     </div>
 
@@ -252,15 +252,15 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div class="flex gap-2">
           <input type="text" id="top1-name" value="SKK Trần Đăng Ninh" placeholder="Tên ST 1" class="w-2/3 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-lg px-2.5 py-1.5 outline-none">
-          <input type="number" id="top1-count" value="23" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
+          <input type="number" id="top1-count" value="35" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
         </div>
         <div class="flex gap-2">
-          <input type="text" id="top2-name" value="SKK Đội Cấn" placeholder="Tên ST 2" class="w-2/3 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-lg px-2.5 py-1.5 outline-none">
-          <input type="number" id="top2-count" value="17" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
+          <input type="text" id="top2-name" value="SKK Thái Hà" placeholder="Tên ST 2" class="w-2/3 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-lg px-2.5 py-1.5 outline-none">
+          <input type="number" id="top2-count" value="24" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
         </div>
         <div class="flex gap-2">
-          <input type="text" id="top3-name" value="SKK Hàng Bông" placeholder="Tên ST 3" class="w-2/3 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-lg px-2.5 py-1.5 outline-none">
-          <input type="number" id="top3-count" value="15" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
+          <input type="text" id="top3-name" value="SKK Mandarin" placeholder="Tên ST 3" class="w-2/3 bg-slate-50 border border-slate-300 text-xs font-semibold rounded-lg px-2.5 py-1.5 outline-none">
+          <input type="number" id="top3-count" value="23" placeholder="Số đơn" class="w-1/3 bg-slate-50 border border-slate-300 text-xs font-bold text-center rounded-lg px-2 py-1.5 outline-none">
         </div>
       </div>
     </div>
@@ -279,21 +279,21 @@
             <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center">1</span>
             <span id="disp-top1-name" class="text-xs font-bold text-slate-800">SKK Trần Đăng Ninh</span>
           </div>
-          <span id="disp-top1-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">23 đơn</span>
+          <span id="disp-top1-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">35 đơn</span>
         </div>
         <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
           <div class="flex items-center gap-3">
             <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 font-bold text-xs flex items-center justify-center">2</span>
-            <span id="disp-top2-name" class="text-xs font-bold text-slate-800">SKK Đội Cấn</span>
+            <span id="disp-top2-name" class="text-xs font-bold text-slate-800">SKK Thái Hà</span>
           </div>
-          <span id="disp-top2-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">17 đơn</span>
+          <span id="disp-top2-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">24 đơn</span>
         </div>
         <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
           <div class="flex items-center gap-3">
             <span class="w-6 h-6 rounded-full bg-amber-700 text-white font-bold text-xs flex items-center justify-center">3</span>
-            <span id="disp-top3-name" class="text-xs font-bold text-slate-800">SKK Hàng Bông</span>
+            <span id="disp-top3-name" class="text-xs font-bold text-slate-800">SKK Mandarin</span>
           </div>
-          <span id="disp-top3-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">15 đơn</span>
+          <span id="disp-top3-count" class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">23 đơn</span>
         </div>
       </div>
     </div>
@@ -309,7 +309,7 @@
     </div>
   </div>
 
-  <!-- 4. KHU VỰC NÚT CẬP NHẬT & BÁO CÁO KẾT QUẢ (MÃ MỚI CỦA CHỊ) -->
+  <!-- 4. KHU VỰC NÚT CẬP NHẬT & BÁO CÁO KẾT QUẢ -->
   
   <!-- NÚT CẬP NHẬT KẾT QUẢ -->
   <div class="mt-6">
@@ -333,12 +333,12 @@
       <!-- TIÊU ĐỀ BÁO CÁO DỘNG -->
       <div>
         <h2 id="report-title" class="text-xl font-black text-slate-900 tracking-tight">
-          BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH THÁNG <span id="lbl-report-month">08/2026</span>
+          BÁO CÁO KẾT QUẢ ĐỔI TRẢ GIAO DỊCH THÁNG <span id="lbl-report-month">06/2026</span>
         </h2>
         <p class="text-xs text-slate-500 mt-1">P. Kiểm soát - SVN | Ngày tạo: <span id="lbl-today-date">13/08/2026</span></p>
-        <p id="report-intro" class="text-xs text-slate-600 mt-3 italic">
+        <p id="report-intro" class="text-xs text-slate-600 mt-3 italic leading-relaxed">
           Dear các anh chị Siêu Thị,<br>
-          Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch Tháng <span id="lbl-intro-month">8/2026</span>.
+          Phòng Kiểm Soát Chất Lượng xin gửi tới các siêu thị Báo Cáo Kết Quả Thực Hiện Đổi Trả giao dịch Tháng <span id="lbl-intro-month">6/2026</span>.
         </p>
       </div>
 
@@ -346,50 +346,75 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
         <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
           <p class="text-[11px] font-bold text-slate-500 uppercase">Tổng Đơn Đổi Trả</p>
-          <p id="val-total-orders" class="text-2xl font-black text-slate-900 mt-1">0</p>
+          <p id="val-total-orders" class="text-2xl font-black text-slate-900 mt-1">237</p>
         </div>
         <div class="bg-sky-50 border border-sky-200 p-4 rounded-xl">
           <p class="text-[11px] font-bold text-sky-600 uppercase">Do Khách</p>
-          <p id="val-cust-orders" class="text-2xl font-black text-sky-600 mt-1">0</p>
-          <p id="val-cust-percent" class="text-[10px] text-sky-500 font-semibold">0%</p>
+          <p id="val-cust-orders" class="text-2xl font-black text-sky-600 mt-1">165</p>
+          <p id="val-cust-percent" class="text-[10px] text-sky-500 font-semibold">69.6%</p>
         </div>
         <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
           <p class="text-[11px] font-bold text-rose-600 uppercase">Do Siêu Thị</p>
-          <p id="val-store-orders" class="text-2xl font-black text-rose-600 mt-1">0</p>
-          <p id="val-store-percent" class="text-[10px] text-rose-500 font-semibold">0%</p>
+          <p id="val-store-orders" class="text-2xl font-black text-rose-600 mt-1">58</p>
+          <p id="val-store-percent" class="text-[10px] text-rose-500 font-semibold">24.5%</p>
         </div>
         <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
           <p class="text-[11px] font-bold text-amber-600 uppercase">Lý Do Khác</p>
-          <p id="val-other-orders" class="text-2xl font-black text-amber-600 mt-1">0</p>
-          <p id="val-other-percent" class="text-[10px] text-amber-500 font-semibold">0%</p>
+          <p id="val-other-orders" class="text-2xl font-black text-amber-600 mt-1">14</p>
+          <p id="val-other-percent" class="text-[10px] text-amber-500 font-semibold">5.9%</p>
         </div>
       </div>
 
-      <!-- NHẬN XÉT CHI TIẾT -->
+      <!-- NHẬN XÉT CHI TIẾT (ĐÃ NÂNG CẤP PHÂN TÍCH LOGIC SÂU) -->
       <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed">
         <h4 class="font-bold text-slate-900 flex items-center gap-1.5 uppercase text-[11px]">
           <i class="fa-solid fa-chart-line text-amber-500"></i> Nhận Xét & Đánh Giá Chi Tiết:
         </h4>
-        <ul class="list-disc pl-5 space-y-1.5">
-          <li><b>Tổng quan:</b> Toàn hệ thống ghi nhận tổng cộng <b id="txt-sum-total">0 đơn đổi trả</b> trong tháng.</li>
-          <li><b>Phân tích nguyên nhân:</b> Nguyên nhân chính chiếm tỷ lệ cao nhất là <b id="txt-main-reason">...</b>.</li>
-          <li><b>Đơn vị cần lưu ý:</b> Top các siêu thị có số lượng đơn đổi trả cao nhất gồm: <b id="txt-top-stores">Chưa có dữ liệu</b>.</li>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><b>Tổng quan:</b> Toàn hệ thống ghi nhận tổng cộng <b id="txt-sum-total" class="text-slate-900">237 đơn đổi trả</b> trong tháng.</li>
+          <li><b>Đánh giá tương quan & Rủi ro:</b> <span id="txt-risk-assessment">...</span></li>
+          <li><b>Phân tích nguyên nhân chính:</b> <span id="txt-main-reason">...</span></li>
+          <li><b>Đơn vị cần lưu ý:</b> Top 3 siêu thị có số lượng đơn đổi trả cao nhất gồm: <b id="txt-top-stores" class="text-rose-600">...</b>, chiếm tổng cộng <b id="txt-top3-share" class="text-rose-700">0%</b> toàn hệ thống.</li>
         </ul>
       </div>
 
-      <!-- KHUYẾN NGHỊ SMART LOGIC -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-        <div class="bg-amber-50/60 border border-amber-200 p-3.5 rounded-xl">
-          <p class="font-bold text-amber-800 flex items-center gap-1 mb-1">
-            <i class="fa-solid fa-triangle-exclamation"></i> Nguyên nhân trọng tâm:
-          </p>
-          <p id="txt-recommend-reason" class="text-amber-900 leading-relaxed">Cần theo dõi sát sao tình hình đổi trả phát sinh tại các đơn vị.</p>
+      <!-- KHUYẾN NGHỊ SMART LOGIC & LỜI KHUYÊN CHI TIẾT -->
+      <div class="space-y-4">
+        <h4 class="font-bold text-slate-900 flex items-center gap-1.5 uppercase text-[11px]">
+          <i class="fa-solid fa-lightbulb text-amber-500"></i> Khuyến Nghị & Giải Pháp Cụ Thể:
+        </h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- Cột Lời khuyên Theo Nguyên Nhân -->
+          <div class="bg-amber-50/70 border border-amber-200 p-4 rounded-xl space-y-2">
+            <p class="font-bold text-amber-900 flex items-center gap-1 border-b border-amber-200 pb-2">
+              <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Nguyên nhân trọng tâm & Hướng xử lý:
+            </p>
+            <div id="txt-recommend-reason" class="text-amber-950 leading-relaxed space-y-1">
+              Cần theo dõi sát sao tình hình đổi trả phát sinh tại các đơn vị.
+            </div>
+          </div>
+
+          <!-- Cột Lời khuyên Cho Nhóm Siêu Thị Điểm Nóng -->
+          <div class="bg-sky-50/70 border border-sky-200 p-4 rounded-xl space-y-2">
+            <p class="font-bold text-sky-900 flex items-center gap-1 border-b border-sky-200 pb-2">
+              <i class="fa-solid fa-bullseye text-sky-600"></i> Đơn vị kiểm soát & Chỉ thị hành động:
+            </p>
+            <div id="txt-recommend-store" class="text-sky-950 leading-relaxed space-y-1">
+              Ưu tiên hỗ trợ và kiểm tra trực tiếp tại các siêu thị thuộc nhóm phát sinh nhiều đơn nhất.
+            </div>
+          </div>
         </div>
-        <div class="bg-sky-50/60 border border-sky-200 p-3.5 rounded-xl">
-          <p class="font-bold text-sky-800 flex items-center gap-1 mb-1">
-            <i class="fa-solid fa-bullseye"></i> Đơn vị kiểm soát:
+
+        <!-- QUY ĐỊNH BẮT BUỘC TOÀN HỆ THỐNG -->
+        <div class="bg-rose-50/60 border border-rose-200 p-4 rounded-xl text-xs space-y-2">
+          <p class="font-bold text-rose-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-exclamation text-rose-600"></i> Các siêu thị lưu ý bắt buộc:
           </p>
-          <p id="txt-recommend-store" class="text-sky-900 leading-relaxed">Ưu tiên hỗ trợ và kiểm tra trực tiếp tại các siêu thị thuộc nhóm phát sinh nhiều đơn nhất.</p>
+          <ul class="list-disc pl-5 text-rose-900 space-y-1.5 leading-relaxed">
+            <li><b>Tuân thủ và thực hiện đúng quy trình thu ngân khi thanh toán:</b> 100% in hóa đơn sau khi khách hàng đã thanh toán (Áp dụng cả đơn online và offline).</li>
+            <li><b>Kiểm tra kỹ nguyên nhân lỗi sản phẩm:</b> Thu ngân/NVBH kiểm tra kỹ bao bì, date, lỗi tem giá trước khi tiến hành tạo đơn đổi trả trên hệ thống POS/Lark Base.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -397,17 +422,17 @@
 
 </div>
 
-<!-- SCRIPT XỬ LÝ (MÃ CHÍNH XÁC CỦA CHỊ) -->
+<!-- SCRIPT XỬ LÝ NÂNG CẤP (TƯƠNG THÍCH HOÀN TOÀN VỚI MÃ CỦA CHỊ) -->
 <script>
 let pieChartInstance = null;
 
-// Hàm xử lý chỉ chạy khi bấm nút "CẬP NHẬT LẠI KẾT QUẢ & BÁO CÁO"
+// Hàm xử lý chạy khi bấm "CẬP NHẬT LẠI KẾT QUẢ & BÁO CÁO"
 function renderReportAndCharts() {
   // 1. Lấy thông tin Tháng & Năm từ Bộ lọc
   const monthSelect = document.getElementById('filter-month') || document.getElementById('select-month');
   const yearSelect = document.getElementById('filter-year') || document.getElementById('select-year');
   
-  const selectedMonth = monthSelect ? monthSelect.value.padStart(2, '0') : '08';
+  const selectedMonth = monthSelect ? monthSelect.value.padStart(2, '0') : '06';
   const selectedYear = yearSelect ? yearSelect.value : '2026';
 
   // 2. Cập nhật tiêu đề báo cáo
@@ -418,7 +443,7 @@ function renderReportAndCharts() {
   document.getElementById('lbl-today-date').innerText = 
     `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-  // 3. Lấy số liệu tổng hợp từ các ô Input (hoặc từ mảng dữ liệu nhập)
+  // 3. Lấy số liệu tổng hợp từ các ô Input
   const custOrders = parseInt(document.getElementById('input-cust-orders')?.value || 0);
   const storeOrders = parseInt(document.getElementById('input-store-orders')?.value || 0);
   const otherOrders = parseInt(document.getElementById('input-other-orders')?.value || 0);
@@ -440,34 +465,81 @@ function renderReportAndCharts() {
 
   document.getElementById('txt-sum-total').innerText = `${totalOrders} đơn đổi trả`;
 
-  // 5. Đánh giá Smart Logic về nguyên nhân chiếm ưu thế
+  // 5. Lấy dữ liệu Top 3 Siêu thị từ các ô Input Top 1, Top 2, Top 3
+  const t1Name = document.getElementById('top1-name')?.value || 'SKK Trần Đăng Ninh';
+  const t1Count = parseInt(document.getElementById('top1-count')?.value || 0);
+  const t2Name = document.getElementById('top2-name')?.value || 'SKK Thái Hà';
+  const t2Count = parseInt(document.getElementById('top2-count')?.value || 0);
+  const t3Name = document.getElementById('top3-name')?.value || 'SKK Mandarin';
+  const t3Count = parseInt(document.getElementById('top3-count')?.value || 0);
+
+  // Cập nhật khối thẻ hiển thị Top 3 bên trên
+  document.getElementById('disp-top1-name').innerText = t1Name;
+  document.getElementById('disp-top1-count').innerText = `${t1Count} đơn`;
+  document.getElementById('disp-top2-name').innerText = t2Name;
+  document.getElementById('disp-top2-count').innerText = `${t2Count} đơn`;
+  document.getElementById('disp-top3-name').innerText = t3Name;
+  document.getElementById('disp-top3-count').innerText = `${t3Count} đơn`;
+
+  const top3Sum = t1Count + t2Count + t3Count;
+  const top3Pct = totalOrders > 0 ? ((top3Sum / totalOrders) * 100).toFixed(1) : '0.0';
+
+  document.getElementById('txt-top-stores').innerText = `${t1Name} (${t1Count} đơn), ${t2Name} (${t2Count} đơn), ${t3Name} (${t3Count} đơn)`;
+  document.getElementById('txt-top3-share').innerText = `${top3Pct}%`;
+
+  // =========================================================
+  // THUẬT TOÁN LOGIC PHÂN TÍCH CHUYÊN SÂU VÀ LỜI KHUYÊN CHI TIẾT
+  // =========================================================
+
+  let riskText = "";
   let mainReasonText = "";
-  let recommendText = "";
+  let recommendReasonHTML = "";
+  let recommendStoreHTML = "";
 
-  if (custOrders >= storeOrders && custOrders >= otherOrders) {
-    mainReasonText = `Do khách với ${custOrders} đơn (${custPct}%). Tiếp theo là Do Siêu thị (${storePct}%) và Lý do khác (${otherPct}%).`;
-    recommendText = "Cần tăng cường tư vấn chi tiết về tính năng, công dụng và hạn dùng sản phẩm để giảm thiểu tỷ lệ khách hàng đổi trả sau khi mua.";
-  } else if (storeOrders >= custOrders && storeOrders >= otherOrders) {
-    mainReasonText = `Do Siêu thị với ${storeOrders} đơn (${storePct}%). Tiếp theo là Do Khách (${custPct}%) và Lý do khác (${otherPct}%).`;
-    recommendText = "Cần Siêu thị rà soát lại quy trình thu ngân, kiểm kê hàng hóa tại quầy và tuân thủ chặt chẽ việc kiểm tra tem nhãn/date trước khi xuất hóa đơn.";
+  // A. Đánh giá tỷ lệ rủi ro lỗi Siêu Thị (Nội bộ)
+  if (parseFloat(storePct) >= 30) {
+    riskText = `Tỷ lệ đổi trả do lỗi Siêu thị đang ở mức <b class="text-rose-600">BÁO ĐỘNG CAO (${storePct}%)</b>. Cần lập tức rà soát lại khâu đào tạo nhân sự, quy trình kiểm date và thao tác tính tiền.`;
+  } else if (parseFloat(storePct) >= 20) {
+    riskText = `Tỷ lệ lỗi do Siêu thị chiếm <b class="text-amber-600">${storePct}%</b> (ở mức cần lưu ý). Cần siết chặt kiểm tra tem giá và đối soát hóa đơn trước khi giao sản phẩm.`;
   } else {
-    mainReasonText = `Lý do khác với ${otherOrders} đơn (${otherPct}%).`;
-    recommendText = "Cần phối hợp bộ phận Vận chuyển/Kho để kiểm tra chất lượng đóng gói và luồng giao hàng.";
+    riskText = `Tỷ lệ lỗi phát sinh từ phía Siêu thị duy trì mức an toàn <b class="text-emerald-600">${storePct}%</b>. Phần lớn các đơn xuất phát từ nhu cầu chủ quan của Khách hàng.`;
+  }
+  document.getElementById('txt-risk-assessment').innerHTML = riskText;
+
+  // B. Xác định nguyên nhân chính & Lời khuyên trọng tâm
+  if (custOrders >= storeOrders && custOrders >= otherOrders) {
+    mainReasonText = `Nguyên nhân chính chiếm tỷ lệ cao nhất là <b>Do Khách</b> với <b>${custOrders} đơn (${custPct}%)</b>. Tiếp theo là Do Siêu thị (${storePct}%) và Lý do khác (${otherPct}%).`;
+    
+    recommendReasonHTML = `
+      <p>• <b>Tăng cường tư vấn chi tiết:</b> Nhân viên tư vấn kỹ về tính năng, công dụng, thành phần, hạn dùng và hướng dẫn sử dụng sản phẩm để giảm thiểu việc khách mua sai nhu cầu.</p>
+      <p>• <b>Hướng dẫn kiểm tra tại quầy:</b> Nhắc khách kiểm tra kỹ bao bì/sản phẩm trước khi thanh toán, đặc biệt với mặt hàng đồ dùng hoặc mỹ phẩm.</p>
+    `;
+  } else if (storeOrders >= custOrders && storeOrders >= otherOrders) {
+    mainReasonText = `Nguyên nhân chính chiếm tỷ lệ cao nhất là <b>Do Siêu Thị</b> với <b>${storeOrders} đơn (${storePct}%)</b>. Đây là nguyên nhân trực tiếp làm ảnh hưởng trải nghiệm mua sắm của khách.`;
+
+    recommendReasonHTML = `
+      <p>• <b>Rà soát quy trình Thu ngân:</b> Đào tạo lại thao tác quét mã vạch, kiểm tra chênh lệch giá niêm yết trên kệ và giá trên POS.</p>
+      <p>• <b>Quản lý Date & Tem giá:</b> Thực hiện xoay vòng hàng hóa (FIFO), kiểm tra hàng cận date hằng ngày để loại bỏ sản phẩm không đạt tiêu chuẩn.</p>
+    `;
+  } else {
+    mainReasonText = `Nguyên nhân chiếm tỷ lệ cao nhất là <b>Lý Do Khác</b> với <b>${otherOrders} đơn (${otherPct}%)</b>.`;
+
+    recommendReasonHTML = `
+      <p>• <b>Kiểm tra khâu Vận chuyển:</b> Làm việc lại với bộ phận Giao hàng/Kho để đảm bảo chất lượng đóng gói, tránh va đập vỡ hỏng hàng hóa.</p>
+    `;
   }
 
-  document.getElementById('txt-main-reason').innerText = mainReasonText;
-  document.getElementById('txt-recommend-reason').innerText = recommendText;
+  document.getElementById('txt-main-reason').innerHTML = mainReasonText;
+  document.getElementById('txt-recommend-reason').innerHTML = recommendReasonHTML;
 
-  // 6. Lấy dữ liệu Top Siêu Thị Đổi Trả Cao
-  // Giả định hàm getTopStoresData() trả về danh sách top siêu thị đã nhập
-  const topStores = typeof getTopStoresData === 'function' ? getTopStoresData() : [];
-  if (topStores.length > 0) {
-    const topStr = topStores.map(s => `${s.name} (${s.count} đơn)`).join(', ');
-    document.getElementById('txt-top-stores').innerText = topStr;
-    document.getElementById('txt-recommend-store').innerText = `Ưu tiên hỗ trợ và kiểm tra trực tiếp tại ${topStores[0].name} để khắc phục nguyên nhân phát sinh đơn.`;
-  }
+  // C. Lời khuyên cụ thể cho Đơn vị kiểm soát (Top Siêu Thị)
+  recommendStoreHTML = `
+    <p>• <b>Đơn vị kiểm soát trực tiếp:</b> Ưu tiên hỗ trợ và kiểm tra trực tiếp tại <b>${t1Name}</b> để khắc phục triệt để các nguyên nhân phát sinh đơn.</p>
+    <p>• <b>Giám sát định kỳ:</b> Yêu cầu Cửa hàng trưởng của <b>${t2Name}</b> và <b>${t3Name}</b> rà soát nhật ký đổi trả trên Lark Base, báo cáo giải trình chi tiết về Phòng QC.</p>
+  `;
+  document.getElementById('txt-recommend-store').innerHTML = recommendStoreHTML;
 
-  // 7. Render lại Biểu Đồ Tròn (Pie Chart) chỉ khi bấm Cập nhật
+  // 6. Cập nhật Biểu Đồ Tròn (Pie Chart)
   updatePieChart(custOrders, storeOrders, otherOrders);
 }
 
@@ -506,6 +578,24 @@ function updatePieChart(cust, store, other) {
     }
   });
 }
+
+// Hàm sao chép văn bản báo cáo
+function copyReportText() {
+  const reportEl = document.getElementById('report-content-area');
+  if (!reportEl) return;
+  
+  const textToCopy = reportEl.innerText;
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    alert('Đã sao chép toàn bộ mẫu báo cáo vào bộ nhớ tạm!');
+  }).catch(err => {
+    console.error('Lỗi sao chép: ', err);
+  });
+}
+
+// Tự động chạy tạo báo cáo ban đầu khi tải trang
+document.addEventListener('DOMContentLoaded', () => {
+  renderReportAndCharts();
+});
 </script>
         <!-- TAB 3: BÁO CÁO CHẤM ĐIỂM DỊCH VỤ CÁC SIÊU THỊ -->
 <div id="dichvu" class="content-section p-8 space-y-6">
